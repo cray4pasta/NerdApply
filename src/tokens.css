@@ -1,0 +1,51 @@
+/* Design tokens — extracted from Nerd Apply's own foundations, see docs/03-DESIGN.md section 3.
+   Semantic names only. No component or screen should ever use a raw value instead of one of
+   these. If a value is missing, add a token here rather than inlining. */
+
+:root {
+  /* confirmed from Nerd Apply */
+  --surface: #ffffff;
+  --ink: #181d27;
+  --brand: #5b5b98;
+
+  /* derived from --ink, cool ramp */
+  --ink-2: #4a5163;
+  --ink-3: #656c7f;
+  --rule: #e4e6ec;
+
+  /* derived from --brand */
+  --brand-hover: #4d4d85;
+  --brand-tint: #efeff6;
+
+  /* app chrome — barely-there cool tint so cards separate from the page without a new hue */
+  --paper: #f7f7fa;
+
+  /* semantic flag — the only warm value in the system, reserved for Needs Review + warnings */
+  --flag: #9c5a3c;
+  --flag-bg: #f7ede8;
+
+  /* radius — not yet extracted from a live Nerd Apply page; using the documented default */
+  --r-control: 6px;
+  --r-card: 8px;
+
+  /* spacing — 8px base, every gap a multiple */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* type scale */
+  --text-12: 12px;
+  --text-14: 14px;
+  --text-15: 15px;
+  --text-16: 16px; /* added: design doc calls for a 16px serif notes textarea, not in the base scale */
+  --text-18: 18px;
+  --text-22: 22px;
+  --text-28: 28px;
+  --text-40: 40px;
+}

@@ -1,3 +1,21 @@
+@import './tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Albert Sans', system-ui, sans-serif;
+  }
+
+  * {
+    border-color: var(--rule);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
