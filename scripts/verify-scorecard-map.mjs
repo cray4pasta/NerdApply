@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { normalizeScorecardSchool } from '../src/lib/scorecard-map.js'
+
+const raw = JSON.parse(
+  readFileSync(new URL('./fixtures/scorecard-school.json', import.meta.url), 'utf8')
+)
+const school = normalizeScorecardSchool(raw, {
+  queriedSlugs: ['design'],
+  tagsBySlug: {},
+  unitIdToSlug: {},
+  lastVerified: '2026-09-15',
+})
+
+assert.equal(school.id, '166027')
+assert.equal(school.name, 'Harvard University')
+assert.equal(school.ownership, 'private')
+assert.equal(school.setting, 'city')
+assert.equal(school.admit_rate, 0.03)
+assert.equal(school.sat_p25, 1490)
+assert.equal(school.sat_p75, 1580)
+assert.deepEqual(school.programs, ['design'])
+assert.equal(school.program_names.design, 'Design and Applied Arts')
+assert.equal(school.program_awards.design, 12)
+assert.equal(school.source, 'College Scorecard (live)')
+assert.equal(school.last_verified, '2026-09-15')
+console.log('verify-scorecard-map ok')

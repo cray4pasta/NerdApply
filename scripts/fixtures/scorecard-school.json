@@ -1,0 +1,50 @@
+{
+  "id": 166027,
+  "school": {
+    "name": "Harvard University",
+    "city": "Cambridge",
+    "state": "MA",
+    "ownership": 2,
+    "locale": 12,
+    "school_url": "https://www.harvard.edu/",
+    "minority_serving": { "historically_black": 0 }
+  },
+  "location": { "lat": 42.3744, "lon": -71.1182 },
+  "latest": {
+    "student": { "size": 7000 },
+    "admissions": {
+      "admission_rate": { "overall": 0.03 },
+      "sat_scores": {
+        "25th_percentile": { "critical_reading": 730, "math": 760 },
+        "75th_percentile": { "critical_reading": 780, "math": 800 }
+      }
+    },
+    "cost": {
+      "tuition": { "in_state": 54000, "out_of_state": 54000 },
+      "roomboard": { "oncampus": 18000 },
+      "booksupply": 1000,
+      "net_price": {
+        "private": {
+          "by_income_level": {
+            "0-30000": 1000,
+            "30001-48000": 2000,
+            "48001-75000": 8000,
+            "75001-110000": 20000,
+            "110001-plus": 40000
+          }
+        }
+      }
+    },
+    "completion": { "rate_suppressed": { "four_year": 0.97 } },
+    "programs": {
+      "cip_4_digit": [
+        {
+          "code": "5004",
+          "title": "Design and Applied Arts",
+          "credential": { "level": 3 },
+          "counts": { "ipeds_awards2": 12 }
+        }
+      ]
+    }
+  }
+}
