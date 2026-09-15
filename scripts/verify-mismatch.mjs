@@ -47,4 +47,30 @@ const list = buildList({
 
 assert.equal(list.some((s) => s.id === 'harvard'), false)
 assert.equal(list.some((s) => s.id === 'open-design'), true)
+
+const smallProgram = {
+  ...openDesign,
+  id: 'small-design',
+  name: 'Small Design College',
+  program_awards: { design: 10 },
+}
+const largeProgram = {
+  ...openDesign,
+  id: 'large-design',
+  name: 'Large Design College',
+  sat_p25: 730,
+  program_awards: { design: 400 },
+}
+const ranked = buildList({
+  schools: [harvard, smallProgram, largeProgram],
+  criteria: [{ id: 'c1', category: 'academic_interest', value: 'design', strength: 'required' }],
+  income_band: '75001-110000',
+  max_out_of_pocket: 25000,
+  home_state: 'PA',
+  academic: { sat: 600, gpa: 3.0 },
+  priorityOrder: ['program', 'affordability', 'proximity', 'admissions_realism', 'environment', 'support'],
+})
+assert.equal(ranked.some((s) => s.id === 'harvard'), false)
+assert.ok(ranked.findIndex((s) => s.id === 'large-design') < ranked.findIndex((s) => s.id === 'small-design'))
+
 console.log('verify-mismatch ok')

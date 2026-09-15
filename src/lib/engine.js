@@ -142,6 +142,12 @@ function dimensionContributions(school, ctx) {
     if (school.programs?.includes(c.value)) {
       programPoints += (hasSpecialty ? 25 : 10) * strengthOf(c)
     }
+    const awards = school.program_awards?.[c.value]
+    if (awards != null && ctx.awardsTerciles) {
+      if (awards >= ctx.awardsTerciles.high) programPoints += 15 * strengthOf(c)
+      else if (awards >= ctx.awardsTerciles.mid) programPoints += 8 * strengthOf(c)
+      else programPoints += 3 * strengthOf(c)
+    }
   }
 
   let proximityPoints = 0
@@ -194,6 +200,18 @@ function dimensionContributions(school, ctx) {
     admissions_realism: admissionsPoints,
     environment: environmentPoints,
     support: supportPoints,
+  }
+}
+
+function awardsTerciles(schools, slugs) {
+  const values = schools
+    .map((s) => Math.max(0, ...slugs.map((slug) => s.program_awards?.[slug] ?? 0)))
+    .filter((n) => n > 0)
+    .sort((a, b) => a - b)
+  if (values.length === 0) return null
+  return {
+    mid: values[Math.floor(values.length / 3)] ?? values[0],
+    high: values[Math.floor((values.length * 2) / 3)] ?? values[values.length - 1],
   }
 }
 
@@ -329,6 +347,8 @@ export function buildList({ schools, criteria, income_band, max_out_of_pocket, h
     })
   )
 
+  const awardsTercileCtx = awardsTerciles(surviving, interestPrograms)
+
   const scored = surviving.map((school) => {
     const { strength, coarse } = academicStrength(school, academic?.sat, academic?.gpa)
     const band = admissionsBand(school.admit_rate, strength)
@@ -349,7 +369,14 @@ export function buildList({ schools, criteria, income_band, max_out_of_pocket, h
           : 'Admissions data on file is incomplete for this school',
     }
 
-    const fit = fitScore(school, { priorityOrder, criteria, admissions, affordability, ceiling: max_out_of_pocket })
+    const fit = fitScore(school, {
+      priorityOrder,
+      criteria,
+      admissions,
+      affordability,
+      ceiling: max_out_of_pocket,
+      awardsTerciles: awardsTercileCtx,
+    })
     const totalAnnualCost =
       school.cost_of_attendance != null
         ? school.cost_of_attendance.tuition_in_state + school.cost_of_attendance.room_board + school.cost_of_attendance.books_personal
