@@ -1,79 +1,143 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import NotesStep from './components/NotesStep.jsx'
 import CriteriaStep from './components/CriteriaStep.jsx'
-import { extractFallback } from './lib/extract.js'
+import PrioritiesStep from './components/PrioritiesStep.jsx'
+import ListStep from './components/ListStep.jsx'
+import { extractCriteria } from './lib/extract.js'
+import { buildList } from './lib/engine.js'
+import { getColleges } from './lib/colleges.js'
+import { getRationales } from './lib/rationale.js'
+import { assertList } from './lib/guardrails.js'
 
-const LAW_NOTES = 'wants to pursue law but not sure. SAT 1500, Pennsylvania, far from home.'
-const SHORT_NOTES =
-  'Interested in nursing but may change direction. Needs strong financial support. Close-knit, not too large. Driving distance. Anxious about reaches.'
+const DEFAULT_ORDER = [
+  'affordability',
+  'program',
+  'proximity',
+  'admissions_realism',
+  'environment',
+  'support',
+]
 
 export default function App() {
-  const [notes, setNotes] = useState(LAW_NOTES)
-  const extraction = useMemo(() => extractFallback(notes), [notes])
-  const [criteria, setCriteria] = useState(extraction.criteria)
-  const [homeState, setHomeState] = useState(extraction.home_state)
+  const [step, setStep] = useState('notes')
+  const [notes, setNotes] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [extraction, setExtraction] = useState(null)
+  const [criteria, setCriteria] = useState([])
+  const [homeState, setHomeState] = useState(null)
   const [incomeBand, setIncomeBand] = useState('75001-110000')
   const [maxOutOfPocket, setMaxOutOfPocket] = useState(25000)
-  const [confirmed, setConfirmed] = useState(false)
+  const [priorityOrder, setPriorityOrder] = useState(DEFAULT_ORDER)
+  const [list, setList] = useState([])
+  const [rationales, setRationales] = useState({})
+  const [notesById, setNotesById] = useState({})
 
-  function load(nextNotes) {
-    const next = extractFallback(nextNotes)
-    setNotes(nextNotes)
-    setCriteria(next.criteria)
-    setHomeState(next.home_state)
-    setConfirmed(false)
+  async function onExtract() {
+    setBusy(true)
+    try {
+      const result = await extractCriteria(notes)
+      setExtraction(result)
+      setCriteria(result.criteria ?? [])
+      setHomeState(result.home_state ?? null)
+      if (result.affordability_signal?.aid_needed) setIncomeBand('30001-48000')
+      setStep('criteria')
+    } finally {
+      setBusy(false)
+    }
   }
 
-  const activeExtraction = { ...extraction, criteria }
+  async function onBuild() {
+    setBusy(true)
+    try {
+      const built = assertList(
+        buildList({
+          schools: getColleges(),
+          criteria,
+          income_band: incomeBand,
+          max_out_of_pocket: maxOutOfPocket,
+          home_state: homeState,
+          academic: extraction?.academic,
+          priorityOrder,
+        })
+      )
+      const sentences = await getRationales(built, criteria)
+      setList(built)
+      setRationales(sentences)
+      setNotesById({})
+      setStep('list')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
-    <div className="mx-auto max-w-wide px-6 py-8">
-      <h1 className="font-display text-22 text-ink">Criteria review</h1>
-      <p className="mt-2 font-sans text-14 text-ink-2">
-        Phrase first, then a one-line paraphrase, then edit and delete together.
-      </p>
-      <div className="mt-4 flex flex-wrap gap-3">
-        <button
-          type="button"
-          className="rounded-control border border-rule bg-surface px-3 py-2 font-sans text-14 text-ink hover:border-brand"
-          onClick={() => load(LAW_NOTES)}
-        >
-          Load law / not sure
-        </button>
-        <button
-          type="button"
-          className="rounded-control border border-rule bg-surface px-3 py-2 font-sans text-14 text-ink hover:border-brand"
-          onClick={() => load(SHORT_NOTES)}
-        >
-          Load short counselor notes
-        </button>
-      </div>
-      <div className="mt-6">
-        <CriteriaStep
-          extraction={activeExtraction}
-          criteria={criteria}
-          setCriteria={setCriteria}
-          incomeBand={incomeBand}
-          setIncomeBand={setIncomeBand}
-          maxOutOfPocket={maxOutOfPocket}
-          setMaxOutOfPocket={setMaxOutOfPocket}
-          homeState={homeState}
-          setHomeState={setHomeState}
-          onContinue={() => setConfirmed(true)}
-        />
-      </div>
-      {confirmed && (
-        <div className="mt-6 rounded-card border border-rule bg-surface p-5">
-          <h2 className="font-sans text-18 font-medium text-ink">Fields the list builder still receives</h2>
-          <p className="mt-1 font-sans text-14 text-ink-2">
-            Confidence and importance are hidden on the table. Category, value, and strength stay on each row.
-          </p>
-          <ul className="mt-3 list-disc space-y-1 pl-5 font-sans text-14 text-ink-2">
-            {criteria.map((c) => (
-              <li key={c.id}>
-                {c.category}: {typeof c.value === 'object' ? JSON.stringify(c.value) : String(c.value)} ({c.strength})
-              </li>
-            ))}
-          </ul>
+    <div className="min-h-full bg-paper px-6 py-8">
+      {step === 'notes' && <NotesStep notes={notes} setNotes={setNotes} onSubmit={onExtract} busy={busy} />}
+
+      {step === 'criteria' && (
+        <div className="mx-auto max-w-wide">
+          <button type="button" className="mb-4 font-sans text-14 text-ink-3 hover:text-ink" onClick={() => setStep('notes')}>
+            Back to notes
+          </button>
+          <h1 className="mb-4 font-display text-22 text-ink">Criteria review</h1>
+          <CriteriaStep
+            extraction={extraction}
+            criteria={criteria}
+            setCriteria={setCriteria}
+            incomeBand={incomeBand}
+            setIncomeBand={setIncomeBand}
+            maxOutOfPocket={maxOutOfPocket}
+            setMaxOutOfPocket={setMaxOutOfPocket}
+            homeState={homeState}
+            setHomeState={setHomeState}
+            onContinue={() => setStep('priorities')}
+            continueLabel="Looks right — continue"
+          />
+        </div>
+      )}
+
+      {step === 'priorities' && (
+        <div>
+          <button
+            type="button"
+            className="mx-auto mb-4 block max-w-priorities font-sans text-14 text-ink-3 hover:text-ink"
+            onClick={() => setStep('criteria')}
+          >
+            Back to criteria
+          </button>
+          <PrioritiesStep order={priorityOrder} setOrder={setPriorityOrder} onContinue={onBuild} />
+          {busy && <p className="mx-auto mt-4 max-w-priorities font-sans text-14 text-ink-2">Building the list…</p>}
+        </div>
+      )}
+
+      {step === 'list' && (
+        <div>
+          <div className="mx-auto mb-6 flex max-w-wide flex-wrap gap-4">
+            <button type="button" className="font-sans text-14 text-ink-3 hover:text-ink" onClick={() => setStep('criteria')}>
+              Edit criteria
+            </button>
+            <button type="button" className="font-sans text-14 text-ink-3 hover:text-ink" onClick={() => setStep('priorities')}>
+              Edit ranking
+            </button>
+            <button
+              type="button"
+              className="font-sans text-14 text-ink-3 hover:text-ink"
+              onClick={() => {
+                setStep('notes')
+                setList([])
+              }}
+            >
+              Start over
+            </button>
+          </div>
+          <ListStep
+            list={list}
+            criteria={criteria}
+            rationales={rationales}
+            notesById={notesById}
+            setNotesById={setNotesById}
+            onRemove={(id) => setList((prev) => prev.filter((s) => s.id !== id))}
+          />
         </div>
       )}
     </div>

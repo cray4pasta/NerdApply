@@ -69,21 +69,11 @@ function stripFences(text) {
   return text.replace(/^```(json)?/i, '').replace(/```$/, '').trim()
 }
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'method_not_allowed' })
-    return
-  }
-
-  const { mode, ...payload } = req.body ?? {}
+export async function runLlm({ mode, ...payload }) {
   const key = process.env.GEMINI_API_KEY
-  if (!key) {
-    res.status(503).json({ error: 'no_key' })
-    return
-  }
+  if (!key) return { status: 503, data: { error: 'no_key' } }
 
   const prompt = mode === 'extract' ? extractPrompt(payload.notes) : rationalePrompt(payload.criteria, payload.schools)
-  // New AI Studio keys cannot call retired 2.5 Flash; the API names 3.6 Flash as the replacement.
   const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash'
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), 10000)
@@ -104,20 +94,27 @@ export default async function handler(req, res) {
     const data = await r.json()
     if (data.error) {
       console.error('[api/llm] Gemini error', data.error)
-      res.status(502).json({ error: 'upstream_failed', detail: data.error.message })
-      return
+      return { status: 502, data: { error: 'upstream_failed', detail: data.error.message } }
     }
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text
     if (!text) {
       console.error('[api/llm] empty response from Gemini', data)
-      res.status(502).json({ error: 'empty_response' })
-      return
+      return { status: 502, data: { error: 'empty_response' } }
     }
-    res.status(200).json(JSON.parse(stripFences(text)))
+    return { status: 200, data: JSON.parse(stripFences(text)) }
   } catch (err) {
     console.error('[api/llm] call failed', err)
-    res.status(502).json({ error: 'upstream_failed' })
+    return { status: 502, data: { error: 'upstream_failed' } }
   } finally {
     clearTimeout(timer)
   }
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'method_not_allowed' })
+    return
+  }
+  const result = await runLlm(req.body ?? {})
+  res.status(result.status).json(result.data)
 }
