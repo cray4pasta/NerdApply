@@ -1,0 +1,97 @@
+{
+  "source": "fallback",
+  "cases": [
+    {
+      "id": "journalism-to-sports",
+      "title": "Journalism list, then sports",
+      "notes": "Marcus is a Pennsylvania junior outside Pittsburgh. Interested in journalism. 3.5 GPA, 1280 SAT. Plays football. Family is fine with a mix of states.",
+      "followup": "I think he wants to pursue sports.",
+      "why_hard": "Counselors re-aim the academic focus in chat after a list exists, without restating SAT, GPA, or football.",
+      "expect": {
+        "action": "revise_criteria",
+        "new_interest": "sport",
+        "drop_interest": "journalism",
+        "keep": [
+          "sat",
+          "gpa",
+          "football"
+        ],
+        "message_re": "sports program"
+      }
+    },
+    {
+      "id": "switch-to-med-school",
+      "title": "Same journalism student, switch to med school",
+      "notes": "Marcus is a Pennsylvania junior outside Pittsburgh. Interested in journalism. 3.5 GPA, 1280 SAT. Plays football. Family is fine with a mix of states.",
+      "followup": "he wants to switch to med school",
+      "why_hard": "Counselors say med school, not medical school, and switch to X rather than switch the major. Undergrad path should be biology / pre-med, not a graduate MD program.",
+      "expect": {
+        "action": "revise_criteria",
+        "new_interest": "bio",
+        "drop_interest": "journalism",
+        "keep": [
+          "sat",
+          "gpa",
+          "football"
+        ],
+        "message_re": "Biology"
+      }
+    },
+    {
+      "id": "cs-to-nursing-keep-aid-oos",
+      "title": "CS, far from home, needs aid → nursing",
+      "notes": "Aisha, Texas. 1320 SAT, 3.7 GPA. Computer science. Wants to go far from home, out of state. Needs financial aid — family cannot cover sticker.",
+      "followup": "she wants to switch to nursing",
+      "why_hard": "The new major is easy to hear; the risk is dropping aid-needed and out-of-state because the counselor did not repeat them.",
+      "expect": {
+        "action": "revise_criteria",
+        "new_interest": "nursing",
+        "drop_interest": "computer",
+        "keep": [
+          "sat",
+          "gpa",
+          "aid",
+          "far"
+        ],
+        "message_re": "Nursing"
+      }
+    },
+    {
+      "id": "acting-to-polisci-keep-football",
+      "title": "Acting plus football → political science",
+      "notes": "Jordan, Ohio. 3.6 GPA, 1210 SAT. Wants acting. Plays football. No distance preference on file.",
+      "followup": "he wants to switch to political science",
+      "why_hard": "Football is a campus activity, not a major. Switching the academic focus must not erase the football row.",
+      "expect": {
+        "action": "revise_criteria",
+        "new_interest": "political",
+        "drop_interest": "acting|performing",
+        "keep": [
+          "sat",
+          "gpa",
+          "football"
+        ],
+        "message_re": "Political science"
+      }
+    },
+    {
+      "id": "law-hedge-then-lock",
+      "title": "Not sure about law, then actually law",
+      "notes": "Priya, Virginia. 1400 SAT, 3.8 GPA. Interested in law but not sure. Family wants her close to home.",
+      "followup": "actually law",
+      "why_hard": "The first file hedges. The later chat locks in without 'pursue' or 'interested in' — counselors just say actually law.",
+      "expect": {
+        "action": "revise_criteria",
+        "new_interest": "law",
+        "drop_interest": null,
+        "law_strength": "required",
+        "keep": [
+          "sat",
+          "gpa",
+          "geo"
+        ],
+        "message_re": "Law"
+      }
+    }
+  ]
+}

@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic } from 'lucide-react'
-import Icon from './ui/Icon.jsx'
 
 const PROMPTS = [
   'Build a list of 15 colleges that offer full ride for design programs',
@@ -85,10 +83,7 @@ export default function NotesEntry({ onSend, disabled }) {
           <div className="flex w-full items-center justify-between px-5 pb-5 pt-4">
             <span className="text-12 text-ink-3">Enter to send · Shift+Enter for a new line</span>
 
-            <span className="flex h-create items-center justify-end gap-2">
-              <button type="button" aria-label="Dictate notes" className="inline-flex text-ink-3 hover:text-ink">
-                <Icon icon={Mic} size="sm" />
-              </button>
+            <span className="flex h-create items-center justify-end">
               {hasText && (
                 <button
                   type="submit"

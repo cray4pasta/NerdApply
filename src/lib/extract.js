@@ -35,7 +35,7 @@ const INTEREST_KEYWORDS = [
   [/environmental science|environmental studies|sustainability/i, 'environmental_science'],
   [/engineering/i, 'engineering'],
   [/nursing|\bRN\b/i, 'nursing'],
-  [/pre-?med|premed|medical school|\bdoctor\b|\bmedicine\b/i, 'biology'],
+  [/pre-?med|premed|med(?:ical)? school|\bdoctor\b|\bmedicine\b/i, 'biology'],
   [/\bbiology\b/i, 'biology'],
   [/business|finance|entrepreneur|accounting|economics/i, 'business'],
   [/teaching|\beducation\b/i, 'education'],
@@ -50,6 +50,11 @@ const NOT_A_MAJOR = new Set([
   'basketball',
   'robotics',
   'athletics',
+  'hiking',
+  'outdoors',
+  'outdoor',
+  'mountains',
+  'mountain',
   'club',
   'clubs',
   'aid',
@@ -95,6 +100,7 @@ function addFreeformMajors(notes, criteria, matchedValues) {
   const cues = [
     /interested in ([^.,;\n]+)/gi,
     /wants to (?:study|major in|pursue) ([^.,;\n]+)/gi,
+    /switch(?:ing)? to (?:a |an |the )?([^.,;\n]+)/gi,
     /aiming for (?:a |an )?([^.,;\n]+)/gi,
     /\bmajoring in ([^.,;\n]+)/gi,
     /\b([A-Za-z][A-Za-z\s]{1,28}) major\b/gi,
@@ -406,6 +412,20 @@ export function extractFallback(notes) {
       )
     )
   }
+  const hiking = notes.match(/\bhiking\b|\boutdoors?\b|\bmountains?\b/i)
+  if (hiking) {
+    criteria.push(
+      makeCriterion(
+        'other',
+        'Hiking / outdoors',
+        'hiking',
+        'low',
+        hiking[0],
+        'preferred',
+        'Look for campuses with hiking, outdoor clubs, and mountain access — keep the academic program as it is.'
+      )
+    )
+  }
   const football = notes.match(/plays football|\bfootball\b/i)
   if (football) {
     criteria.push(
@@ -635,6 +655,9 @@ function canonicalProgram(raw) {
   if (/agricult/.test(words)) return 'agriculture'
   if (/\blaw\b/.test(words) || /pre_?law/.test(s)) return 'law'
   if (/politic|public policy|international relations|government/.test(words)) return 'political_science'
+  if (/pre_?med/.test(s) || /\bmedicine\b/.test(words) || /med(?:ical)? school/.test(words) || /\bdoctor\b/.test(words)) {
+    return 'biology'
+  }
   if (/\bbio/.test(words)) return 'biology'
   return null
 }
@@ -714,6 +737,21 @@ export function normalizeAiExtraction(data, notes) {
   for (const fb of fallback.criteria.filter((c) => c.category === 'academic_interest')) {
     if (criteria.some((c) => c.category === 'academic_interest' && c.value === fb.value)) continue
     criteria.push({ ...fb, id: `fb-${fb.id}` })
+  }
+
+  const fbHiking = fallback.criteria.find((c) => c.value === 'hiking')
+  if (fbHiking) {
+    for (const row of criteria) {
+      if (row.category === 'academic_interest' && /hiking|outdoors|mountain/i.test(`${row.value} ${row.label}`)) {
+        row.category = 'other'
+        row.value = 'hiking'
+        row.label = fbHiking.label
+        row.understood = fbHiking.understood
+      }
+    }
+    if (!criteria.some((c) => c.value === 'hiking')) {
+      criteria.push({ ...fbHiking, id: `fb-${fbHiking.id}` })
+    }
   }
 
   const fbFar = fallback.criteria.find((c) => c.category === 'geography' && c.value?.prefer_far)

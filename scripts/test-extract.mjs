@@ -111,6 +111,24 @@ assert(
   'known acting notes should not also invent a freeform major'
 )
 
+function assertPreMedPath(notes, hint) {
+  const extracted = extractFallback(notes)
+  const majors = extracted.criteria.filter((c) => c.category === 'academic_interest')
+  assert(
+    majors.some((c) => c.value === 'biology'),
+    `${hint}: should map to biology / pre-med`
+  )
+  assert(
+    !majors.some((c) => /med[_ ]?school|medical_school/i.test(String(c.value))),
+    `${hint}: should not invent a med-school graduate program`
+  )
+}
+
+assertPreMedPath('he wants to switch to med school', 'switch to med school')
+assertPreMedPath('interested in medical school', 'medical school')
+assertPreMedPath('pre-med student in Pennsylvania', 'pre-med')
+assertPreMedPath('wants to pursue medicine', 'medicine')
+
 const footballNotes = 'Interested in acting and entertainment. Plays football. 3.6 GPA, 1280 SAT.'
 const football = extractFallback(footballNotes)
 assert(
@@ -121,6 +139,35 @@ assert(
   !football.criteria.some((c) => c.value === 'basketball'),
   'football should not be labeled basketball'
 )
+
+function assertHikingIsClub(notes, hint) {
+  const extracted = extractFallback(notes)
+  const hiking = extracted.criteria.find(
+    (c) => c.category === 'other' && (c.value === 'hiking' || /hiking|outdoors/i.test(`${c.label} ${c.value}`))
+  )
+  assert(hiking, `${hint}: hiking should be a campus-life criterion`)
+  assert(/hiking|outdoors/i.test(hiking.label), `${hint}: label should mention hiking or outdoors, got ${hiking.label}`)
+  assert(
+    !extracted.criteria.some((c) => c.category === 'academic_interest' && /hiking|outdoors|mountain/i.test(`${c.value} ${c.label}`)),
+    `${hint}: hiking should not be a major`
+  )
+  return extracted
+}
+
+assertHikingIsClub('new interest is hiking', 'new interest is hiking')
+assertHikingIsClub("she's into hiking now", 'into hiking now')
+assertHikingIsClub('add hiking', 'add hiking')
+assertHikingIsClub('outdoors / mountains', 'outdoors / mountains')
+
+const journalismHiking = assertHikingIsClub(
+  'Pennsylvania junior. Interested in journalism. 3.5 GPA, 1280 SAT. New interest is hiking.',
+  'journalism plus hiking'
+)
+assert(
+  journalismHiking.criteria.some((c) => c.category === 'academic_interest' && c.value === 'journalism'),
+  'journalism plus hiking should keep journalism as the major'
+)
+assertHikingIsClub('Interested in hiking. 3.5 GPA, 1280 SAT.', 'interested in hiking should stay a club, not a major')
 
 console.log(
   'ok',

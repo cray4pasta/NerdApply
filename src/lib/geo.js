@@ -34,6 +34,10 @@ export const STATE_NAMES = {
 // Used when notes ask for a warm climate (Student B, and similar). Not a hard filter.
 export const WARM_STATES = new Set(['FL', 'TX', 'GA', 'SC', 'NC', 'AL', 'MS', 'LA', 'AZ', 'HI', 'CA'])
 
+// Used when notes ask for hiking / mountain access. Prefer these states in the overlay mix
+// and give them a modest ranking bump — not a hard filter. NC is included for the Appalachians.
+export const MOUNTAIN_STATES = new Set(['CO', 'UT', 'VT', 'NH', 'WA', 'OR', 'MT', 'ID', 'WY', 'AK', 'NC'])
+
 // A tiny hand-maintained map of the home state's principal commercial airport, per
 // docs/02-ENGINEERING.md 7.9: "a tiny hand-maintained map of major hubs, not an airline API."
 export const STATE_HUB = {

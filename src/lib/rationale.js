@@ -14,7 +14,9 @@ function templateRationale(school, criteria) {
     : `A ${school.ownership} school with unknown enrollment`
 
   const club = school.clubs ? `, ${String(school.clubs).split(',')[0].trim().toLowerCase()}` : ''
-  return `${schoolPhrase} in ${school.setting} ${school.state} with ${programPhrase}${club}, ${travel}.`
+  const hiking = (criteria ?? []).some((c) => c.value === 'hiking')
+  const hikeBit = hiking ? ', hiking and mountain access' : ''
+  return `${schoolPhrase} in ${school.setting} ${school.state} with ${programPhrase}${hikeBit || club}, ${travel}.`
 }
 
 export function templatesFor(schools, criteria) {

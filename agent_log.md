@@ -1,5 +1,64 @@
 # Agent log
 
+## 2026-09-16 11:52 PT — SAT score follow-ups rebuild the list
+
+**What changed.** After a list already exists, a score update like “her sat score improved to 1650,” “SAT is now 1480,” “his SAT went up to 1520,” or “updated SAT 1400” is treated as a criteria change. The SAT row and the score used for admissions bands both update. GPA, major, football, geography, and aid stay. The list rebuilds. Asking why a named school is a Target still just answers. 1650 is above the SAT maximum of 1600, so the file uses 1600 and the assistant says so instead of ignoring the message. Law lock-in and hiking-as-campus-life follow-ups were left in place.
+
+**Why.** Counselors were correcting a score in chat. The tool only heard major switches, and 1650 was not a valid SAT, so nothing on the list moved.
+
+**What it affects.** Follow-up chat after a list exists, the SAT row on the file, and Likely / Target / Reach (and the mid-50% comparison) on rebuild. Code still picks the schools.
+
+**Checked.** Follow-up and extract tests pass. A rebuild with the updated SAT changed the published score ranges next to each school. The in-app browser tab could not be opened from this session, so the click-through on localhost:5173 was not completed there.
+
+
+## 2026-09-16 11:52 PT — Hiking follow-up changes clubs and mountain locations, not the major
+
+**What changed.** After a list exists, a counselor can say the student has a new interest in hiking (or is into hiking, add hiking, or outdoors / mountains). That rebuilds the list as a campus-life change: hiking/outdoors is added, journalism or whatever major was already on the file stays, and SAT, GPA, and football stay. The spoken line says it is looking for campuses with hiking and mountain access and keeping those facts. Club lines mention hiking. The overlay prefers a small set of mountain states (Colorado, Utah, Vermont, New Hampshire, Washington, Oregon, Montana, Idaho, Wyoming, Alaska, and North Carolina), and ranking gives those states a small bump, the same idea as a warm-climate ask. Sports, med school, “actually law,” and SAT score updates were left in place.
+
+**Why.** Hiking is not a major. Treating it like “pursue sports” or “switch to med school” would have wiped journalism (or biology, CS, and so on) and would not have steered the list toward mountain campuses.
+
+**What it affects.** Follow-up chat after a list exists, keyword reading of hiking/outdoors/mountains, overlay club and campus lines, overlay mix, and a modest ranking bump. Code still picks the schools. Figures on the sheet are still invented stand-ins.
+
+**Checked.** Follow-up, extract, and overlay checks pass. A full rebuild of a journalism file plus “new interest is hiking” kept Programme as journalism, put hiking on every club line and why-it-is-here line, and put three mountain-state schools on the ten-school list (Washington, Utah, Oregon). The in-app browser tool could not attach to localhost:5173 even though the app was serving, so the click-through in the window was not done.
+
+
+## 2026-09-16 11:40 PT — “Actually law” locks in required pre-law
+
+**What changed.** After a list already exists, a short lock-in like “actually law,” “actually it’s law,” “lock in law,” or “set on law now” is treated as a criteria change, not a question or a dead end. Law becomes required undergraduate pre-law, the hedge label goes away, the list rebuilds, and SAT, GPA, geography, and football stay. The assistant says it is locking in law and replacing the hedged row. Asking why a named school is a Target still just answers. Sports and med-school switches still rebuild.
+
+**Why.** Counselors were saying “actually law” to stop hedging. The tool only heard longer phrases like “actually interested,” so the file stayed “not sure” and the list never moved.
+
+**What it affects.** Follow-up chat after a list exists, and the five-case switch eval (all five pass). Code still picks the schools. This is still undergraduate law-related study, not a JD program.
+
+## 2026-09-16 11:36 PDT — Removed the unused dictate-notes mic
+
+**What changed.** Took the microphone / “Dictate notes” control off the empty notes box and the chat prompt. Create and Send still sit on the right of that row. There is no voice feature.
+
+**Why.** The mic was only decorative. It did not listen or type. The counselor asked to remove it everywhere.
+
+**What it affects.** The first notes box and the prompt after notes are sent. Typing, Enter to send, and Create/Send are unchanged. Print, unused older steps, and the rest of the app never had this control.
+
+**Checked on the running app** at localhost:5173. Empty notes had no mic; typing showed Create on the right with no leftover gap. After sending notes, the thread prompt had no mic. Send still posted a follow-up once the profile finished reading.
+
+## 2026-09-16 11:31 PT — Follow-up switch eval, 4 of 5 pass
+
+**What changed.** Added a five-case eval of counselor chat after a list already exists. Four switches rebuilt the list around the new want and kept SAT, GPA, football, aid-needed, and out-of-state. “I think he wants to pursue sports,” “he wants to switch to med school,” “she wants to switch to nursing,” and “he wants to switch to political science” all worked. “actually law” was treated as a question, so a hedged law file never locked in and the list did not rebuild.
+
+**Why.** Students keep changing direction in chat. We needed to know whether the tool revises the same file or ignores the new want / starts over.
+
+**What it affects.** Nothing in the live app. Harness is `scripts/run-switch-evals.mjs`. Cases are `evals/switch-cases.json`. Results are `evals/switch-latest.json` and `evals/switch-latest.md`. Catalog rows are still invented stand-ins.
+
+**Gemini.** Quota blocked case invention and judging. The five cases were written by hand. Extract used keyword fallback, not Gemini. Scores are mechanical. The med-school case passed because that phrasing is already treated as undergraduate biology.
+
+
+## 2026-09-16 11:28 PT — Switch to med school rebuilds around biology
+
+**What changed.** After a list is built, saying the student wants to switch to med school (or medical school, pre-med, or medicine) is treated as a criteria change, not a question. The list updates around undergraduate biology / pre-med, replaces the old major, and keeps SAT, GPA, football, and the rest. “He wants to pursue biology” still rebuilds. Asking why a named school is on the list still just answers.
+
+**Why.** “Med school” was not recognized as the same path as medical school or pre-med, and “switch to” was not treated as a major change, so the follow-up never rebuilt the list.
+
+**What it affects.** Follow-up messages after a list exists, and keyword extraction of pre-med phrasing. Code still picks the schools. This is not a graduate medical program filter.
+
 ## 2026-09-16 11:12 PT — Follow-ups can change the major and rebuild
 
 **What changed.** After a list exists, a message like “I think he wants to pursue sports” is treated as a conversation, not a trivia question. The builder says it will look for a strong sports program, replaces the old major, keeps SAT, GPA, football, and the rest, and rebuilds the table. Asking why a named school is on the list still just answers from the sheet.
@@ -842,4 +901,14 @@ Three smaller adjustments came with it so the step reads consistently. The messa
 **What it affects.** Only that resize control. Column width still has the same min and max. Nothing about students, lists, or chat behaviour changed.
 
 **Checked in the live browser.** The handle is four pixels wide to grab and paints a one-pixel black line while dragging. The previous purple fill is gone.
+
+## 2026-09-16 11:35 PDT — Unknown prompts get a fixed reply; greetings still chat
+
+**What changed.** After a list exists, typing something the tool cannot do — like writing a recommendation letter — now gets this exact reply: “Hmm, that's not something I am currently prepared of doing. I can answer from the list, add a column, or rebuild with different priorities.” Short greetings still get a short, friendly answer. “Hi” and “what’s up” do not use that fallback.
+
+**Why.** Requested. A prompt the product does not understand should say so plainly, without guessing. Small talk should still feel like a conversation.
+
+**What it affects.** Only the chat after a list is on screen. Asking about a school, adding a column, rebuilding, and revising priorities still work the same way. Criteria and ranking steps are unchanged.
+
+**Checked** with the follow-up tests plus a direct check of those phrases: “hi” and “what’s up” classified as chat with a friendly reply; “write me a recommendation letter” got the exact fallback; school questions, “add a campus column,” “too many reaches,” and “put affordability first” stayed on their old paths. A live click-through in the browser tab could not be opened in this session, so the on-screen send was not re-clicked.
 

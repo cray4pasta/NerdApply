@@ -85,13 +85,29 @@ export function listSizeFrom(snapshot) {
   return parseListSize(snapshot?.notes)
 }
 
+function scoreFromCriteria(criteria, prefix) {
+  const row = (criteria ?? []).find((c) => String(c.label).startsWith(prefix))
+  if (row == null) return undefined
+  const n = Number(row.value)
+  return Number.isFinite(n) ? n : undefined
+}
+
+export function academicFrom(snapshot) {
+  const academic = { ...(snapshot?.extraction?.academic ?? {}) }
+  const sat = scoreFromCriteria(snapshot?.criteria, 'SAT')
+  const gpa = scoreFromCriteria(snapshot?.criteria, 'GPA')
+  if (sat != null) academic.sat = sat
+  if (gpa != null) academic.gpa = gpa
+  return academic
+}
+
 export function engineInputs(snapshot, settings) {
   return {
     criteria: snapshot.criteria ?? [],
     income_band: incomeKey(settings?.incomeBand ?? snapshot.incomeBand),
     max_out_of_pocket: parseCap(settings?.maxOop) || snapshot.maxOutOfPocket || 25000,
     home_state: stateAbbr(settings?.homeState) || snapshot.homeState,
-    academic: snapshot.extraction?.academic ?? {},
+    academic: academicFrom(snapshot),
     priorityOrder: priorityKeys(settings?.order),
     listSize: settings?.listSize ?? listSizeFrom(snapshot),
   }

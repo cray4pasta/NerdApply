@@ -1,7 +1,7 @@
 // The heart of the app. Plain code, no AI. Every rule below maps to a numbered section in
 // docs/02-ENGINEERING.md section 7 — when you change a weight or a threshold, say which
 // numbered rule it maps to, per the Cursor rules in docs/04-GUARDRAILS.md 2.3.
-import { travelBurden, WARM_STATES } from './geo.js'
+import { travelBurden, MOUNTAIN_STATES, WARM_STATES } from './geo.js'
 
 const DIMENSIONS = ['affordability', 'program', 'proximity', 'admissions_realism', 'environment', 'support']
 const RANK_WEIGHTS = [1.6, 1.4, 1.2, 1.0, 0.85, 0.7]
@@ -188,6 +188,10 @@ function dimensionContributions(school, ctx) {
     else if (val === 'large' && school.size != null && school.size > 20000) environmentPoints += 10 * strengthOf(c)
     else if (val === 'warm' && WARM_STATES.has(school.state)) environmentPoints += 10 * strengthOf(c)
   }
+
+  // 7.6 — hiking / mountain access is campus fit, not a hard filter. Modest bump, same scale as warm.
+  const hiking = criteria.some((c) => c.value === 'hiking')
+  if (hiking && MOUNTAIN_STATES.has(school.state)) environmentPoints += 10
 
   let supportPoints = 0
   for (const c of supportCriteria) {

@@ -132,6 +132,42 @@ assert.ok(
   'unknown majors must show in Programme, not “not published”'
 )
 
+const hikingNotes =
+  'Pennsylvania junior. Interested in journalism. 3.5 GPA, 1280 SAT. Plays football.\n\nnew interest is hiking'
+const hikingExtract = extractFallback(hikingNotes)
+const hikingCatalog = composeCatalog({
+  notes: hikingNotes,
+  criteria: hikingExtract.criteria,
+  academic: hikingExtract.academic,
+  homeState: hikingExtract.home_state,
+  incomeBand: '75001-110000',
+  cap: 25000,
+  listSize: 10,
+})
+assert.ok(
+  hikingCatalog.hooks.clubs.some((c) => /hiking/i.test(c)),
+  `hiking notes should hook a hiking club, got ${hikingCatalog.hooks.clubs}`
+)
+assert.ok(
+  hikingCatalog.schools.every((s) => /hiking/i.test(s.clubs)),
+  'every overlay club line should mention hiking'
+)
+assert.ok(
+  hikingCatalog.schools.every((s) => !/design-build|design club/i.test(s.clubs)),
+  'hiking notes must not invent design clubs'
+)
+assert.ok(
+  hikingCatalog.schools.every((s) => s.programs?.includes('journalism')),
+  'hiking overlay should keep journalism as the programme'
+)
+const MOUNTAIN_STATES = new Set(['CO', 'UT', 'VT', 'NH', 'WA', 'OR', 'MT', 'ID', 'WY', 'AK', 'NC'])
+const hikingTop10 = hikingCatalog.schools.slice(0, 10)
+const hikingMountainCount = hikingTop10.filter((s) => MOUNTAIN_STATES.has(s.state)).length
+assert.ok(
+  hikingMountainCount >= 3,
+  `hiking overlay should put at least 3 mountain-state schools in the first 10, got ${hikingMountainCount}: ${hikingTop10.map((s) => `${s.name} ${s.state}`).join('; ')}`
+)
+
 console.log('verify-overlay-home ok', {
   unknown: unknownHome.schools.slice(0, 8).map((s) => `${s.name} ${s.state}`),
   pa: paHome.schools.slice(0, 5).map((s) => `${s.name} ${s.state}`),

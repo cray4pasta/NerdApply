@@ -8,7 +8,7 @@ import { buildList } from './lib/engine.js'
 import { assertList } from './lib/guardrails.js'
 import { getRationales } from './lib/rationale.js'
 import { loadSyntheticCatalog } from './lib/synthesize.js'
-import { engineInputs, settingsFromConversation, toTableRow } from './lib/listRows.js'
+import { academicFrom, engineInputs, settingsFromConversation, toTableRow } from './lib/listRows.js'
 import {
   createConversation,
   createSchool,
@@ -20,7 +20,7 @@ import {
   schoolIdForNotes,
   titleFrom,
 } from './lib/caseload.js'
-import { answerFollowup, bumpPriority, classifyFollowup } from './lib/followup.js'
+import { answerFollowup, bumpPriority, chatReply, classifyFollowup, UNKNOWN_FOLLOWUP } from './lib/followup.js'
 
 const CONTINUE_PHRASE =
   /^(continue|yes|yep|yeah|y|ok|okay|sure|looks good(?:[,\s].*)?|looks right|confirm|next|done)$/i
@@ -195,13 +195,25 @@ export default function App() {
   function startBuilding(id, settings, userText, assistantText, snapshotPatch = null) {
     const conv = conversations.find((c) => c.id === id)
     const nextSettings = settings ?? draftSettingsRef.current ?? settingsFromConversation(conv ?? {})
+    const criteria = snapshotPatch?.criteria ?? conv?.criteria ?? []
+    const extraction = {
+      ...(conv?.extraction ?? {}),
+      ...(snapshotPatch?.extraction ?? {}),
+      academic: academicFrom({
+        criteria,
+        extraction: {
+          academic: {
+            ...(conv?.extraction?.academic ?? {}),
+            ...(snapshotPatch?.extraction?.academic ?? {}),
+          },
+        },
+      }),
+      list_size: nextSettings.listSize ?? snapshotPatch?.extraction?.list_size ?? conv?.extraction?.list_size,
+    }
     const snapshot = {
       notes: snapshotPatch?.notes ?? conv?.notes ?? '',
-      criteria: snapshotPatch?.criteria ?? conv?.criteria ?? [],
-      extraction: {
-        ...(conv?.extraction ?? {}),
-        list_size: nextSettings.listSize ?? conv?.extraction?.list_size,
-      },
+      criteria,
+      extraction,
       homeState: conv?.homeState,
       incomeBand: conv?.incomeBand,
       maxOutOfPocket: conv?.maxOutOfPocket,
@@ -211,6 +223,7 @@ export default function App() {
         ...c,
         notes: snapshot.notes,
         criteria: snapshot.criteria,
+        extraction,
         phase: 'building',
         listSettings: nextSettings,
         removedSchoolIds: [],
@@ -371,7 +384,16 @@ export default function App() {
 
     if (action.type === 'revise_criteria') {
       const notes = `${conv.notes}\n\n${text}`.trim()
-      startBuilding(id, settings, text, action.message, { notes, criteria: action.criteria })
+      startBuilding(id, settings, text, action.message, {
+        notes,
+        criteria: action.criteria,
+        extraction: {
+          academic: {
+            ...(conv.extraction?.academic ?? {}),
+            ...(action.academic ?? {}),
+          },
+        },
+      })
       return
     }
 
@@ -396,6 +418,16 @@ export default function App() {
         text,
         why ? `Building a new list — ${why}.` : 'Building a new list from the same criteria.'
       )
+      return
+    }
+
+    if (action.type === 'chat') {
+      note(null, chatReply(text))
+      return
+    }
+
+    if (action.type === 'unknown') {
+      note(null, UNKNOWN_FOLLOWUP)
       return
     }
 

@@ -93,13 +93,39 @@ function listSizeIn(text) {
   return parseListSize(text) || parseListSize(`list of ${text}`)
 }
 
+function isSatCriterion(c) {
+  return String(c?.label).startsWith('SAT')
+}
+
+export function parseFollowupSat(text) {
+  const t = String(text || '')
+  if (/\b(why is|why was|what would|how (?:far|much)|tell me about|does |can they)\b/i.test(t)) return null
+  if (!/\bsat\b/i.test(t)) return null
+  const updatey =
+    /\b(improved|now|went\s+up|went\s+down|updated|raised|jumped|scored)\b/i.test(t) ||
+    /\bsat\s+(?:score\s+)?(?:is|to)\b/i.test(t) ||
+    /\bupdated\s+sat\b/i.test(t)
+  if (!updatey) return null
+  const m = t.match(/\bsat[^0-9]{0,48}(\d{3,4})\b/i) || t.match(/\b(\d{3,4})\s*(?:SAT|on the SAT)\b/i)
+  if (!m) return null
+  const requested = Number(m[1])
+  if (!Number.isFinite(requested) || requested < 400) return null
+  const used = Math.min(1600, requested)
+  return { requested, used, capped: requested > 1600, phrase: m[0].trim() }
+}
+
 function looksLikeCriteriaRevision(text) {
   const t = String(text || '')
   if (/\b(why is|why was|what would|how (?:far|much)|tell me about|does |can they)\b/i.test(t)) return false
+  if (parseFollowupSat(t)) return true
   return (
-    /\b(i think|he wants|she wants|they want|wants to pursue|now interested|actually interested|switch(?:ing)? (?:the )?(?:major|program|degree)|change(?: the)? (?:major|program|degree)|look for schools with)\b/i.test(
+    /\b(i think|he wants|she wants|they want|wants to pursue|now interested|actually interested|switch(?:ing)? to|switch(?:ing)? (?:the )?(?:major|program|degree)|change(?: the)? (?:major|program|degree)|look for schools with)\b/i.test(
       t
-    ) || /\b(pursue|major in|degree in)\b/i.test(t)
+    ) ||
+    /\b(pursue|major in|degree in)\b/i.test(t) ||
+    /\bactually(?:\s+it'?s)?\s+\S/i.test(t) ||
+    /\b(lock(?:ing)? in|set on)\b/i.test(t) ||
+    /\b(hiking|outdoors?|mountains?)\b/i.test(t)
   )
 }
 
@@ -116,22 +142,98 @@ function keptFactLabels(criteria) {
     .filter(Boolean)
 }
 
+function isHikingCriterion(c) {
+  return c?.value === 'hiking' || /hiking|outdoors/i.test(`${c?.value ?? ''} ${c?.label ?? ''}`)
+}
+
 export function revisionMessage({ replaced = [], added = [], kept = [] }) {
   const sports = added.some((c) => /sport|athletics/i.test(`${c.value} ${c.label}`))
+  const hiking = added.some(isHikingCriterion)
+  const lockingLaw =
+    added.some((c) => c.value === 'law' && c.strength === 'required') &&
+    replaced.some((c) => c.value === 'law' && c.strength !== 'required')
   const addedLabel = added.map((c) => c.label).join(', ') || 'the new focus'
-  const lead = sports ? "I'll look for schools with a strong sports program" : `I'll update the list around ${addedLabel}`
-  const keepBits = keptFactLabels(kept).slice(0, 6)
-  const keep = keepBits.length ? `, keeping ${keepBits.join(', ')}` : ', keeping the other confirmed facts'
+  const lead = hiking
+    ? "I'll look for campuses with hiking and mountain access"
+    : sports
+      ? "I'll look for schools with a strong sports program"
+      : lockingLaw
+        ? "I'll lock in law"
+        : `I'll update the list around ${addedLabel}`
+  const keepBits = []
+  if (hiking) {
+    for (const c of kept ?? []) {
+      if (c.category === 'academic_interest' && c.label && !keepBits.includes(c.label)) keepBits.push(c.label)
+    }
+  }
+  for (const label of keptFactLabels(kept)) {
+    if (!keepBits.includes(label)) keepBits.push(label)
+  }
+  const keep = keepBits.length ? `, keeping ${keepBits.slice(0, 6).join(', ')}` : ', keeping the other confirmed facts'
   const drop = replaced.length
     ? ` Replacing ${replaced.map((c) => c.label).join(', ')} as the academic focus.`
     : '.'
   return `${lead}${keep}.${drop}`.replace(/\.\./g, '.')
 }
 
+function satRowFromUpdate(update, previous) {
+  const understood = update.capped
+    ? `${update.requested} is above the SAT maximum of 1600 — SAT ${update.used} is on file for admissions comparison.`
+    : `SAT ${update.used} is on file for admissions comparison.`
+  return {
+    ...(previous ?? {}),
+    id: previous?.id || `sat-${update.used}`,
+    category: 'other',
+    label: `SAT ${update.used}`,
+    value: update.used,
+    confidence: previous?.confidence || 'low',
+    source_phrase: update.phrase,
+    strength: previous?.strength || 'required',
+    understood,
+  }
+}
+
+function satRevisionMessage(update, kept) {
+  const capBit = update.capped
+    ? `${update.requested} is above the SAT maximum, so the file uses ${update.used}. `
+    : ''
+  const major = (kept ?? []).find((c) => c.category === 'academic_interest')
+  const keepBits = [major?.label, ...keptFactLabels(kept)].filter(Boolean).slice(0, 6)
+  const keep = keepBits.length ? `, keeping ${keepBits.join(', ')}` : ', keeping the other confirmed facts'
+  return `${capBit}The SAT on file is now ${update.used}${keep}. Rebuilding the list so Likely, Target, and Reach can move.`
+}
+
 export function followupRevision(text, { criteria = [] } = {}) {
+  const satUpdate = parseFollowupSat(text)
+  if (satUpdate) {
+    const previous = (criteria ?? []).find(isSatCriterion)
+    const added = [satRowFromUpdate(satUpdate, previous)]
+    const replaced = previous ? [previous] : []
+    const kept = (criteria ?? []).filter((c) => !isSatCriterion(c))
+    return {
+      criteria: [...kept, ...added],
+      replaced,
+      added,
+      academic: { sat: satUpdate.used },
+      message: satRevisionMessage(satUpdate, kept),
+    }
+  }
   if (!looksLikeCriteriaRevision(text)) return null
   const incoming = extractFallback(text)
+  const hikingAdded = incoming.criteria.filter(isHikingCriterion)
   const added = incoming.criteria.filter((c) => c.category === 'academic_interest')
+  if (hikingAdded.length && !added.length) {
+    const extras = hikingAdded.filter(
+      (c) => typeof c.value === 'string' && !(criteria ?? []).some((k) => k.value === c.value)
+    )
+    if (!extras.length) return null
+    return {
+      criteria: [...(criteria ?? []), ...extras],
+      replaced: [],
+      added: extras,
+      message: revisionMessage({ replaced: [], added: extras, kept: criteria }),
+    }
+  }
   if (!added.length) return null
   const replaced = (criteria ?? []).filter((c) => c.category === 'academic_interest')
   const kept = (criteria ?? []).filter((c) => c.category !== 'academic_interest')
@@ -146,9 +248,44 @@ export function followupRevision(text, { criteria = [] } = {}) {
   }
 }
 
+export const UNKNOWN_FOLLOWUP =
+  "Hmm, that's not something I am currently prepared of doing. I can answer from the list, add a column, or rebuild with different priorities"
+
+const CHAT_RE =
+  /^(hi+|hello|hey(?: there)?|yo|sup|what'?s up|whats up|how are you|how'?s it going|hows it going|good (?:morning|afternoon|evening)|thanks?(?: you)?|thx|cheers|ok|okay|cool|nice)[.!?]*$/i
+
+export function isChatFollowup(text) {
+  return CHAT_RE.test(String(text || '').trim())
+}
+
+export function chatReply(text) {
+  const t = String(text || '').trim().toLowerCase()
+  if (/thanks|thx|thank you|cheers/.test(t)) {
+    return 'Anytime. I can answer from the list, add a column, or rebuild with different priorities.'
+  }
+  if (/what'?s up|whats up|how are you|how'?s it going|hows it going|sup/.test(t)) {
+    return "Not much — this list is still here. Ask about a school, add a column, or rebuild whenever you're ready."
+  }
+  return "Hi. Ask about a school on the list, add a column, or rebuild with different priorities whenever you're ready."
+}
+
+function looksLikeQuestion(text) {
+  return (
+    /\?/.test(text) ||
+    /^(why|how|what|which|who|where|when|tell me|explain|does|is |are |can |could |should |would )\b/i.test(text)
+  )
+}
+
+function looksLikeUnsupportedTask(text) {
+  return /\b(write|draft|compose|email|book |schedule |download|powerpoint|resume|recommendation letter|rec letter|cover letter|apply for|translate|make me a|create a)\b/i.test(
+    text
+  )
+}
+
 export function classifyFollowup(text, { schools = [], removed = [], extras, criteria = [] } = {}) {
   const trimmed = String(text || '').trim()
-  if (!trimmed) return { type: 'question' }
+  if (!trimmed) return { type: 'unknown' }
+  if (isChatFollowup(trimmed)) return { type: 'chat' }
 
   if (/\b(remove|drop|delete|cut|take)\b/i.test(trimmed)) {
     const school = matchSchool(trimmed, schools)
@@ -214,14 +351,15 @@ export function classifyFollowup(text, { schools = [], removed = [], extras, cri
     return { type: 'new_notes' }
   }
 
-  return { type: 'question' }
+  if (looksLikeUnsupportedTask(trimmed)) return { type: 'unknown' }
+  if (looksLikeQuestion(trimmed)) return { type: 'question' }
+  return { type: 'unknown' }
 }
 
 export function fallbackAnswer(text, { schools = [], settings } = {}) {
+  if (isChatFollowup(text)) return chatReply(text)
   const school = matchSchool(text, schools)
-  if (!school) {
-    return 'I can answer from the list, add a column, or rebuild with different priorities. Say what to change — the code still picks the schools.'
-  }
+  if (!school) return UNKNOWN_FOLLOWUP
   if (/why.*\b(likely|target|reach)\b|why is this/i.test(text)) {
     return `${school.name} is a ${school.band}. ${school.rationale} Admissions context: ${school.rate} admit rate, ${school.midSat}. Affordability is a separate label: ${school.capNote}.`
   }

@@ -1,0 +1,482 @@
+{
+  "ran_at": "2026-09-16T18:36:27.234Z",
+  "model": "gemini-3.6-flash",
+  "case_source": "fallback",
+  "extract_mode": "extractFallback",
+  "headline": "5 of 5 counselor follow-ups revised the list and kept the rest of the file.",
+  "prototype_risk": "",
+  "judge_error": "",
+  "pass": 5,
+  "fail": 0,
+  "cases": [
+    {
+      "id": "journalism-to-sports",
+      "title": "Journalism list, then sports",
+      "why_hard": "Counselors re-aim the academic focus in chat after a list exists, without restating SAT, GPA, or football.",
+      "notes": "Marcus is a Pennsylvania junior outside Pittsburgh. Interested in journalism. 3.5 GPA, 1280 SAT. Plays football. Family is fine with a mix of states.",
+      "followup": "I think he wants to pursue sports.",
+      "extract_degraded": true,
+      "before_list_size": 8,
+      "after_list_size": 9,
+      "catalog_source": "overlay",
+      "before_criteria": [
+        {
+          "category": "academic_interest",
+          "label": "Journalism",
+          "value": "journalism",
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "SAT 1280",
+          "value": 1280,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.5",
+          "value": 3.5,
+          "strength": "preferred"
+        },
+        {
+          "category": "other",
+          "label": "Plays football",
+          "value": "football",
+          "strength": "preferred"
+        }
+      ],
+      "after_criteria": [
+        {
+          "category": "other",
+          "label": "SAT 1280",
+          "value": 1280,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.5",
+          "value": 3.5,
+          "strength": "preferred"
+        },
+        {
+          "category": "other",
+          "label": "Plays football",
+          "value": "football",
+          "strength": "preferred"
+        },
+        {
+          "category": "academic_interest",
+          "label": "Sports",
+          "value": "sports",
+          "strength": "required"
+        }
+      ],
+      "verdict": {
+        "pass": true,
+        "action_ok": true,
+        "major_changed": true,
+        "kept_ok": true,
+        "list_changed": true,
+        "message_honest": true,
+        "issues": [],
+        "before_interest": "Journalism journalism required",
+        "after_interest": "Sports sports required",
+        "kept": {
+          "sat": true,
+          "gpa": true,
+          "football": true
+        },
+        "action_type": "revise_criteria",
+        "message": "I'll look for schools with a strong sports program, keeping SAT 1280, GPA 3.5, Plays football. Replacing Journalism as the academic focus.",
+        "before_programs": [
+          "Journalism"
+        ],
+        "after_programs": [
+          "Sports"
+        ]
+      },
+      "judgment": null
+    },
+    {
+      "id": "switch-to-med-school",
+      "title": "Same journalism student, switch to med school",
+      "why_hard": "Counselors say med school, not medical school, and switch to X rather than switch the major. Undergrad path should be biology / pre-med, not a graduate MD program.",
+      "notes": "Marcus is a Pennsylvania junior outside Pittsburgh. Interested in journalism. 3.5 GPA, 1280 SAT. Plays football. Family is fine with a mix of states.",
+      "followup": "he wants to switch to med school",
+      "extract_degraded": true,
+      "before_list_size": 8,
+      "after_list_size": 10,
+      "catalog_source": "overlay",
+      "before_criteria": [
+        {
+          "category": "academic_interest",
+          "label": "Journalism",
+          "value": "journalism",
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "SAT 1280",
+          "value": 1280,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.5",
+          "value": 3.5,
+          "strength": "preferred"
+        },
+        {
+          "category": "other",
+          "label": "Plays football",
+          "value": "football",
+          "strength": "preferred"
+        }
+      ],
+      "after_criteria": [
+        {
+          "category": "other",
+          "label": "SAT 1280",
+          "value": 1280,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.5",
+          "value": 3.5,
+          "strength": "preferred"
+        },
+        {
+          "category": "other",
+          "label": "Plays football",
+          "value": "football",
+          "strength": "preferred"
+        },
+        {
+          "category": "academic_interest",
+          "label": "Biology",
+          "value": "biology",
+          "strength": "required"
+        }
+      ],
+      "verdict": {
+        "pass": true,
+        "action_ok": true,
+        "major_changed": true,
+        "kept_ok": true,
+        "list_changed": true,
+        "message_honest": true,
+        "issues": [],
+        "before_interest": "Journalism journalism required",
+        "after_interest": "Biology biology required",
+        "kept": {
+          "sat": true,
+          "gpa": true,
+          "football": true
+        },
+        "action_type": "revise_criteria",
+        "message": "I'll update the list around Biology, keeping SAT 1280, GPA 3.5, Plays football. Replacing Journalism as the academic focus.",
+        "before_programs": [
+          "Journalism"
+        ],
+        "after_programs": [
+          "Biology"
+        ]
+      },
+      "judgment": null
+    },
+    {
+      "id": "cs-to-nursing-keep-aid-oos",
+      "title": "CS, far from home, needs aid → nursing",
+      "why_hard": "The new major is easy to hear; the risk is dropping aid-needed and out-of-state because the counselor did not repeat them.",
+      "notes": "Aisha, Texas. 1320 SAT, 3.7 GPA. Computer science. Wants to go far from home, out of state. Needs financial aid — family cannot cover sticker.",
+      "followup": "she wants to switch to nursing",
+      "extract_degraded": true,
+      "before_list_size": 9,
+      "after_list_size": 9,
+      "catalog_source": "overlay",
+      "before_criteria": [
+        {
+          "category": "academic_interest",
+          "label": "Computer science",
+          "value": "computer_science",
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "SAT 1320",
+          "value": 1320,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.7",
+          "value": 3.7,
+          "strength": "preferred"
+        },
+        {
+          "category": "geography",
+          "label": "Out of state — far from home",
+          "value": {
+            "home_state": "TX",
+            "max_miles": null,
+            "prefer_far": true
+          },
+          "strength": "preferred"
+        },
+        {
+          "category": "family_constraint",
+          "label": "Needs strong financial support",
+          "value": "aid_needed",
+          "strength": "required"
+        }
+      ],
+      "after_criteria": [
+        {
+          "category": "other",
+          "label": "SAT 1320",
+          "value": 1320,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.7",
+          "value": 3.7,
+          "strength": "preferred"
+        },
+        {
+          "category": "geography",
+          "label": "Out of state — far from home",
+          "value": {
+            "home_state": "TX",
+            "max_miles": null,
+            "prefer_far": true
+          },
+          "strength": "preferred"
+        },
+        {
+          "category": "family_constraint",
+          "label": "Needs strong financial support",
+          "value": "aid_needed",
+          "strength": "required"
+        },
+        {
+          "category": "academic_interest",
+          "label": "Nursing",
+          "value": "nursing",
+          "strength": "required"
+        }
+      ],
+      "verdict": {
+        "pass": true,
+        "action_ok": true,
+        "major_changed": true,
+        "kept_ok": true,
+        "list_changed": true,
+        "message_honest": true,
+        "issues": [],
+        "before_interest": "Computer science computer_science required",
+        "after_interest": "Nursing nursing required",
+        "kept": {
+          "sat": true,
+          "gpa": true,
+          "aid": true,
+          "far": true
+        },
+        "action_type": "revise_criteria",
+        "message": "I'll update the list around Nursing, keeping SAT 1320, GPA 3.7, Out of state — far from home. Replacing Computer science as the academic focus.",
+        "before_programs": [
+          "Computer science"
+        ],
+        "after_programs": [
+          "Nursing"
+        ]
+      },
+      "judgment": null
+    },
+    {
+      "id": "acting-to-polisci-keep-football",
+      "title": "Acting plus football → political science",
+      "why_hard": "Football is a campus activity, not a major. Switching the academic focus must not erase the football row.",
+      "notes": "Jordan, Ohio. 3.6 GPA, 1210 SAT. Wants acting. Plays football. No distance preference on file.",
+      "followup": "he wants to switch to political science",
+      "extract_degraded": true,
+      "before_list_size": 10,
+      "after_list_size": 10,
+      "catalog_source": "overlay",
+      "before_criteria": [
+        {
+          "category": "academic_interest",
+          "label": "Acting / entertainment",
+          "value": "performing_arts",
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "SAT 1210",
+          "value": 1210,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.6",
+          "value": 3.6,
+          "strength": "preferred"
+        },
+        {
+          "category": "other",
+          "label": "Plays football",
+          "value": "football",
+          "strength": "preferred"
+        }
+      ],
+      "after_criteria": [
+        {
+          "category": "other",
+          "label": "SAT 1210",
+          "value": 1210,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.6",
+          "value": 3.6,
+          "strength": "preferred"
+        },
+        {
+          "category": "other",
+          "label": "Plays football",
+          "value": "football",
+          "strength": "preferred"
+        },
+        {
+          "category": "academic_interest",
+          "label": "Political science",
+          "value": "political_science",
+          "strength": "required"
+        }
+      ],
+      "verdict": {
+        "pass": true,
+        "action_ok": true,
+        "major_changed": true,
+        "kept_ok": true,
+        "list_changed": true,
+        "message_honest": true,
+        "issues": [],
+        "before_interest": "Acting / entertainment performing_arts required",
+        "after_interest": "Political science political_science required",
+        "kept": {
+          "sat": true,
+          "gpa": true,
+          "football": true
+        },
+        "action_type": "revise_criteria",
+        "message": "I'll update the list around Political science, keeping SAT 1210, GPA 3.6, Plays football. Replacing Acting / entertainment as the academic focus.",
+        "before_programs": [
+          "Acting / entertainment"
+        ],
+        "after_programs": [
+          "Political science"
+        ]
+      },
+      "judgment": null
+    },
+    {
+      "id": "law-hedge-then-lock",
+      "title": "Not sure about law, then actually law",
+      "why_hard": "The first file hedges. The later chat locks in without 'pursue' or 'interested in' — counselors just say actually law.",
+      "notes": "Priya, Virginia. 1400 SAT, 3.8 GPA. Interested in law but not sure. Family wants her close to home.",
+      "followup": "actually law",
+      "extract_degraded": true,
+      "before_list_size": 10,
+      "after_list_size": 10,
+      "catalog_source": "overlay",
+      "before_criteria": [
+        {
+          "category": "academic_interest",
+          "label": "Law (not sure)",
+          "value": "law",
+          "strength": "preferred"
+        },
+        {
+          "category": "other",
+          "label": "SAT 1400",
+          "value": 1400,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.8",
+          "value": 3.8,
+          "strength": "preferred"
+        },
+        {
+          "category": "geography",
+          "label": "Within ~300 miles of home",
+          "value": {
+            "home_state": "VA",
+            "max_miles": 300,
+            "prefer_far": false
+          },
+          "strength": "preferred"
+        }
+      ],
+      "after_criteria": [
+        {
+          "category": "other",
+          "label": "SAT 1400",
+          "value": 1400,
+          "strength": "required"
+        },
+        {
+          "category": "other",
+          "label": "GPA 3.8",
+          "value": 3.8,
+          "strength": "preferred"
+        },
+        {
+          "category": "geography",
+          "label": "Within ~300 miles of home",
+          "value": {
+            "home_state": "VA",
+            "max_miles": 300,
+            "prefer_far": false
+          },
+          "strength": "preferred"
+        },
+        {
+          "category": "academic_interest",
+          "label": "Law / pre-law",
+          "value": "law",
+          "strength": "required"
+        }
+      ],
+      "verdict": {
+        "pass": true,
+        "action_ok": true,
+        "major_changed": true,
+        "kept_ok": true,
+        "list_changed": true,
+        "message_honest": true,
+        "issues": [],
+        "before_interest": "Law (not sure) law preferred",
+        "after_interest": "Law / pre-law law required",
+        "kept": {
+          "sat": true,
+          "gpa": true,
+          "geo": true
+        },
+        "action_type": "revise_criteria",
+        "message": "I'll lock in law, keeping SAT 1400, GPA 3.8, Within ~300 miles of home. Replacing Law (not sure) as the academic focus.",
+        "before_programs": [
+          "Law / pre-law"
+        ],
+        "after_programs": [
+          "Law / pre-law"
+        ]
+      },
+      "judgment": null
+    }
+  ]
+}

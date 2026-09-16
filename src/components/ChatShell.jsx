@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, PanelLeftOpen } from 'lucide-react'
+import { PanelLeftOpen } from 'lucide-react'
 import Icon from './ui/Icon.jsx'
 import CaseloadSidebar from './CaseloadSidebar.jsx'
 import NotesEntry from './NotesEntry.jsx'
@@ -106,10 +106,7 @@ function Composer({ draft, setDraft, onSend, disabled, placeholder, autoFocus, c
       />
       <div className="flex items-center justify-between px-5 pb-4 pt-4">
         <span className="text-12 text-ink-3">Enter to send · Shift+Enter for a new line</span>
-        <span className="flex h-create items-center justify-end gap-2">
-          <button type="button" aria-label="Dictate notes" className="inline-flex text-ink-3 hover:text-ink">
-            <Icon icon={Mic} size="sm" />
-          </button>
+        <span className="flex h-create items-center justify-end">
           {hasText && (
             <button
               type="submit"

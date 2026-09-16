@@ -1,7 +1,7 @@
 // Invents a prompt-specific catalog of recognizable schools. Facts are plausible, not verified.
 // engine.js still assigns every admissions and affordability label from the numbers here.
 import { PROGRAM_CHOICES } from './extract.js'
-import { haversineMiles, STATE_CENTROIDS, STATE_HUB, STATE_NAMES, WARM_STATES } from './geo.js'
+import { haversineMiles, MOUNTAIN_STATES, STATE_CENTROIDS, STATE_HUB, STATE_NAMES, WARM_STATES } from './geo.js'
 import { fetchWithTimeout } from './progress.js'
 import { SCHOOL_POOL } from './schoolPool.js'
 
@@ -15,6 +15,7 @@ const CLUB_PATTERNS = [
   [/newspaper|journalism/i, 'Student newspaper'],
   [/\bband\b|orchestra|music/i, 'Music ensembles'],
   [/volunteer|community service/i, 'Volunteer corps'],
+  [/\bhiking\b|\boutdoors?\b|\bmountains?\b/i, 'Hiking club'],
   [/\bbasketball\b/i, 'Basketball'],
   [/\bathletics\b|\bsports\b/i, 'Athletics'],
 ]
@@ -40,6 +41,7 @@ export function hooksFrom(notes, criteria) {
     if (c.value === 'football' && !clubs.includes('Football')) clubs.push('Football')
     if (c.value === 'basketball' && !clubs.includes('Basketball')) clubs.push('Basketball')
     if (c.value === 'robotics' && !clubs.includes('Robotics club')) clubs.push('Robotics club')
+    if (c.value === 'hiking' && !clubs.includes('Hiking club')) clubs.push('Hiking club')
   }
   const social = /\bsocial\b|outgoing|extroverted|greek|party|campus life/i.test(text)
   const quiet = /\bquiet\b|introverted|keeps to (himself|herself|themselves)/i.test(text)
@@ -84,7 +86,7 @@ function inStateAnchors(abbr) {
   ]
 }
 
-function pickMixedPool(cap, preferWarm) {
+function pickMixedPool(cap, preferStates) {
   const buckets = new Map()
   const states = []
   for (const s of SCHOOL_POOL) {
@@ -94,8 +96,8 @@ function pickMixedPool(cap, preferWarm) {
     }
     buckets.get(s.state).push(s)
   }
-  if (preferWarm) {
-    states.sort((a, b) => Number(WARM_STATES.has(b)) - Number(WARM_STATES.has(a)))
+  if (preferStates?.size) {
+    states.sort((a, b) => Number(preferStates.has(b)) - Number(preferStates.has(a)))
   } else {
     states.sort((a, b) => (buckets.get(a)[0].lon ?? 0) - (buckets.get(b)[0].lon ?? 0))
   }
@@ -114,9 +116,9 @@ function pickMixedPool(cap, preferWarm) {
   return picked
 }
 
-function pickAnchors(homeState, rng, limit, preferWarm) {
+function pickAnchors(homeState, rng, limit, preferStates) {
   const cap = Math.max(16, limit || 16)
-  if (!homeState) return pickMixedPool(cap, preferWarm)
+  if (!homeState) return pickMixedPool(cap, preferStates)
   const home = STATE_CENTROIDS[homeState]
   const local = SCHOOL_POOL.filter((s) => s.state === homeState)
   const anchors = local.length >= 3 ? local : [...local, ...inStateAnchors(homeState)]
@@ -189,6 +191,14 @@ function clubLine(school, hooks, i) {
 }
 
 function campusLine(school, hooks, i) {
+  if (hooks.clubs.some((c) => /hiking/i.test(c))) {
+    const hike = [
+      'Trailheads and mountain access shape weekend plans',
+      'Outdoor clubs run hiking trips into nearby ranges',
+      'Campus sits close to high-country hiking',
+    ]
+    return hike[i % hike.length]
+  }
   if (hooks.clubs.some((c) => /football/i.test(c))) {
     const games = [
       'Football Saturdays set the campus calendar',
@@ -257,9 +267,11 @@ export function composeCatalog({ notes, criteria, academic, homeState, incomeBan
   const ceiling = cap || 25000
   const sat = academic?.sat ?? null
   const warm = (criteria ?? []).some((c) => c.value === 'warm')
+  const hiking = (criteria ?? []).some((c) => c.value === 'hiking')
   const home = wantsNearby(criteria) ? homeState || null : null
   const catalogSize = Math.max(18, (listSize || 10) + 10)
-  const picked = pickAnchors(home, rng, catalogSize, warm && !home)
+  const preferStates = hiking ? MOUNTAIN_STATES : warm ? WARM_STATES : null
+  const picked = pickAnchors(hiking ? null : home, rng, catalogSize, preferStates)
   const schools = picked.map((base, i) => {
     const stats = inventStats(base, sat, ceiling, rng)
     const tags = []
