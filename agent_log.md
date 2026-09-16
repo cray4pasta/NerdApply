@@ -459,3 +459,27 @@
 **Why.** The handoff needs reproducible proof that the committed demo builds, the design mapping works, and the academic gate prevents program availability from restoring a severe SAT mismatch.
 
 **What it affects.** Verification and handoff records only. The live Scorecard sort was rejected, so the existing unsorted retry supplied all three pages successfully; no key value was printed or recorded.
+
+## 2026-09-15 18:10 PDT — Delayed generating-phase snapshot recover timeout
+
+**What changed.** In `src/App.jsx`, imported `SCORECARD_MS` from `./lib/progress.js` and raised the stuck-generating recover timeout from 5000ms to `SCORECARD_MS + STEP_MS * BUILD_STEPS.length + 3000` (17.8s). Appended the browser SAT 600 design race note to `.superpowers/sdd/task-9-report.md`.
+
+**Why.** Live Scorecard takes up to 12s plus ~2.8s for progress steps; the old 5s timeout recovered from the 40-school local snapshot first, showing community colleges with “Design is not in this snapshot” instead of the live catalog.
+
+**What it affects.** List generation in the browser: snapshot recover remains last resort after Scorecard and step animation time; the same `console.warn('[app] generate recover used local snapshot')` log is unchanged.
+
+## 2026-09-15 18:13 PDT — Pushed live Scorecard branch to GitHub
+
+**What changed.** Pushed `feat/live-scorecard-catalog` to `origin` and set upstream tracking. Left the local `agent_log.md` update and the `Geist copy/` font folder uncommitted, matching earlier handoff notes that keep those files out of git.
+
+**Why.** The branch had commits with no remote tracking, so the Scorecard list-building work was only on this machine.
+
+**What it affects.** The remote now has the feature branch. A pull request can be opened at https://github.com/cray4pasta/NerdApply/pull/new/feat/live-scorecard-catalog. Local uncommitted files were not included.
+
+## 2026-09-15 18:14 PDT — Committed remaining log notes and pushed again
+
+**What changed.** Staged and committed the leftover `agent_log.md` notes (recover timeout and first GitHub push), then pushed `feat/live-scorecard-catalog`. The `Geist copy/` font folder stayed untracked.
+
+**Why.** The branch was already on GitHub; only the local log was still sitting uncommitted, so a second push needed that commit first.
+
+**What it affects.** Remote history now includes the session log. Local Geist font files are still not in the repository.
