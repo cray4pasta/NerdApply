@@ -1,3 +1,9 @@
+// Priorities as a chat card. Up/down buttons instead of drag — per docs/03-DESIGN.md 4.3:
+// "Reordering has to work; it does not have to feel like iOS."
+// Labels stay icon-free. Arrows are the reorder control, not decoration.
+import { ArrowDown, ArrowUp } from 'lucide-react'
+import Icon from './ui/Icon.jsx'
+
 const DIMENSION_LABEL = {
   affordability: 'Affordability',
   program: 'Academic programme strength',
@@ -7,59 +13,69 @@ const DIMENSION_LABEL = {
   support: 'Student support services',
 }
 
-export default function PrioritiesStep({ order, setOrder, onContinue }) {
-  function move(index, dir) {
-    const next = index + dir
-    if (next < 0 || next >= order.length) return
-    setOrder((prev) => {
-      const copy = [...prev]
-      const [row] = copy.splice(index, 1)
-      copy.splice(next, 0, row)
-      return copy
-    })
+export default function PrioritiesStep({
+  priorityOrder,
+  setPriorityOrder,
+  locked = false,
+  onContinue,
+  continueLabel = 'Build the list',
+}) {
+  function move(index, direction) {
+    const next = [...priorityOrder]
+    const target = index + direction
+    if (target < 0 || target >= next.length) return
+    ;[next[index], next[target]] = [next[target], next[index]]
+    setPriorityOrder(next)
   }
 
   return (
-    <div className="mx-auto max-w-priorities">
-      <h2 className="font-display text-22 text-ink">What matters most for this student?</h2>
-      <p className="mt-2 font-sans text-14 text-ink-2">
-        Move rows to reorder. This changes which schools rise to the top.
-      </p>
-      <ol className="mt-6 space-y-2">
-        {order.map((dim, i) => (
-          <li key={dim} className="flex items-center gap-3 rounded-card border border-rule bg-surface px-4 py-3">
-            <span className="w-6 font-sans text-12 tabular text-ink-3">{i + 1}</span>
+    <div className="rounded-card border border-rule bg-surface p-5">
+      <ol className="space-y-2">
+        {priorityOrder.map((dim, i) => (
+          <li key={dim} className="flex items-center gap-4 rounded-card border border-rule bg-paper px-4 py-3">
+            <span className="tabular font-sans text-12 text-ink-3">{i + 1}</span>
             <span className="flex-1 font-sans text-18 text-ink">{DIMENSION_LABEL[dim]}</span>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                className="rounded-control px-2 py-1 text-ink-3 hover:text-ink"
-                aria-label={`Move ${DIMENSION_LABEL[dim]} up`}
-                disabled={i === 0}
-                onClick={() => move(i, -1)}
-              >
-                ↑
-              </button>
-              <button
-                type="button"
-                className="rounded-control px-2 py-1 text-ink-3 hover:text-ink"
-                aria-label={`Move ${DIMENSION_LABEL[dim]} down`}
-                disabled={i === order.length - 1}
-                onClick={() => move(i, 1)}
-              >
-                ↓
-              </button>
-            </div>
+            {!locked && (
+              <span className="flex flex-col">
+                <button
+                  type="button"
+                  className="px-2 text-ink-3 hover:text-ink disabled:opacity-30"
+                  aria-label={`Move ${DIMENSION_LABEL[dim]} up`}
+                  disabled={i === 0}
+                  onClick={() => move(i, -1)}
+                >
+                  <Icon icon={ArrowUp} size="sm" />
+                </button>
+                <button
+                  type="button"
+                  className="px-2 text-ink-3 hover:text-ink disabled:opacity-30"
+                  aria-label={`Move ${DIMENSION_LABEL[dim]} down`}
+                  disabled={i === priorityOrder.length - 1}
+                  onClick={() => move(i, 1)}
+                >
+                  <Icon icon={ArrowDown} size="sm" />
+                </button>
+              </span>
+            )}
           </li>
         ))}
       </ol>
-      <button
-        type="button"
-        className="mt-6 rounded-control bg-brand px-5 py-3 font-sans text-15 font-medium text-surface hover:bg-brand-hover"
-        onClick={onContinue}
-      >
-        Build the list
-      </button>
+
+      <p className="mt-4 font-sans text-14 text-ink-2">Reorder with the arrows. This changes which schools rise to the top.</p>
+
+      {!locked && (
+        <div className="mt-6">
+          <button
+            type="button"
+            className="rounded-control bg-brand px-5 py-3 font-sans text-15 font-medium text-surface hover:bg-brand-hover"
+            onClick={onContinue}
+          >
+            {continueLabel}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
+
+export { DIMENSION_LABEL }

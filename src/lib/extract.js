@@ -1,6 +1,6 @@
 // Turns free-form notes into structured criteria. Tries the AI extraction call first; if the
-// key is missing, falls back to keyword matching. Each row also carries a one-line `understood`
-// paraphrase of the source phrase for the criteria table.
+// key is missing, falls back to keyword matching. Patterns include the short counselor notes in
+// src/data/counselor-note-examples.csv. See files/02-ENGINEERING.md 6.4.
 import { STATE_NAMES } from './geo.js'
 import { fetchWithTimeout } from './progress.js'
 
@@ -18,11 +18,14 @@ export const PROGRAM_CHOICES = [
   { value: 'business', label: 'Business' },
   { value: 'education', label: 'Education' },
   { value: 'art', label: 'Art' },
+  { value: 'design', label: 'Design' },
   { value: 'environmental_science', label: 'Environmental science' },
   { value: 'agriculture', label: 'Agriculture' },
+  { value: 'law', label: 'Law / pre-law' },
 ]
 
 const INTEREST_KEYWORDS = [
+  [/graphic design|industrial design|visual design|\bUX\b|interested in design|\bdesign\b/i, 'design'],
   [/interested in (the )?arts?|art school|fine arts|studio art|drawing|painting|\barts\b|\bart\b/i, 'art'],
   [/marine biology|marine science|oceanography|\bocean\b/i, 'marine_biology'],
   [/computer science|\bcomp sci\b|\bC\.?S\.?\b|programming|coding|software|computing/i, 'computer_science'],
@@ -40,6 +43,7 @@ const LABEL_FOR = Object.fromEntries(PROGRAM_CHOICES.map((p) => [p.value, p.labe
 
 const PROGRAM_UNDERSTOOD = {
   art: 'Art is the academic focus — prioritize schools with a real studio or fine-arts program.',
+  design: 'Design is the academic focus for this search.',
   marine_biology: 'Marine biology is the academic focus for this search.',
   computer_science: 'Computer science is the academic focus for this search.',
   engineering: 'Engineering is the academic focus for this search.',
@@ -49,6 +53,7 @@ const PROGRAM_UNDERSTOOD = {
   education: 'Education is the academic focus for this search.',
   environmental_science: 'Environmental science is the academic focus for this search.',
   agriculture: 'Agriculture is the academic focus for this search.',
+  law: 'Looking for colleges with a path toward law, including pre-law advising and related majors.',
 }
 
 let nextId = 1
@@ -61,7 +66,7 @@ function makeCriterion(category, label, value, confidence, sourcePhrase, strengt
     confidence,
     source_phrase: sourcePhrase,
     strength,
-    understood: understood || label,
+    understood: understood || PROGRAM_UNDERSTOOD[value] || label,
   }
 }
 
@@ -140,7 +145,15 @@ export function extractFallback(notes) {
         ? 'Interested in nursing but may change direction — keep related health majors and other paths in play.'
         : PROGRAM_UNDERSTOOD[value] ?? label
       criteria.push(
-        makeCriterion('academic_interest', label, value, 'low', m[0], flexible ? 'flexible' : 'required', understood)
+        makeCriterion(
+          'academic_interest',
+          label,
+          value,
+          'low',
+          m[0],
+          flexible ? 'flexible' : 'required',
+          understood
+        )
       )
     }
   }
@@ -161,23 +174,31 @@ export function extractFallback(notes) {
 
   const law = notes.match(/\blaw\b|pre-?law|lawyer/i)
   if (law) {
-    const unsure = Boolean(hedge)
+    const strength = hedge ? 'preferred' : 'required'
     const clause = notes.match(/[^.\n]*\b(?:law|pre-?law|lawyer)\b[^.\n]*/i)
     const phrase = (clause?.[0] || law[0]).trim()
     criteria.push(
       makeCriterion(
         'academic_interest',
-        unsure ? 'Law (not sure)' : 'Law / pre-law',
+        hedge ? 'Law (not sure)' : 'Law / pre-law',
         'law',
         'low',
         phrase,
-        'flexible',
-        unsure
+        strength,
+        hedge
           ? 'Exploring law without locking in — look for flexible majors and low-stakes ways to test legal work.'
-          : 'Looking for colleges with a path toward law, including pre-law advising and related majors.'
+          : PROGRAM_UNDERSTOOD.law
       )
     )
-    unresolved.push('This snapshot has no law school. Law is noted as flexible so it will not empty the list.')
+    if (hedge) {
+      unresolved.push(
+        'Law is treated as preferred because the notes say they are not sure. Undergraduate law-related majors stay in play without emptying the list.'
+      )
+    } else {
+      unresolved.push(
+        'Law here means an undergraduate law-related major from a published catalog. A JD is graduate school and is not the filter.'
+      )
+    }
   }
 
   if (sat != null) {
@@ -284,15 +305,7 @@ export function extractFallback(notes) {
   const warm = notes.match(/\bwarm\b|somewhere warm|hot climate|the south|southern|beach town/i)
   if (warm) {
     criteria.push(
-      makeCriterion(
-        'environment',
-        'Warm climate',
-        'warm',
-        'low',
-        warm[0],
-        'preferred',
-        'Prefer a warm climate.'
-      )
+      makeCriterion('environment', 'Warm climate', 'warm', 'low', warm[0], 'preferred', 'Prefer a warm climate.')
     )
   }
 
@@ -388,9 +401,7 @@ export function extractFallback(notes) {
     )
   }
 
-  const reachAnxiety = notes.match(
-    /anxious about reaches|afraid of reaches|too many reaches|reach-heavy|worried about reaches/i
-  )
+  const reachAnxiety = notes.match(/anxious about reaches|afraid of reaches|too many reaches|reach-heavy|worried about reaches/i)
   if (reachAnxiety) {
     criteria.push(
       makeCriterion(
@@ -417,9 +428,7 @@ export function extractFallback(notes) {
   }
 
   if (!matchedValues.size && !law) {
-    unresolved.push(
-      'No major in this snapshot was detected. Use “Add a criterion” and pick a program, or the list will not filter by major.'
-    )
+    unresolved.push('No major in this snapshot was detected. Use “Add a criterion” and pick a program, or the list will not filter by major.')
   }
   if (!state && !driving && !nearHome && !farFrom) unresolved.push('No home state detected; distance cannot be estimated.')
   if (sat == null && act == null) {
@@ -448,6 +457,7 @@ function canonicalProgram(raw) {
   const words = s.replace(/_/g, ' ')
   const byLabel = PROGRAM_CHOICES.find((p) => p.label.toLowerCase() === words)
   if (byLabel) return byLabel.value
+  if (/design/.test(words)) return 'design'
   if (/\bart/.test(words) && !/martial/.test(words)) return 'art'
   if (/computer|programming|coding|software/.test(words)) return 'computer_science'
   if (/marine|ocean/.test(words)) return 'marine_biology'
@@ -457,6 +467,7 @@ function canonicalProgram(raw) {
   if (/environment|sustain/.test(words)) return 'environmental_science'
   if (/educat|teach/.test(words)) return 'education'
   if (/agricult/.test(words)) return 'agriculture'
+  if (/\blaw\b/.test(words) || /pre_?law/.test(s)) return 'law'
   if (/\bbio/.test(words)) return 'biology'
   return null
 }
@@ -483,13 +494,7 @@ function normalizeAiExtraction(data, notes) {
       next.label = LABEL_FOR[prog] ?? next.label
     }
     const geoObject = c.value && typeof c.value === 'object'
-    if (
-      c.category === 'geography' ||
-      looksFarFromHome(c) ||
-      geoObject?.prefer_far ||
-      geoObject?.home_state ||
-      geoObject?.max_miles != null
-    ) {
+    if (c.category === 'geography' || looksFarFromHome(c) || geoObject?.prefer_far || geoObject?.home_state || geoObject?.max_miles != null) {
       const existing = geoObject ? c.value : {}
       const far = looksFarFromHome(c)
       next.category = 'geography'
@@ -502,12 +507,24 @@ function normalizeAiExtraction(data, notes) {
     }
     if (!next.understood || !String(next.understood).trim()) {
       const fbMatch = fallback.criteria.find(
-        (row) => row.category === next.category && String(row.value) === String(next.value)
+        (row) => row.category === next.category && JSON.stringify(row.value) === JSON.stringify(next.value)
       )
       next.understood = fbMatch?.understood || next.label
     }
     return next
   })
+
+  const fbLaw = fallback.criteria.find((c) => c.value === 'law')
+  if (fbLaw) {
+    const existing = criteria.find((c) => c.value === 'law' || /pre-?law|\blaw\b/i.test(`${c.label} ${c.value}`))
+    if (!existing) criteria.push({ ...fbLaw, id: `fb-${fbLaw.id}` })
+    else {
+      existing.value = 'law'
+      existing.category = 'academic_interest'
+      existing.strength = fbLaw.strength
+      existing.label = fbLaw.label
+    }
+  }
 
   const fbArt = fallback.criteria.find((c) => c.value === 'art')
   if (fbArt && !criteria.some((c) => c.value === 'art')) criteria.push({ ...fbArt, id: `fb-${fbArt.id}` })
@@ -524,7 +541,7 @@ function normalizeAiExtraction(data, notes) {
         max_miles: geo.value?.max_miles ?? null,
       }
       geo.label = 'Out of state — far from home'
-      if (!geo.understood || geo.understood === geo.label) geo.understood = fbFar.understood
+      if (!geo.understood) geo.understood = fbFar.understood
     }
   }
 
@@ -538,7 +555,9 @@ function normalizeAiExtraction(data, notes) {
       rigor_notes: data.academic?.rigor_notes ?? null,
     },
     criteria,
-    unresolved: [...new Set([...(data.unresolved ?? []), ...(fallback.unresolved ?? [])])],
+    unresolved: [
+      ...new Set([...(data.unresolved ?? []), ...(fallback.unresolved ?? [])].filter((u) => !/no law school/i.test(u))),
+    ],
   }
 }
 

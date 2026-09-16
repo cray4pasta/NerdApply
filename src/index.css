@@ -11,10 +11,11 @@
     height: 100%;
   }
 
+  html,
   body {
     background-color: var(--paper);
     color: var(--ink);
-    font-family: 'Albert Sans', system-ui, sans-serif;
+    font-family: var(--font-body);
   }
 
   * {
@@ -24,4 +25,50 @@
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+
+  .history-pane {
+    width: var(--history-width, var(--width-history));
+    min-width: var(--width-history-min);
+    max-width: var(--width-history-max);
+  }
+
+  .history-resize {
+    width: var(--width-resize);
+    cursor: col-resize;
+    background: transparent;
+  }
+
+  .history-resize:hover,
+  .history-resize:focus-visible {
+    background-color: var(--brand);
+  }
+
+  body.is-resizing-history {
+    cursor: col-resize;
+    user-select: none;
+  }
+
+  .status-now {
+    animation: status-pulse var(--duration-status) ease-in-out infinite;
+  }
+
+  @keyframes status-pulse {
+    50% {
+      opacity: 0.45;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-now {
+      animation: none;
+    }
+  }
+}
+
+/* Unlayered so it wins over Tailwind preflight and any stale font-sans / font-display utilities. */
+html,
+body,
+.font-sans,
+.font-display {
+  font-family: var(--font-body);
 }

@@ -1,0 +1,750 @@
+{
+  "pitt": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "nursing",
+      "biology",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "abet_engineering",
+      "co_op",
+      "research_university"
+    ],
+    "program_names": {
+      "law": "Law, Criminal Justice, and Society BA"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Law, Criminal Justice, and Society",
+        "Criminal Law",
+        "Civil Rights Law",
+        "The Legal System"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.upp.pitt.edu/preview_program.php?catoid=235&poid=73269"
+    }
+  },
+  "psu": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "business",
+      "biology",
+      "education",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "research_university",
+      "large_flagship"
+    ],
+    "program_names": {
+      "law": "Law and Society BA"
+    },
+    "courses": {
+      "law": [
+        "The American Legal Process",
+        "American Constitutional Law",
+        "Criminal Law and Procedure",
+        "Philosophy of Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://bulletins.psu.edu/undergraduate/colleges/liberal-arts/law-society-ba/"
+    }
+  },
+  "temple": {
+    "programs": [
+      "computer_science",
+      "business",
+      "education",
+      "nursing",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "research_university"
+    ],
+    "program_names": {
+      "law": "Legal Studies BBA"
+    },
+    "courses": {
+      "law": [
+        "Law of Contracts",
+        "Law for Business",
+        "Legal Reasoning in Action",
+        "Entertainment Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://bulletin.temple.edu/undergraduate/fox-business-management/legal-studies-bba/"
+    }
+  },
+  "drexel": {
+    "programs": [
+      "engineering",
+      "computer_science",
+      "business",
+      "law"
+    ],
+    "tags": [
+      "co_op",
+      "abet_engineering",
+      "strong_merit"
+    ],
+    "program_names": {
+      "law": "Law BA"
+    },
+    "courses": {
+      "law": [
+        "Law & Society",
+        "American Legal Systems",
+        "Foundations of Legal Research",
+        "Legal Reasoning"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.drexel.edu/undergraduate/schooloflaw/law/"
+    }
+  },
+  "lehigh": {
+    "programs": [
+      "engineering",
+      "computer_science",
+      "business"
+    ],
+    "tags": [
+      "abet_engineering",
+      "research_university"
+    ]
+  },
+  "cmu": {
+    "programs": [
+      "computer_science",
+      "engineering"
+    ],
+    "tags": [
+      "research_university",
+      "elite_cs"
+    ]
+  },
+  "wcu": {
+    "programs": [
+      "computer_science",
+      "education",
+      "nursing",
+      "business",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "regional_public"
+    ],
+    "program_names": {
+      "law": "Law, Politics, and Society minor"
+    },
+    "courses": {
+      "law": [
+        "Legal Environment of Business",
+        "Constitutional Law I",
+        "Criminal Law",
+        "Philosophy of Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.wcupa.edu/undergraduate/sciences-mathematics/political-science/law-politics-society-minor/"
+    }
+  },
+  "millersville": {
+    "programs": [
+      "education",
+      "business",
+      "computer_science",
+      "art"
+    ],
+    "tags": [
+      "regional_public"
+    ]
+  },
+  "udel": {
+    "programs": [
+      "engineering",
+      "computer_science",
+      "business",
+      "marine_biology",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "research_university"
+    ],
+    "program_names": {
+      "law": "Legal Studies minor / Criminal Justice Law and Society"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Legal Studies",
+        "Introduction to Law",
+        "Introduction to Criminal Law",
+        "Constitutional Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.udel.edu/preview_program.php?catoid=94&poid=93380"
+    }
+  },
+  "rutgers": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "business",
+      "biology",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "research_university",
+      "large_flagship"
+    ],
+    "program_names": {
+      "law": "Criminal Justice BA with law coursework"
+    },
+    "courses": {
+      "law": [
+        "Criminal Law: Theory and Practice",
+        "Criminal Procedure",
+        "Law and Politics",
+        "American Constitutional Law I"
+      ]
+    },
+    "course_source": {
+      "law": "https://criminaljustice.rutgers.edu/academics/program-info/our-major"
+    }
+  },
+  "upenn": {
+    "programs": [
+      "computer_science",
+      "business",
+      "engineering",
+      "art"
+    ],
+    "tags": [
+      "research_university"
+    ]
+  },
+  "miami": {
+    "programs": [
+      "marine_biology",
+      "biology",
+      "business",
+      "law"
+    ],
+    "tags": [
+      "research_university",
+      "marine_science_specialty"
+    ],
+    "program_names": {
+      "law": "Legal Studies BBA"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Business Law and Ethics",
+        "Introduction to Litigation and Trial Advocacy",
+        "Corporate Law",
+        "White Collar Crime"
+      ]
+    },
+    "course_source": {
+      "law": "https://bulletin.miami.edu/undergraduate-academic-programs/business/business-law/legal-studies-bba/"
+    }
+  },
+  "usf": {
+    "programs": [
+      "marine_biology",
+      "biology",
+      "computer_science",
+      "law"
+    ],
+    "tags": [
+      "marine_science_specialty",
+      "research_university"
+    ],
+    "program_names": {
+      "law": "Legal Studies minor"
+    },
+    "courses": {
+      "law": [
+        "Law And Business I",
+        "Law And Business II",
+        "Constitutional Law I",
+        "Substantive Criminal Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.usf.edu/preview_program.php?catoid=23&poid=11608"
+    }
+  },
+  "fit": {
+    "programs": [
+      "marine_biology",
+      "engineering",
+      "computer_science"
+    ],
+    "tags": [
+      "marine_science_specialty",
+      "strong_merit"
+    ]
+  },
+  "uf": {
+    "programs": [
+      "marine_biology",
+      "biology",
+      "engineering",
+      "computer_science",
+      "business",
+      "law"
+    ],
+    "tags": [
+      "research_university",
+      "marine_science_specialty",
+      "large_flagship"
+    ],
+    "program_names": {
+      "law": "Criminology BA (law-driven courses)"
+    },
+    "courses": {
+      "law": [
+        "Law and Society",
+        "Law and the Legal Process",
+        "Criminal Law",
+        "Criminal Procedure"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.ufl.edu/UGRD/colleges-schools/UGLAS/CRI_BA/"
+    }
+  },
+  "eckerd": {
+    "programs": [
+      "marine_biology",
+      "biology",
+      "environmental_science"
+    ],
+    "tags": [
+      "marine_science_specialty"
+    ]
+  },
+  "tamug": {
+    "programs": [
+      "marine_biology",
+      "engineering"
+    ],
+    "tags": [
+      "marine_science_specialty",
+      "regional_public"
+    ]
+  },
+  "uhm": {
+    "programs": [
+      "marine_biology",
+      "biology"
+    ],
+    "tags": [
+      "marine_science_specialty",
+      "research_university"
+    ]
+  },
+  "cofc": {
+    "programs": [
+      "marine_biology",
+      "biology",
+      "business"
+    ],
+    "tags": [
+      "marine_science_specialty"
+    ]
+  },
+  "savstate": {
+    "programs": [
+      "marine_biology",
+      "biology"
+    ],
+    "tags": [
+      "marine_science_specialty",
+      "hbcu"
+    ]
+  },
+  "newpaltz": {
+    "programs": [
+      "business",
+      "education",
+      "art",
+      "computer_science",
+      "law"
+    ],
+    "tags": [
+      "regional_public"
+    ],
+    "program_names": {
+      "law": "Law & Politics minor"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Law",
+        "Constitutional Law: National Government",
+        "Criminal Law & Procedure",
+        "Philosophy of Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.newpaltz.edu/undergraduate/college-liberal-arts-sciences/political-science-international-relations/minor-law-politics/"
+    }
+  },
+  "towson": {
+    "programs": [
+      "business",
+      "education",
+      "nursing",
+      "computer_science",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "regional_public"
+    ],
+    "program_names": {
+      "law": "Law and American Civilization BA"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Law",
+        "Judicial System",
+        "Constitutional Law and Politics",
+        "Civil Rights and Civil Liberties"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.towson.edu/undergraduate/liberal-arts/political-science/law-american-civilization/"
+    }
+  },
+  "uncw": {
+    "programs": [
+      "marine_biology",
+      "biology",
+      "business",
+      "law"
+    ],
+    "tags": [
+      "regional_public",
+      "marine_science_specialty"
+    ],
+    "program_names": {
+      "law": "Criminology BA (criminal-law coursework)"
+    },
+    "courses": {
+      "law": [
+        "Criminal Law",
+        "Criminal Procedure",
+        "Criminal Courts",
+        "Sociology of Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalogue.uncw.edu/preview_program.php?catoid=77&poid=15542"
+    }
+  },
+  "slippery": {
+    "programs": [
+      "education",
+      "business",
+      "computer_science",
+      "art"
+    ],
+    "tags": [
+      "regional_public"
+    ]
+  },
+  "usm": {
+    "programs": [
+      "marine_biology",
+      "biology"
+    ],
+    "tags": [
+      "regional_public",
+      "marine_science_specialty"
+    ]
+  },
+  "gasouthern": {
+    "programs": [
+      "biology",
+      "business",
+      "computer_science",
+      "education",
+      "art"
+    ],
+    "tags": [
+      "regional_public"
+    ]
+  },
+  "iup": {
+    "programs": [
+      "computer_science",
+      "business",
+      "education",
+      "nursing"
+    ],
+    "tags": [
+      "regional_public"
+    ]
+  },
+  "howard": {
+    "programs": [
+      "computer_science",
+      "business",
+      "biology",
+      "engineering",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "hbcu",
+      "research_university"
+    ],
+    "program_names": {
+      "law": "Legal Communication concentration"
+    },
+    "courses": {
+      "law": [
+        "Constitutional Law",
+        "Communications Law",
+        "Intro to Legal Research",
+        "Mock Trial"
+      ]
+    },
+    "course_source": {
+      "law": "https://communications.howard.edu/sites/communications.howard.edu/files/2023-12/COMM%20Legal%20Scheme%2011-2023.pdf"
+    }
+  },
+  "famu": {
+    "programs": [
+      "business",
+      "computer_science",
+      "biology",
+      "engineering",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "hbcu"
+    ],
+    "program_names": {
+      "law": "Criminal Justice BCJ, Legal Studies area"
+    },
+    "courses": {
+      "law": [
+        "American Criminal Law",
+        "American Court Systems",
+        "American Criminal Procedures",
+        "Juvenile Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.famu.edu/preview_program.php?catoid=12&poid=4009"
+    }
+  },
+  "ncat": {
+    "programs": [
+      "engineering",
+      "computer_science",
+      "business",
+      "agriculture"
+    ],
+    "tags": [
+      "hbcu",
+      "abet_engineering"
+    ]
+  },
+  "nova": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "business",
+      "biology"
+    ],
+    "tags": [
+      "community_college"
+    ]
+  },
+  "mc3": {
+    "programs": [
+      "computer_science",
+      "business",
+      "nursing"
+    ],
+    "tags": [
+      "community_college"
+    ]
+  },
+  "miamidade": {
+    "programs": [
+      "marine_biology",
+      "biology",
+      "business"
+    ],
+    "tags": [
+      "community_college",
+      "marine_science_specialty"
+    ]
+  },
+  "duke": {
+    "programs": [
+      "computer_science",
+      "biology",
+      "engineering",
+      "business",
+      "art"
+    ],
+    "tags": [
+      "research_university"
+    ]
+  },
+  "northeastern": {
+    "programs": [
+      "computer_science",
+      "business",
+      "engineering",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "co_op",
+      "research_university"
+    ],
+    "program_names": {
+      "law": "Law and Public Policy minor / Political Science Law and Legal Studies"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Law",
+        "Introduction to Law, Policy, and Society",
+        "U.S. Constitutional Law",
+        "Law and Society"
+      ]
+    },
+    "course_source": {
+      "law": "https://catalog.northeastern.edu/undergraduate/social-sciences-humanities/interdisciplinary/law-public-policy-minor/"
+    }
+  },
+  "emory": {
+    "programs": [
+      "biology",
+      "business",
+      "computer_science",
+      "art"
+    ],
+    "tags": [
+      "research_university"
+    ]
+  },
+  "michigan": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "business",
+      "biology",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "research_university",
+      "large_flagship"
+    ],
+    "program_names": {
+      "law": "Law, Justice, and Social Change minor"
+    },
+    "courses": {
+      "law": [
+        "Gender and the Law",
+        "Law and Society",
+        "Criminology",
+        "Justice in Action"
+      ]
+    },
+    "course_source": {
+      "law": "https://lsa.umich.edu/soc/undergraduates/law-justice-and-social-change/ljsc-minor.html"
+    }
+  },
+  "utaustin": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "business",
+      "art"
+    ],
+    "tags": [
+      "research_university",
+      "large_flagship"
+    ]
+  },
+  "osu": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "business",
+      "biology",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "research_university",
+      "large_flagship"
+    ],
+    "program_names": {
+      "law": "Legal Foundations of Society minor"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Law and Society",
+        "American Constitutional Law",
+        "Law and Politics",
+        "Philosophical Problems in the Law"
+      ]
+    },
+    "course_source": {
+      "law": "https://artsandsciences.osu.edu/academics/programs/minors/legal-foundations-society"
+    }
+  },
+  "asu": {
+    "programs": [
+      "computer_science",
+      "engineering",
+      "business",
+      "biology",
+      "art",
+      "law"
+    ],
+    "tags": [
+      "research_university",
+      "large_flagship",
+      "strong_merit"
+    ],
+    "program_names": {
+      "law": "Justice Studies BS / Socio-Legal Studies"
+    },
+    "courses": {
+      "law": [
+        "Introduction to Justice Studies",
+        "Justice Theory",
+        "Constitutional Law I",
+        "Law and Society"
+      ]
+    },
+    "course_source": {
+      "law": "https://degrees.apps.asu.edu/checksheet/2026/CLA/LAJUSBS/null"
+    }
+  }
+}

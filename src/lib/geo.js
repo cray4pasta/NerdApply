@@ -1,136 +1,99 @@
-// Postal codes and names for the home-state control and keyword geography matching.
-export const STATE_NAMES = {
-  AL: 'Alabama',
-  AK: 'Alaska',
-  AZ: 'Arizona',
-  AR: 'Arkansas',
-  CA: 'California',
-  CO: 'Colorado',
-  CT: 'Connecticut',
-  DE: 'Delaware',
-  DC: 'District of Columbia',
-  FL: 'Florida',
-  GA: 'Georgia',
-  HI: 'Hawaii',
-  ID: 'Idaho',
-  IL: 'Illinois',
-  IN: 'Indiana',
-  IA: 'Iowa',
-  KS: 'Kansas',
-  KY: 'Kentucky',
-  LA: 'Louisiana',
-  ME: 'Maine',
-  MD: 'Maryland',
-  MA: 'Massachusetts',
-  MI: 'Michigan',
-  MN: 'Minnesota',
-  MS: 'Mississippi',
-  MO: 'Missouri',
-  MT: 'Montana',
-  NE: 'Nebraska',
-  NV: 'Nevada',
-  NH: 'New Hampshire',
-  NJ: 'New Jersey',
-  NM: 'New Mexico',
-  NY: 'New York',
-  NC: 'North Carolina',
-  ND: 'North Dakota',
-  OH: 'Ohio',
-  OK: 'Oklahoma',
-  OR: 'Oregon',
-  PA: 'Pennsylvania',
-  RI: 'Rhode Island',
-  SC: 'South Carolina',
-  SD: 'South Dakota',
-  TN: 'Tennessee',
-  TX: 'Texas',
-  UT: 'Utah',
-  VT: 'Vermont',
-  VA: 'Virginia',
-  WA: 'Washington',
-  WV: 'West Virginia',
-  WI: 'Wisconsin',
-  WY: 'Wyoming',
-}
+// Distance and travel-burden helpers. Distance is estimated from a state centroid rather than
+// a ZIP code — Philadelphia and Pittsburgh look identical under this model. That is a known
+// limitation, named in the UI and in the README, not hidden. See docs/02-ENGINEERING.md 7.9.
 
 export const STATE_CENTROIDS = {
-  AL: { lat: 32.8, lon: -86.8 },
-  AK: { lat: 64.2, lon: -149.5 },
-  AZ: { lat: 34.3, lon: -111.7 },
-  AR: { lat: 34.9, lon: -92.4 },
-  CA: { lat: 36.8, lon: -119.4 },
-  CO: { lat: 39.0, lon: -105.5 },
-  CT: { lat: 41.6, lon: -72.7 },
-  DE: { lat: 39.0, lon: -75.5 },
-  DC: { lat: 38.9, lon: -77.0 },
-  FL: { lat: 27.8, lon: -81.7 },
-  GA: { lat: 32.7, lon: -83.4 },
-  HI: { lat: 20.8, lon: -156.3 },
-  ID: { lat: 44.4, lon: -114.6 },
-  IL: { lat: 40.0, lon: -89.0 },
-  IN: { lat: 39.8, lon: -86.3 },
-  IA: { lat: 42.0, lon: -93.5 },
-  KS: { lat: 38.5, lon: -98.4 },
-  KY: { lat: 37.8, lon: -84.9 },
-  LA: { lat: 31.2, lon: -91.9 },
-  ME: { lat: 45.3, lon: -69.2 },
-  MD: { lat: 39.0, lon: -76.7 },
-  MA: { lat: 42.3, lon: -71.8 },
-  MI: { lat: 43.3, lon: -84.5 },
-  MN: { lat: 46.0, lon: -94.3 },
-  MS: { lat: 32.7, lon: -89.7 },
-  MO: { lat: 38.4, lon: -92.5 },
-  MT: { lat: 47.1, lon: -109.6 },
-  NE: { lat: 41.5, lon: -99.8 },
-  NV: { lat: 38.5, lon: -117.0 },
-  NH: { lat: 43.7, lon: -71.6 },
-  NJ: { lat: 40.2, lon: -74.7 },
-  NM: { lat: 34.5, lon: -106.1 },
-  NY: { lat: 42.9, lon: -75.5 },
-  NC: { lat: 35.6, lon: -79.4 },
-  ND: { lat: 47.5, lon: -100.5 },
-  OH: { lat: 40.3, lon: -82.8 },
-  OK: { lat: 35.6, lon: -97.5 },
-  OR: { lat: 43.9, lon: -120.6 },
-  PA: { lat: 40.9, lon: -77.8 },
-  RI: { lat: 41.7, lon: -71.5 },
-  SC: { lat: 33.9, lon: -80.9 },
-  SD: { lat: 44.4, lon: -100.2 },
-  TN: { lat: 35.9, lon: -86.4 },
-  TX: { lat: 31.5, lon: -99.3 },
-  UT: { lat: 39.3, lon: -111.7 },
-  VT: { lat: 44.1, lon: -72.7 },
-  VA: { lat: 37.5, lon: -78.9 },
-  WA: { lat: 47.4, lon: -120.5 },
-  WV: { lat: 38.6, lon: -80.6 },
-  WI: { lat: 44.3, lon: -89.6 },
-  WY: { lat: 43.0, lon: -107.6 },
+  AL: [32.79, -86.83], AK: [64.07, -152.28], AZ: [34.27, -111.66], AR: [34.9, -92.44],
+  CA: [37.18, -119.47], CO: [38.99, -105.55], CT: [41.62, -72.73], DE: [38.99, -75.51],
+  DC: [38.9, -77.03], FL: [28.63, -82.45], GA: [32.64, -83.44], HI: [20.29, -156.37],
+  ID: [44.35, -114.61], IL: [40.03, -89.16], IN: [39.89, -86.28], IA: [42.07, -93.5],
+  KS: [38.49, -98.38], KY: [37.53, -85.3], LA: [31.05, -92.0], ME: [45.37, -69.24],
+  MD: [39.05, -76.64], MA: [42.26, -71.81], MI: [44.35, -85.41], MN: [46.39, -94.64],
+  MS: [32.74, -89.67], MO: [38.46, -92.29], MT: [46.92, -110.45], NE: [41.5, -99.68],
+  NV: [39.34, -116.42], NH: [43.68, -71.58], NJ: [40.19, -74.67], NM: [34.4, -106.13],
+  NY: [42.83, -75.5], NC: [35.63, -79.9], ND: [47.53, -99.78], OH: [40.39, -82.76],
+  OK: [35.57, -96.93], OR: [44.57, -122.07], PA: [40.59, -77.21], RI: [41.68, -71.51],
+  SC: [33.86, -80.94], SD: [44.3, -100.24], TN: [35.75, -86.69], TX: [31.05, -97.56],
+  UT: [40.15, -111.86], VT: [44.04, -72.71], VA: [37.77, -78.17], WA: [47.4, -121.49],
+  WV: [38.6, -80.45], WI: [44.27, -89.62], WY: [42.76, -107.3]
 }
 
-function toRad(deg) {
-  return (deg * Math.PI) / 180
+export const STATE_NAMES = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California', CO: 'Colorado',
+  CT: 'Connecticut', DE: 'Delaware', DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas',
+  KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts',
+  MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana',
+  NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico',
+  NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma',
+  OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota',
+  TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginia', WA: 'Washington',
+  WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming'
 }
 
-export function milesBetween(a, b) {
-  if (!a || !b || a.lat == null || b.lat == null) return null
+// Used when notes ask for a warm climate (Student B, and similar). Not a hard filter.
+export const WARM_STATES = new Set(['FL', 'TX', 'GA', 'SC', 'NC', 'AL', 'MS', 'LA', 'AZ', 'HI', 'CA'])
+
+// A tiny hand-maintained map of the home state's principal commercial airport, per
+// docs/02-ENGINEERING.md 7.9: "a tiny hand-maintained map of major hubs, not an airline API."
+export const STATE_HUB = {
+  AL: 'BHM', AK: 'ANC', AZ: 'PHX', AR: 'XNA', CA: 'LAX', CO: 'DEN', CT: 'BDL', DE: 'PHL',
+  DC: 'DCA', FL: 'MCO', GA: 'ATL', HI: 'HNL', ID: 'BOI', IL: 'ORD', IN: 'IND', IA: 'DSM',
+  KS: 'ICT', KY: 'SDF', LA: 'MSY', ME: 'PWM', MD: 'BWI', MA: 'BOS', MI: 'DTW', MN: 'MSP',
+  MS: 'JAN', MO: 'STL', MT: 'BIL', NE: 'OMA', NV: 'LAS', NH: 'MHT', NJ: 'EWR', NM: 'ABQ',
+  NY: 'JFK', NC: 'CLT', ND: 'FAR', OH: 'CMH', OK: 'OKC', OR: 'PDX', PA: 'PHL', RI: 'PVD',
+  SC: 'CHS', SD: 'FSD', TN: 'BNA', TX: 'DFW', UT: 'SLC', VT: 'BTV', VA: 'DCA', WA: 'SEA',
+  WV: 'CRW', WI: 'MKE', WY: 'JAC'
+}
+
+// Airports large/connected enough that a direct route between any two is a reasonable
+// assumption for a demo. Not an airline schedule lookup — a deliberate simplification named
+// in the README.
+export const MAJOR_HUBS = new Set([
+  'ATL', 'ORD', 'DFW', 'DEN', 'LAX', 'JFK', 'EWR', 'PHL', 'CLT', 'MIA', 'BOS', 'IAH', 'SEA',
+  'MSP', 'DTW', 'PHX', 'BWI', 'DCA', 'MCO', 'CMH', 'SLC'
+])
+
+export function haversineMiles([lat1, lon1], [lat2, lon2]) {
   const R = 3958.8
-  const dLat = toRad(b.lat - a.lat)
-  const dLon = toRad(b.lon - a.lon)
-  const s =
+  const toRad = (d) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon / 2) ** 2
-  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)))
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
+// Converts a distance into what a family is actually asking: can he come home at Thanksgiving.
+// Rules verbatim from docs/02-ENGINEERING.md 7.9.
 export function travelBurden(homeState, school) {
-  const home = homeState ? STATE_CENTROIDS[homeState] : null
-  const miles = home ? milesBetween(home, school) : null
-  if (miles == null) return { miles: null, label: 'Distance unknown — set a home state.' }
+  const home = STATE_CENTROIDS[homeState]
+  if (!home || school.lat == null || school.lon == null) {
+    return { miles: null, text: 'Distance unknown — home state not resolved.', estimated: true }
+  }
+
+  const miles = Math.round(haversineMiles(home, [school.lat, school.lon]))
   const hours = Math.max(1, Math.round(miles / 60))
-  let label
-  if (miles < 60) label = 'Close enough to come home any weekend'
-  else if (miles < 180) label = `About a ${hours}-hour drive`
-  else if (miles < 350) label = `About a ${hours}-hour drive, or a short flight`
-  else label = 'A flight, roughly half a day each way'
-  return { miles: Math.round(miles), label }
+
+  if (miles < 60) {
+    return { miles, text: 'Close enough to come home any weekend', estimated: true }
+  }
+  if (miles < 180) {
+    return { miles, text: `About a ${hours}-hour drive`, estimated: true }
+  }
+  if (miles < 350) {
+    return { miles, text: `About a ${hours}-hour drive, or a short flight`, estimated: true }
+  }
+
+  const homeHub = STATE_HUB[homeState]
+  const hasDirect =
+    homeHub && school.nearest_airport && MAJOR_HUBS.has(homeHub) && MAJOR_HUBS.has(school.nearest_airport)
+
+  if (hasDirect) {
+    const airHours = Math.max(3, Math.round(miles / 450) + 2)
+    return { miles, text: `One direct flight, roughly ${airHours}h door to door`, estimated: true }
+  }
+
+  return { miles, text: 'Usually a connecting flight, most of a day each way', estimated: true }
 }

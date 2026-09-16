@@ -45,8 +45,11 @@ Rules:
   a support need explicitly, record it under "support_needs" with the literal phrase, nothing more.
 - academic_interest "value" must be one of these slugs, never a sentence: art, marine_biology,
   computer_science, engineering, nursing, biology, business, education, environmental_science,
-  agriculture. "Interested in art", "art school", "fine arts", or "studio art" → slug "art",
-  label "Art", strength "required".
+  agriculture, law. "Interested in art", "art school", "fine arts", or "studio art" → slug "art",
+  label "Art", strength "required". Law / pre-law → slug "law", label "Law / pre-law",
+  strength "required" unless the notes hedge ("not sure", "maybe"), then "preferred". Never
+  substitute marine_biology. A JD is graduate school; this slug means an undergraduate
+  law-related major or catalog law courses, not a law school.
 - geography "value" must be an object: { "home_state": "PA", "max_miles": number | null, "prefer_far": boolean }.
   "Far from home", "out of state", "leave the state", or "away from home" (not "aren't too far from home")
   → prefer_far true, max_miles null, label "Out of state — far from home". Copy home_state into
@@ -69,52 +72,60 @@ function stripFences(text) {
   return text.replace(/^```(json)?/i, '').replace(/```$/, '').trim()
 }
 
-export async function runLlm({ mode, ...payload }) {
-  const key = process.env.GEMINI_API_KEY
-  if (!key) return { status: 503, data: { error: 'no_key' } }
-
-  const prompt = mode === 'extract' ? extractPrompt(payload.notes) : rationalePrompt(payload.criteria, payload.schools)
-  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash'
-  const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), 10000)
-
-  try {
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: ctrl.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
-        }),
-      }
-    )
-    const data = await r.json()
-    if (data.error) {
-      console.error('[api/llm] Gemini error', data.error)
-      return { status: 502, data: { error: 'upstream_failed', detail: data.error.message } }
-    }
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-    if (!text) {
-      console.error('[api/llm] empty response from Gemini', data)
-      return { status: 502, data: { error: 'empty_response' } }
-    }
-    return { status: 200, data: JSON.parse(stripFences(text)) }
-  } catch (err) {
-    console.error('[api/llm] call failed', err)
-    return { status: 502, data: { error: 'upstream_failed' } }
-  } finally {
-    clearTimeout(timer)
-  }
-}
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method_not_allowed' })
     return
   }
-  const result = await runLlm(req.body ?? {})
-  res.status(result.status).json(result.data)
+
+  const { mode, ...payload } = req.body ?? {}
+  const key = process.env.GEMINI_API_KEY
+  if (!key) {
+    res.status(503).json({ error: 'no_key' })
+    return
+  }
+
+  const prompt = mode === 'extract' ? extractPrompt(payload.notes) : rationalePrompt(payload.criteria, payload.schools)
+  // New AI Studio keys cannot call retired 2.5 Flash; the API names 3.6 Flash as the replacement.
+  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash'
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 10000)
+
+  try {
+    const r = await Promise.race([
+      fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: ctrl.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+          }),
+        }
+      ),
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('gemini timed out')), 8000)
+      }),
+    ])
+    const data = await r.json()
+    if (data.error) {
+      console.error('[api/llm] Gemini error', data.error)
+      res.status(502).json({ error: 'upstream_failed', detail: data.error.message })
+      return
+    }
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+    if (!text) {
+      console.error('[api/llm] empty response from Gemini', data)
+      res.status(502).json({ error: 'empty_response' })
+      return
+    }
+    res.status(200).json(JSON.parse(stripFences(text)))
+  } catch (err) {
+    console.error('[api/llm] call failed', err)
+    res.status(502).json({ error: 'upstream_failed' })
+  } finally {
+    clearTimeout(timer)
+  }
 }

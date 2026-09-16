@@ -1,117 +1,254 @@
+// Screen 4 — the list as a table. College, its three strongest matches, admit rate, courses.
+// Dual labels stay on the name so admissions and affordability are never blended.
+import { X } from 'lucide-react'
 import AdmissionsBand from './ui/AdmissionsBand.jsx'
+import Icon from './ui/Icon.jsx'
 import AffordabilityPill from './ui/AffordabilityPill.jsx'
-import EvidenceDots from './ui/EvidenceDots.jsx'
-import { balanceWarnings } from '../lib/balance.js'
+import { checkBalance, summarize } from '../lib/balance.js'
+import { DIMENSIONS, topMatchingDimensions } from '../lib/engine.js'
+import { highlightCourses } from '../lib/highlights.js'
 
-function matchedChips(school, criteria) {
-  const chips = []
-  for (const c of criteria) {
-    if (c.category === 'academic_interest' && school.programs?.includes(c.value)) chips.push(c.label)
-    if (c.category === 'geography') chips.push(c.label)
-    const val = c.value
-    if (val === school.setting) chips.push(c.label)
-    else if (val === 'small' && school.size < 5000) chips.push(c.label)
-    else if (val === 'large' && school.size > 20000) chips.push(c.label)
-    else if (val === 'warm') chips.push(c.label)
-  }
-  return [...new Set(chips)].slice(0, 4)
+function admitRate(school) {
+  return school.admit_rate == null ? null : Math.round(school.admit_rate * 100)
 }
 
-function SchoolRow({ school, criteria, rationale, note, onNoteChange, onRemove }) {
-  const chips = matchedChips(school, criteria)
-  const sat = school.sat_p25 != null ? `middle 50% is ${school.sat_p25}–${school.sat_p75}` : 'no SAT range on file'
-  const admit = school.admit_rate != null ? `${Math.round(school.admit_rate * 100)}% admit rate` : 'admit rate unknown'
+function matchedProgramLabels(school, criteria) {
+  return highlightCourses(school, criteria)
+    .filter((p) => p.kind === 'matched')
+    .map((p) => p.label)
+}
+
+function matchValue(dim, school, criteria) {
+  if (dim === 'affordability') return school.affordability.band
+  if (dim === 'admissions_realism') return school.admissions.band
+  if (dim === 'proximity') return school.travel?.text ?? '—'
+  if (dim === 'program') {
+    const hits = matchedProgramLabels(school, criteria)
+    return hits.length ? hits.join(', ') : 'Programme fit'
+  }
+  if (dim === 'environment') {
+    const sizeWord = school.size < 5000 ? 'small' : school.size > 20000 ? 'large' : 'mid-sized'
+    return `${school.setting} · ${sizeWord}`
+  }
+  if (dim === 'support') return 'Support needs noted'
+  return '—'
+}
+
+function padMatches(school, criteria, priorityOrder, ceiling) {
+  const found = topMatchingDimensions(
+    school,
+    {
+      criteria: criteria ?? [],
+      admissions: school.admissions,
+      affordability: school.affordability,
+      priorityOrder: priorityOrder?.length ? priorityOrder : DIMENSIONS,
+      ceiling,
+    },
+    3
+  )
+  while (found.length < 3) found.push(null)
+  return found
+}
+
+function SchoolRows({ school, criteria, rationale, note, priorityOrder, ceiling, onNoteChange, onRemove }) {
+  const matches = padMatches(school, criteria, priorityOrder, ceiling)
+  const rate = admitRate(school)
+  const offered = highlightCourses(school, criteria)
 
   return (
-    <article className="rounded-card border border-rule bg-surface p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="font-display text-18 text-ink">{school.name}</h3>
-          <p className="mt-1 font-sans text-14 text-ink-2">
-            {school.city}, {school.state} · {school.ownership} · {school.size.toLocaleString()} students
+    <tr className="align-top">
+      <td className="sticky left-0 z-10 min-w-college border-b border-r border-rule bg-surface px-5 py-4">
+          <p className="font-display text-15 text-ink">{school.name}</p>
+          <p className="mt-1 font-sans text-12 text-ink-2">
+            {school.city}, {school.state} ·{' '}
+            {school.ownership === 'community_college' ? 'Community college' : school.ownership}
           </p>
-        </div>
-        <button type="button" className="font-sans text-14 text-ink-3 hover:text-ink" onClick={() => onRemove(school.id)}>
-          Remove
-        </button>
-      </div>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <AdmissionsBand band={school.admissions.band} />
-        <EvidenceDots level={school.admissions.evidence} />
-        <span className="font-sans text-12 text-ink-3">
-          {sat} · {admit}
-        </span>
-      </div>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <AffordabilityPill band={school.affordability.band} />
-        {school.affordability.net != null ? (
-          <span className="font-sans text-14 text-ink-2">About ${school.affordability.net.toLocaleString()} / year</span>
-        ) : (
-          <span className="font-sans text-14 text-ink-3">Net price not published for this income band</span>
-        )}
-        <span className="font-sans text-12 text-ink-3">Last verified {school.last_verified}</span>
-      </div>
-      {school.affordability.outOfStatePublic && (
-        <p className="mt-2 font-sans text-12 text-ink-3">
-          Net price shown is in-state. Out-of-state cost is typically higher — verify with the school.
-        </p>
-      )}
-      <p className="mt-3 font-sans text-14 text-ink-2">{school.travel.label}</p>
-      <p className="mt-2 font-sans text-15 text-ink">{rationale}</p>
-      {chips.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {chips.map((chip) => (
-            <span key={chip} className="rounded-control bg-brand-tint px-2 py-1 font-sans text-12 text-ink-2">
-              {chip}
-            </span>
-          ))}
-        </div>
-      )}
-      <label className="mt-4 flex flex-col gap-1 font-sans text-12 text-ink-3">
-        Counselor note
-        <input
-          className="rounded-control border border-rule bg-surface px-3 py-2 font-sans text-14 text-ink focus:border-brand focus:outline-none"
-          value={note ?? ''}
-          onChange={(e) => onNoteChange(school.id, e.target.value)}
-        />
-      </label>
-    </article>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <AdmissionsBand band={school.admissions.band} />
+            <AffordabilityPill band={school.affordability.band} />
+          </div>
+          {rationale && <p className="mt-2 font-sans text-12 text-ink-3">{rationale}</p>}
+          <input
+            type="text"
+            placeholder="Counselor note…"
+            className="mt-2 w-full rounded-control border border-rule bg-paper px-2 py-1 font-sans text-12 text-ink focus:border-brand focus:outline-none"
+            value={note ?? ''}
+            onChange={(e) => onNoteChange(e.target.value)}
+          />
+        </td>
+        {matches.map((match, i) => (
+          <td key={match?.dim ?? `empty-${i}`} className="min-w-match border-b border-rule py-4 pr-4">
+            {match ? (
+              <>
+                <p className="text-12 font-medium uppercase tracking-label text-ink-3">{match.label}</p>
+                <div className="mt-1 font-sans text-14 text-ink">{matchValue(match.dim, school, criteria)}</div>
+              </>
+            ) : (
+              <span className="text-ink-3">—</span>
+            )}
+          </td>
+        ))}
+        <td className="min-w-rate border-b border-rule py-4 pr-4">
+          {rate == null ? (
+            <span className="text-ink-3">—</span>
+          ) : (
+            <p className="tabular font-sans text-15 text-ink">
+              {rate}%<span className="sr-only"> admit rate</span>
+            </p>
+          )}
+          {school.sat_p25 != null && school.sat_p75 != null && (
+            <p className="mt-1 font-sans text-12 text-ink-3">
+              Mid-50% SAT {school.sat_p25}–{school.sat_p75}
+            </p>
+          )}
+        </td>
+        <td className="min-w-highlights border-b border-rule py-4 pr-4">
+          {offered.length === 0 ? (
+            <span className="text-ink-3">—</span>
+          ) : (
+            <div className="space-y-2">
+              {offered.map((p) => (
+                <div key={p.key}>
+                  <p
+                    className={`font-sans text-14 ${
+                      p.kind === 'matched' ? 'font-medium text-ink' : p.kind === 'missing' ? 'text-ink-3' : 'text-ink-2'
+                    }`}
+                  >
+                    {p.label}
+                  </p>
+                  {p.awards != null && (
+                    <p className="mt-1 font-sans text-12 text-ink-3">
+                      Awarded {p.awards} bachelor&apos;s degrees ({school.source}
+                      {school.last_verified ? ` · ${school.last_verified}` : ''})
+                    </p>
+                  )}
+                  {p.courses?.length > 0 && (
+                    <ul className="mt-1 font-sans text-12 text-ink-2">
+                      {p.courses.map((course) => (
+                        <li key={course}>{course}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </td>
+        <td className="border-b border-rule px-5 py-4 text-right">
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 text-body-sm text-ink-3 hover:text-flag"
+            onClick={onRemove}
+          >
+            <Icon icon={X} size="sm" />
+            Remove
+          </button>
+        </td>
+    </tr>
   )
 }
 
-export default function ListStep({ list, criteria, rationales, notesById, setNotesById, onRemove }) {
-  const warnings = balanceWarnings(list)
+export default function ListStep({
+  list,
+  setList,
+  criteria,
+  rationales,
+  counselorNotes,
+  priorityOrder,
+  maxOutOfPocket,
+  catalogNote,
+  onNoteChange,
+  onPrintStudent,
+  onPrintCounselor,
+}) {
+  function removeSchool(id) {
+    setList((prev) => prev.filter((s) => s.id !== id))
+  }
+
+  const summary = summarize(list)
+  const warnings = checkBalance(list)
 
   return (
-    <div className="mx-auto max-w-wide">
-      {warnings.length > 0 && (
-        <aside className="mb-6 rounded-card border border-flag bg-flag-bg p-4">
-          <h2 className="font-sans text-15 font-medium text-flag">Balance check</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5 font-sans text-14 text-flag">
-            {warnings.map((w) => (
-              <li key={w}>{w}</li>
+    <div className="space-y-4">
+      <aside className="rounded-card border border-rule bg-surface p-5">
+        <h2 className="font-sans text-18 font-medium text-ink">Balance</h2>
+        {catalogNote && <p className="mt-2 font-sans text-12 text-ink-2">{catalogNote}</p>}
+        <p className="mt-2 font-sans text-14 text-ink-2">
+          {summary.likely} Likely · {summary.target} Target · {summary.reach} Reach · {summary.affordable} affordable
+        </p>
+
+        {warnings.length === 0 ? (
+          <p className="mt-3 font-sans text-14 text-ink-2">No balance concerns on this list.</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {warnings.map((w, i) => (
+              <li key={i} className="rounded-control bg-flag-bg px-3 py-2 font-sans text-12 text-flag">
+                {w}
+              </li>
             ))}
           </ul>
-        </aside>
-      )}
-      {list.length === 0 && (
-        <p className="font-sans text-15 text-ink-2">
-          No schools in this snapshot matched the required filters. Use Edit on an academic row to pick a program this
-          snapshot has, or add a criterion the list can score.
-        </p>
-      )}
-      <div className="space-y-4">
-        {list.map((school) => (
-          <SchoolRow
-            key={school.id}
-            school={school}
-            criteria={criteria}
-            rationale={rationales[school.id]}
-            note={notesById[school.id]}
-            onNoteChange={(id, value) => setNotesById((prev) => ({ ...prev, [id]: value }))}
-            onRemove={onRemove}
-          />
-        ))}
+        )}
+      </aside>
+
+      <div className="overflow-x-auto rounded-card border border-rule bg-surface">
+        <table className="w-full min-w-list border-separate border-spacing-0 font-sans text-15">
+          <caption className="sr-only">College list with matched criteria, admit rate, and courses</caption>
+          <thead>
+            <tr className="text-left text-12 uppercase tracking-label text-ink-3">
+              <th className="sticky left-0 z-10 min-w-college border-b border-r border-rule bg-surface px-5 py-3 font-medium">
+                College
+              </th>
+              <th className="min-w-match border-b border-rule py-3 pr-4 font-medium">First match</th>
+              <th className="min-w-match border-b border-rule py-3 pr-4 font-medium">Second match</th>
+              <th className="min-w-match border-b border-rule py-3 pr-4 font-medium">Third match</th>
+              <th className="min-w-rate border-b border-rule py-3 pr-4 font-medium">Admit rate</th>
+              <th className="min-w-highlights border-b border-rule py-3 pr-4 font-medium">Highlights</th>
+              <th className="border-b border-rule px-5 py-3">
+                <span className="sr-only">Remove</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-5 py-5 font-sans text-15 text-ink-2">
+                  No schools in this snapshot matched the required filters. Mark the major Preferred instead of Required,
+                  pick a program this dataset actually has, or set a home state for driving distance.
+                </td>
+              </tr>
+            )}
+            {list.map((school) => (
+              <SchoolRows
+                key={school.id}
+                school={school}
+                criteria={criteria}
+                rationale={rationales?.[school.id]}
+                note={counselorNotes?.[school.id]}
+                priorityOrder={priorityOrder}
+                ceiling={maxOutOfPocket}
+                onNoteChange={(v) => onNoteChange(school.id, v)}
+                onRemove={() => removeSchool(school.id)}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="rounded-control bg-brand px-4 py-2 font-sans text-14 font-medium text-surface hover:bg-brand-hover"
+          onClick={onPrintStudent}
+        >
+          Preview &amp; print — student copy
+        </button>
+        <button
+          type="button"
+          className="rounded-control border border-rule px-4 py-2 font-sans text-14 text-ink-2 hover:border-ink-3 hover:text-ink"
+          onClick={onPrintCounselor}
+        >
+          Preview &amp; print — counselor copy
+        </button>
       </div>
     </div>
   )

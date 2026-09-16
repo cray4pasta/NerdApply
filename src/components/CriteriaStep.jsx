@@ -1,6 +1,8 @@
 // Screen 2 — Criteria review. Phrase first, then a one-line paraphrase, then edit and delete
 // together. Confidence and Required/Preferred stay on the row object for scoring, not in the table.
 import { useState } from 'react'
+import { Check, Pencil, Plus, Trash2 } from 'lucide-react'
+import Icon from './ui/Icon.jsx'
 import { PROGRAM_CHOICES } from '../lib/extract.js'
 import { STATE_NAMES } from '../lib/geo.js'
 
@@ -13,38 +15,6 @@ const INCOME_BANDS = [
 ]
 
 let nextNewId = 1000
-
-function IconPencil() {
-  return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L8.25 18.402 3 19.5l1.098-5.25L16.862 4.487z"
-      />
-    </svg>
-  )
-}
-
-function IconCheck() {
-  return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-    </svg>
-  )
-}
-
-function IconTrash() {
-  return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6 7h12M9 7V5.25A1.25 1.25 0 0110.25 4h3.5A1.25 1.25 0 0115 5.25V7m-8 0l.8 12.5A1.5 1.5 0 009.3 21h5.4a1.5 1.5 0 001.5-1.5L16.9 7"
-      />
-    </svg>
-  )
-}
 
 export default function CriteriaStep({
   extraction,
@@ -203,7 +173,7 @@ export default function CriteriaStep({
                           }
                           onClick={() => setEditingId(editing ? null : c.id)}
                         >
-                          {editing ? <IconCheck /> : <IconPencil />}
+                          <Icon icon={editing ? Check : Pencil} size="sm" />
                         </button>
                         <button
                           type="button"
@@ -211,7 +181,7 @@ export default function CriteriaStep({
                           aria-label={`Remove ${understoodDisplay || c.label}`}
                           onClick={() => removeCriterion(c.id)}
                         >
-                          <IconTrash />
+                          <Icon icon={Trash2} size="sm" />
                         </button>
                       </div>
                     )}
@@ -224,8 +194,13 @@ export default function CriteriaStep({
       </div>
 
       {!locked && (
-        <button type="button" className="mt-3 font-sans text-14 text-brand hover:text-brand-hover" onClick={addCriterion}>
-          + Add a criterion
+        <button
+          type="button"
+          className="mt-3 inline-flex items-center gap-1 font-sans text-body-sm text-brand hover:text-brand-hover"
+          onClick={addCriterion}
+        >
+          <Icon icon={Plus} size="sm" />
+          Add a criterion
         </button>
       )}
 

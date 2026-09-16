@@ -1,45 +1,74 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import { runLlm } from './api/llm.js'
+import llmHandler from './api/llm.js'
+import scorecardHandler from './api/scorecard.js'
 
-function readBody(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = []
-    req.on('data', (c) => chunks.push(c))
-    req.on('end', () => {
-      try {
-        resolve(JSON.parse(Buffer.concat(chunks).toString() || '{}'))
-      } catch (err) {
-        reject(err)
-      }
-    })
-    req.on('error', reject)
-  })
+function vercelStyleRes(res) {
+  return {
+    status(code) {
+      res.statusCode = code
+      return this
+    },
+    json(payload) {
+      res.setHeader('Content-Type', 'application/json')
+      res.end(JSON.stringify(payload))
+    },
+  }
 }
 
-function llmApiPlugin(env) {
+function localLlmApi(env) {
   return {
-    name: 'llm-api',
+    name: 'local-llm-api',
     configureServer(server) {
-      if (env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY
-      if (env.GEMINI_MODEL) process.env.GEMINI_MODEL = env.GEMINI_MODEL
-      server.middlewares.use('/api/llm', async (req, res) => {
+      server.middlewares.use('/api/llm', (req, res) => {
+        if (env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY
         if (req.method !== 'POST') {
-          res.statusCode = 405
-          res.end()
+          llmHandler({ method: req.method, body: {} }, vercelStyleRes(res))
           return
         }
-        try {
-          const body = await readBody(req)
-          const result = await runLlm(body)
-          res.statusCode = result.status
-          res.setHeader('Content-Type', 'application/json')
-          res.end(JSON.stringify(result.data))
-        } catch {
-          res.statusCode = 400
-          res.setHeader('Content-Type', 'application/json')
-          res.end(JSON.stringify({ error: 'bad_request' }))
+        const chunks = []
+        req.on('data', (chunk) => chunks.push(chunk))
+        req.on('end', async () => {
+          try {
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : {}
+            await llmHandler({ method: 'POST', body }, vercelStyleRes(res))
+          } catch (err) {
+            console.error('[vite /api/llm]', err)
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'local_api_failed' }))
+          }
+        })
+      })
+    },
+  }
+}
+
+function localScorecardApi(env) {
+  return {
+    name: 'local-scorecard-api',
+    configureServer(server) {
+      server.middlewares.use('/api/scorecard', (req, res) => {
+        if (env.SCORECARD_API_KEY) process.env.SCORECARD_API_KEY = env.SCORECARD_API_KEY
+        if (req.method !== 'POST') {
+          scorecardHandler({ method: req.method, body: {} }, vercelStyleRes(res))
+          return
         }
+        const chunks = []
+        req.on('data', (chunk) => chunks.push(chunk))
+        req.on('end', async () => {
+          try {
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : {}
+            await scorecardHandler({ method: 'POST', body }, vercelStyleRes(res))
+          } catch (err) {
+            console.error('[vite /api/scorecard]', err)
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'local_api_failed' }))
+          }
+        })
       })
     },
   }
@@ -48,6 +77,6 @@ function llmApiPlugin(env) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
-    plugins: [react(), llmApiPlugin(env)],
+    plugins: [react(), localLlmApi(env), localScorecardApi(env)],
   }
 })
