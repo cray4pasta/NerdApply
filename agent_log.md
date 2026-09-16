@@ -496,6 +496,14 @@
 
 **Second test-fixture issue.** The new sort scenario reused a deliberately minimal row whose program field was a string. Multiple pages caused that malformed mock value to be merged and the handler correctly returned an upstream failure before the sort-count assertion. The scenario is supposed to isolate pagination behavior, so its program field will be changed to the array shape Scorecard returns.
 
+## 2026-09-15 18:19 PDT — Published the working app on GitHub main
+
+**What changed.** Fast-forwarded GitHub `main` (and the local `main` pointer) to the committed `feat/live-scorecard-catalog` app, including `index.html` and `src`. Left uncommitted local edits on the feature branch untouched.
+
+**Why.** Claude Design was linking the GitHub default branch, which previously only had spec files, so it reported that it could not find `index.html` or `src`.
+
+**What it affects.** Anyone linking https://github.com/cray4pasta/NerdApply now sees the College List Builder app on `main`. Uncommitted review work and the local Geist font folder were not included.
+
 **Verification typo.** After implementation, the prompt check found the correct design instruction but still failed because its regular expression required lowercase “graphic” while the prompt starts the quoted phrase with a capital letter. The assertion was intended to check wording, not capitalization, so it will be made case-insensitive before rerunning the full suite.
 
 ## 2026-09-15 18:28 PDT — Fixed all whole-branch review items
@@ -507,3 +515,11 @@
 **What it affects.** Printed documents, list highlights and fallback rationale wording, environment scoring rule 7.6, total annual cost, live Scorecard pagination, stuck-generation recovery, keyless design filtering, setup documentation, and the requested verification scripts.
 
 **Verification.** All five requested scripts passed: `verify-cip`, `verify-mismatch`, `verify-scorecard-map`, `verify-catalog-reasons`, and `verify-scorecard-handler`.
+
+## 2026-09-15 18:22 PDT — Committed the GitHub main note and pushed
+
+**What changed.** Committed the leftover log note about publishing the app on GitHub `main`, then pushed `feat/live-scorecard-catalog` and fast-forwarded GitHub `main` to the same commits. No `github.md` file was present in this repo.
+
+**Why.** Claude Design can now read the current app on the default branch. The catalog review fixes were still only local.
+
+**What it affects.** GitHub `main` and the feature branch now include the review fixes and this log. The local Geist font folder stays untracked.
