@@ -9,7 +9,7 @@ export const EXTRACT_STEPS = [
 
 export const BUILD_STEPS = [
   'Reading the confirmed criteria',
-  'Scanning the list of colleges',
+  'Looking up colleges that offer this program',
   'Building the list according to your ranking',
   'Writing a sentence for each school',
 ]
