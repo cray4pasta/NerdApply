@@ -50,10 +50,12 @@ function mapPrograms(entries, queriedSlugs) {
     if (entry?.credential?.level !== 3 || !slug || !requested.has(slug)) continue
 
     if (!programs.includes(slug)) programs.push(slug)
-    if (entry.title) programNames[slug] = entry.title
+    if (entry.title && !programNames[slug]) programNames[slug] = entry.title
 
     const awards = entry?.counts?.ipeds_awards2 ?? entry?.counts?.ipeds_awards1
-    if (awards != null) programAwards[slug] = awards
+    if (typeof awards === 'number') {
+      programAwards[slug] = (programAwards[slug] ?? 0) + awards
+    }
   }
 
   return { programs, programNames, programAwards }
@@ -72,6 +74,12 @@ export function normalizeScorecardSchool(
   const admissions = latest.admissions ?? {}
   const cost = latest.cost ?? {}
   const completion = latest.completion?.rate_suppressed ?? {}
+  const tuitionInState = cost.tuition?.in_state
+  const roomBoard = cost.roomboard?.oncampus
+  const booksPersonal = cost.booksupply
+  const hasAttendanceCost = [tuitionInState, roomBoard, booksPersonal].some(
+    (value) => typeof value === 'number'
+  )
   const { programs, programNames, programAwards } = mapPrograms(
     latest.programs?.cip_4_digit,
     queriedSlugs
@@ -94,12 +102,14 @@ export function normalizeScorecardSchool(
     test_optional: false,
     net_price: firstNetPrice(cost.net_price),
     grad_rate_6yr: completion.four_year ?? completion.overall ?? null,
-    cost_of_attendance: {
-      tuition_in_state: cost.tuition?.in_state ?? null,
-      tuition_out_state: cost.tuition?.out_of_state ?? null,
-      room_board: cost.roomboard?.oncampus ?? null,
-      books_personal: cost.booksupply ?? null,
-    },
+    cost_of_attendance: hasAttendanceCost
+      ? {
+          tuition_in_state: tuitionInState ?? null,
+          tuition_out_state: cost.tuition?.out_of_state ?? null,
+          room_board: roomBoard ?? null,
+          books_personal: booksPersonal ?? null,
+        }
+      : null,
     programs,
     program_names: { ...programNames, ...(overlay.program_names ?? {}) },
     program_awards: programAwards,
