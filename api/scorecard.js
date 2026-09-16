@@ -1,12 +1,15 @@
 import { cipsForSlugs } from '../src/lib/cip.js'
-import { normalizeScorecardSchool } from '../src/lib/scorecard-map.js'
+import {
+  inflateDottedFields,
+  normalizeScorecardSchool,
+} from '../src/lib/scorecard-map.js'
 import tagsBySlug from '../src/data/program-tags.json' with { type: 'json' }
 import snapshotUnitIds from '../src/data/snapshot-unitids.json' with { type: 'json' }
 
 const SCORECARD_URL = 'https://api.data.gov/ed/collegescorecard/v1/schools'
 const PER_PAGE = 100
 const MAX_PAGES = 3
-const TIMEOUT_MS = 8000
+const TIME_BUDGET_MS = 8000
 const SORT = 'latest.programs.cip_4_digit.counts.ipeds_awards2:desc'
 const FIELDS = [
   'id',
@@ -60,39 +63,65 @@ function requestUrl(key, cips, page, sorted) {
   return `${SCORECARD_URL}?${params}`
 }
 
-async function fetchJson(url) {
+class ScorecardBudgetExpiredError extends Error {
+  constructor() {
+    super('Scorecard time budget expired')
+    this.name = 'ScorecardBudgetExpiredError'
+  }
+}
+
+async function fetchJson(url, deadline) {
+  const remainingMs = deadline - Date.now()
+  if (remainingMs <= 0) throw new ScorecardBudgetExpiredError()
+
   const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
+  const timer = setTimeout(() => ctrl.abort(), remainingMs)
   try {
     const response = await fetch(url, { signal: ctrl.signal })
-    return response
+    const data = response.ok ? await response.json() : null
+    return { response, data }
+  } catch (err) {
+    if (ctrl.signal.aborted) throw new ScorecardBudgetExpiredError()
+    throw err
   } finally {
     clearTimeout(timer)
   }
 }
 
-async function fetchPage(key, cips, page) {
-  let response = await fetchJson(requestUrl(key, cips, page, true))
+async function fetchPage(key, cips, page, deadline) {
+  let { response, data } = await fetchJson(requestUrl(key, cips, page, true), deadline)
   if (!response.ok) {
     console.error('[api/scorecard]', 'sorted request failed; retrying without sort', {
       page,
       status: response.status,
     })
-    response = await fetchJson(requestUrl(key, cips, page, false))
+    const fallback = await fetchJson(requestUrl(key, cips, page, false), deadline)
+    response = fallback.response
+    data = fallback.data
   }
   if (!response.ok) throw new Error(`Scorecard returned HTTP ${response.status}`)
 
-  const data = await response.json()
   if (!data || !Array.isArray(data.results)) {
     throw new Error('Scorecard response did not contain a results array')
   }
   return data
 }
 
-async function fetchPages(key, cips) {
+async function fetchPages(key, cips, deadline) {
   const rows = []
   for (let page = 0; page < MAX_PAGES; page += 1) {
-    const data = await fetchPage(key, cips, page)
+    let data
+    try {
+      data = await fetchPage(key, cips, page, deadline)
+    } catch (err) {
+      if (!(err instanceof ScorecardBudgetExpiredError)) throw err
+      console.error('[api/scorecard]', 'time budget expired; stopping pagination', {
+        page,
+        rawRows: rows.length,
+      })
+      return { rows, budgetExpired: true }
+    }
+
     const results = data.results
     rows.push(...results)
     if (results.length === 0) break
@@ -108,22 +137,23 @@ async function fetchPages(key, cips) {
       break
     }
   }
-  return rows
+  return { rows, budgetExpired: false }
 }
 
-function mergeRows(rows) {
+export function mergeRows(rows) {
   const byId = new Map()
   for (const row of rows) {
-    if (row?.id == null) continue
-    const id = String(row.id)
+    const inflated = inflateDottedFields(row)
+    if (inflated.id == null) continue
+    const id = String(inflated.id)
     const existing = byId.get(id)
     if (!existing) {
-      byId.set(id, row)
+      byId.set(id, inflated)
       continue
     }
 
     const existingPrograms = existing.latest?.programs?.cip_4_digit ?? []
-    const incomingPrograms = row.latest?.programs?.cip_4_digit ?? []
+    const incomingPrograms = inflated.latest?.programs?.cip_4_digit ?? []
     existing.latest = {
       ...existing.latest,
       programs: {
@@ -162,12 +192,24 @@ export default async function handler(req, res) {
   const queriedSlugs = [...new Set(programs)]
   const cips = cipsForSlugs(queriedSlugs)
   const vintage = new Date().toISOString().slice(0, 10)
+  const deadline = Date.now() + TIME_BUDGET_MS
 
   try {
-    let rows = await fetchPages(key, cips.join(','))
-    if (rows.length === 0 && cips.length > 1) {
-      const separateRows = await Promise.all(cips.map((cip) => fetchPages(key, cip)))
-      rows = separateRows.flat()
+    let { rows, budgetExpired } = await fetchPages(key, cips.join(','), deadline)
+    if (!budgetExpired && rows.length === 0 && cips.length > 1) {
+      for (const cip of cips) {
+        const result = await fetchPages(key, cip, deadline)
+        rows.push(...result.rows)
+        if (result.budgetExpired) {
+          budgetExpired = true
+          break
+        }
+      }
+    }
+
+    if (budgetExpired && rows.length === 0) {
+      res.status(502).json({ error: 'upstream_failed' })
+      return
     }
 
     const schoolsById = new Map()
@@ -182,7 +224,7 @@ export default async function handler(req, res) {
     }
 
     res.status(200).json({
-      schools: [...schoolsById.values()],
+      schools: [...schoolsById.values()].slice(0, 300),
       vintage,
       source: 'live',
     })

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { mergeRows } from '../api/scorecard.js'
 import { normalizeScorecardSchool } from '../src/lib/scorecard-map.js'
 
 const raw = JSON.parse(
@@ -64,5 +65,22 @@ const duplicateProgramSchool = normalizeScorecardSchool(duplicateProgramRaw, {
 })
 assert.equal(duplicateProgramSchool.program_names.design, 'Design and Applied Arts')
 assert.equal(duplicateProgramSchool.program_awards.design, 20)
+
+const firstProgramPage = flattenScorecardFields(raw)
+const secondProgramPage = flattenScorecardFields(raw)
+firstProgramPage['latest.programs.cip_4_digit'] = [
+  raw.latest.programs.cip_4_digit[0],
+]
+secondProgramPage['latest.programs.cip_4_digit'] = [
+  {
+    ...raw.latest.programs.cip_4_digit[0],
+    counts: { ipeds_awards2: 8 },
+  },
+]
+const mergedFlattenedSchool = normalizeScorecardSchool(
+  mergeRows([firstProgramPage, secondProgramPage])[0],
+  { queriedSlugs: ['design'] }
+)
+assert.equal(mergedFlattenedSchool.program_awards.design, 20)
 
 console.log('verify-scorecard-map ok')

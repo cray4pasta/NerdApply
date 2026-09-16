@@ -8,7 +8,7 @@ const INCOME_KEYS = [
   '110001-plus',
 ]
 
-function inflateDottedFields(raw) {
+export function inflateDottedFields(raw) {
   const entries = Object.entries(raw ?? {})
   const inflated = Object.fromEntries(entries.filter(([key]) => !key.includes('.')))
 
