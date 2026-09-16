@@ -1,5 +1,21 @@
 # Agent log
 
+## 2026-09-16 13:07 PT — README pushed and repo set public
+
+**What changed.** Committed the rewritten README, pushed `main`, and switched the GitHub repo from private to public. The unused Geist font folder was left out.
+
+**Why.** The live URL was already public; the README and source needed to match so a reviewer can clone without a special invite.
+
+**What it affects.** GitHub visibility and `README.md` on `origin/main`. The app is unchanged.
+
+## 2026-09-16 12:10 PT — README rewritten for the technical round
+
+**What changed.** Replaced the README. It now opens with one line on what the tool is, then the live URL and how to clone it, then the pipeline, five product decisions, what to build next, and known limits. Folder trees, screenshots, how long it took, and the old Scorecard-run notes are gone.
+
+**Why.** The README is what an engineering lead reads first. They asked for this order so the live demo and the judgment show up before anything else.
+
+**What it affects.** `README.md` only. The app is unchanged.
+
 ## 2026-09-16 11:52 PT — SAT score follow-ups rebuild the list
 
 **What changed.** After a list already exists, a score update like “her sat score improved to 1650,” “SAT is now 1480,” “his SAT went up to 1520,” or “updated SAT 1400” is treated as a criteria change. The SAT row and the score used for admissions bands both update. GPA, major, football, geography, and aid stay. The list rebuilds. Asking why a named school is a Target still just answers. 1650 is above the SAT maximum of 1600, so the file uses 1600 and the assistant says so instead of ignoring the message. Law lock-in and hiking-as-campus-life follow-ups were left in place.

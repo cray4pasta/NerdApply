@@ -1,56 +1,44 @@
-# College List Builder
-
-A counselor pastes notes about one student. The app returns an editable, evidence-aware college list and two print documents — one the student takes home, one the counselor keeps. Nothing is stored.
+A counselor types a free-form description of a student and gets a printable college list.
 
 ## How to run
 
+**https://nerdapply-xi.vercel.app**
+
 ```bash
+git clone https://github.com/cray4pasta/NerdApply.git
+cd NerdApply
 npm install
-cp .env.example .env.local   # optional. Put keys in .env.local only — never in .env.example.
 npm run dev
 ```
 
-Open the URL Vite prints. `npm run dev` now serves `/api/llm` locally so a Gemini key in `.env.local` is used. Restart Vite after changing keys. Without a Gemini key the app still works: extraction falls back to keyword matching and says so on the criteria screen.
+For live extraction and rationale, put `GEMINI_API_KEY` in `.env.local`. The app runs without it.
 
-`SCORECARD_API_KEY` is optional and is used when a list is generated. Restart Vite after adding or changing it. With the key, the app requests a live College Scorecard catalog for a required program. Without the key, it builds from the 40-school snapshot in `src/data/colleges.json`.
+## How it works
 
-## Architecture decisions
+Free-form notes become a structured student profile through one LLM call, which the counselor can edit. Deterministic code then scores that profile against the college dataset and assigns every school and band. A second LLM call writes a one-sentence fit rationale from those facts only. A print stylesheet turns the reviewed list into a PDF.
 
-**The model reads and writes. The code decides.** Gemini (when a key exists) turns notes into a form and turns engine facts into one sentence. `src/lib/engine.js` picks every school, band, and number. Same notes produce the same list.
+## Key decisions
 
-**Admissions and affordability are never one score.** Every school carries Likely / Target / Reach and, separately, Likely Affordable / Needs Review / Unknown. No admission percentages.
+**Facts stay deterministic.** The model parses notes and writes prose. `engine.js` picks every school, band, and number, so a printed list cannot contain an invented school or admit rate.
 
-**Live catalog with a visible fallback.** At generate time, a required program triggers a College Scorecard lookup through `/api/scorecard.js`. If no Scorecard key is configured or the live service is unavailable, the app uses the local 40-school snapshot. The list identifies which source it used.
+**The catalog is synthetic.** The brief explicitly allows public and synthetic data; this build uses a synthetic set so the demo cannot fail on a live API. Production replaces that file with College Scorecard / IPEDS — and later the counselor’s own outcomes — behind the same adapter.
 
-**The SAT mismatch gate runs before ranking.** A school is excluded when the student's SAT is at least 200 points below its reported SAT 25th percentile. For Scorecard data, that percentile is reading plus math when both component values exist. Missing student or school SAT data does not trigger the exclusion.
+**Likely / Target / Reach, not a percentage.** A printed odds number to a 17-year-old is the wrong artifact. Bands plus evidence strength are something a counselor can defend; a fake precision number is not.
 
-**The counselor confirms first.** Extracted criteria appear in a table, with the source phrase, before any list is generated. Ranked priorities set the scoring weights.
+**The counselor is the gate.** Extracted criteria are reviewed and edited before any list is generated, and schools can be removed before print. No counselor hands a family an unreviewed AI list.
 
-## What I deliberately did not build
+**Print stylesheet, not a PDF library.** The family document is HTML; Chrome’s print dialog produces a tagged PDF from the DOM. A library would have added a dependency and emitted a flat, unreadable file.
 
-| Not building | Why |
-|---|---|
-| Login and accounts | Adds no signal about product judgment. |
-| A database | The session is the state. Nothing is written to disk. |
-| Percentage chances | Sixty schools of public data cannot support an honest one. |
-| Named scholarships | No free structured source. Printing an unverified name is the harm the risk table names. |
-| Alumni / LinkedIn introductions | Connects a minor to strangers; conflicts with de-identified outcomes. |
-| Campus safety on the student document | Crime counts are confounded. Counselor view only, and not in this build. |
-| Application gap, student-life hook, merit-aid | P1. The printed student document is the deliverable. |
+## What I’d do next
+
+- Swap the synthetic catalog for real institutional data (College Scorecard / IPEDS) so every printed figure is a verified one.
+- Score against the counselor’s own de-identified historical outcomes, not generic national stats — that is the Nerd Apply dataset, and it is how a list becomes this counselor’s list.
+- Replace state-centroid distance with ZIP so two cities in the same state stop looking the same.
+- Log every counselor override. A removal is a labelled example of where the engine was wrong, which is how the outcome model gets trained.
 
 ## Known limitations
 
-- Distance is estimated from a **state centroid**, so Philadelphia and Pittsburgh look the same. First fix: a ZIP code field.
-- Live results cover U.S. Title IV institutions only and are capped at 300 Scorecard rows.
-- College Scorecard does not provide program-level admission rates. Admissions evidence remains institution-level.
-- When live lookup is unavailable, the seed set is about **40 schools**, biased for the two brief students, not a national catalog.
-- In the local snapshot, test-optional SAT percentiles can skew upward from self-reporting, so those schools cap at Moderate evidence. Live Scorecard rows currently default to `test_optional: false`, so live evidence is not capped without a separate test-policy source.
-- Scorecard public net price is **in-state**. Out-of-state publics are forced to Needs Review.
-- Without `GEMINI_API_KEY`, extraction is keyword matching and is labelled as such.
-
-## What I would build next
-
-1. ZIP-code distance instead of state centroids
-2. Broader program mappings and stronger live-catalog observability
-3. A counselor override log — every removal or rank change is a labelled example of where the engine was wrong
-4. Then a FERPA-compliant retention model, which this demo correctly refuses to fake
+- College figures are synthetic, and labelled that way.
+- No authentication.
+- One student file in the working view.
+- No server-side persistence. Nothing is stored off the machine.
