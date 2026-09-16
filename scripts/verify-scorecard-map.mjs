@@ -12,6 +12,18 @@ const school = normalizeScorecardSchool(raw, {
   lastVerified: '2026-09-15',
 })
 
+function flattenScorecardFields(value, prefix = '', result = {}) {
+  for (const [key, child] of Object.entries(value)) {
+    const path = prefix ? `${prefix}.${key}` : key
+    if (child && typeof child === 'object' && !Array.isArray(child)) {
+      flattenScorecardFields(child, path, result)
+    } else {
+      result[path] = child
+    }
+  }
+  return result
+}
+
 assert.equal(school.id, '166027')
 assert.equal(school.name, 'Harvard University')
 assert.equal(school.ownership, 'private')
@@ -24,6 +36,14 @@ assert.equal(school.program_names.design, 'Design and Applied Arts')
 assert.equal(school.program_awards.design, 12)
 assert.equal(school.source, 'College Scorecard (live)')
 assert.equal(school.last_verified, '2026-09-15')
+
+const flattenedSchool = normalizeScorecardSchool(flattenScorecardFields(raw), {
+  queriedSlugs: ['design'],
+})
+assert.equal(flattenedSchool.name, 'Harvard University')
+assert.equal(flattenedSchool.sat_p25, 1490)
+assert.deepEqual(flattenedSchool.programs, ['design'])
+assert.equal(flattenedSchool.program_awards.design, 12)
 
 const missingCostsRaw = structuredClone(raw)
 delete missingCostsRaw.latest.cost.tuition

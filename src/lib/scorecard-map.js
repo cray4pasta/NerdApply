@@ -8,6 +8,27 @@ const INCOME_KEYS = [
   '110001-plus',
 ]
 
+function inflateDottedFields(raw) {
+  const entries = Object.entries(raw ?? {})
+  const inflated = Object.fromEntries(entries.filter(([key]) => !key.includes('.')))
+
+  for (const [key, value] of entries.filter(([field]) => field.includes('.'))) {
+    const path = key.split('.')
+    let cursor = inflated
+
+    for (const part of path.slice(0, -1)) {
+      const existing = cursor[part]
+      cursor[part] =
+        existing && typeof existing === 'object' && !Array.isArray(existing) ? { ...existing } : {}
+      cursor = cursor[part]
+    }
+
+    cursor[path.at(-1)] = value
+  }
+
+  return inflated
+}
+
 function localeSetting(locale) {
   if (locale >= 11 && locale <= 13) return 'city'
   if (locale >= 21 && locale <= 23) return 'suburban'
@@ -65,12 +86,13 @@ export function normalizeScorecardSchool(
   raw,
   { queriedSlugs = [], tagsBySlug = {}, unitIdToSlug = {}, lastVerified } = {}
 ) {
-  if (raw?.id == null || !raw?.school?.name) return null
+  const normalized = inflateDottedFields(raw)
+  if (normalized.id == null || !normalized.school?.name) return null
 
-  const unitId = String(raw.id)
+  const unitId = String(normalized.id)
   const snapshotSlug = unitIdToSlug[unitId]
   const overlay = snapshotSlug ? tagsBySlug[snapshotSlug] ?? {} : {}
-  const latest = raw.latest ?? {}
+  const latest = normalized.latest ?? {}
   const admissions = latest.admissions ?? {}
   const cost = latest.cost ?? {}
   const completion = latest.completion?.rate_suppressed ?? {}
@@ -87,15 +109,15 @@ export function normalizeScorecardSchool(
 
   return {
     id: snapshotSlug ?? unitId,
-    name: raw.school.name,
-    city: raw.school.city ?? null,
-    state: raw.school.state ?? null,
-    lat: raw.location?.lat ?? null,
-    lon: raw.location?.lon ?? null,
-    ownership: raw.school.ownership === 1 ? 'public' : 'private',
-    setting: localeSetting(raw.school.locale),
+    name: normalized.school.name,
+    city: normalized.school.city ?? null,
+    state: normalized.school.state ?? null,
+    lat: normalized.location?.lat ?? null,
+    lon: normalized.location?.lon ?? null,
+    ownership: normalized.school.ownership === 1 ? 'public' : 'private',
+    setting: localeSetting(normalized.school.locale),
     size: latest.student?.size ?? null,
-    hbcu: raw.school.minority_serving?.historically_black === 1,
+    hbcu: normalized.school.minority_serving?.historically_black === 1,
     admit_rate: admissions.admission_rate?.overall ?? null,
     sat_p25: satTotal(admissions.sat_scores?.['25th_percentile']),
     sat_p75: satTotal(admissions.sat_scores?.['75th_percentile']),
