@@ -45,18 +45,22 @@ export default {
         wide: 'var(--width-wide)',
         print: 'var(--width-print)',
         chat: 'var(--width-chat)',
-        list: 'var(--width-list)'
+        list: 'var(--width-list)',
+        'notes-entry': 'var(--width-notes-entry)'
       },
       width: {
         history: 'var(--width-history)',
         'icon-sm': 'var(--icon-sm)',
         'icon-md': 'var(--icon-md)',
-        'icon-lg': 'var(--icon-lg)'
+        'icon-lg': 'var(--icon-lg)',
+        'notes-entry': 'var(--width-notes-entry)'
       },
       height: {
         'icon-sm': 'var(--icon-sm)',
         'icon-md': 'var(--icon-md)',
-        'icon-lg': 'var(--icon-lg)'
+        'icon-lg': 'var(--icon-lg)',
+        'notes-entry': 'var(--height-notes-entry)',
+        create: 'var(--height-create)'
       },
       maxHeight: {
         composer: 'var(--height-composer-max)'

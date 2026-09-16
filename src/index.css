@@ -58,8 +58,48 @@
     }
   }
 
+  @keyframes ph-rise {
+    0% {
+      opacity: 0;
+      transform: translateY(var(--motion-ph-from));
+    }
+    8% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    86% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(calc(-1 * var(--motion-ph-to)));
+    }
+  }
+
+  @keyframes btn-in {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--motion-btn-from));
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .ph-rise {
+    animation: ph-rise var(--duration-ph) ease-in-out both;
+  }
+
+  .btn-in {
+    animation: btn-in var(--duration-btn-in) var(--ease-enter) both;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .status-now {
+    .status-now,
+    .ph-rise,
+    .btn-in {
       animation: none;
     }
   }

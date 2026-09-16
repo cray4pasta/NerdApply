@@ -1,5 +1,13 @@
 # Agent log
 
+## 2026-09-15 18:25 PT — Local main now has the Scorecard work
+
+**What changed.** Checked out `main`, fast-forwarded to match GitHub (`origin/main`), and confirmed `feat/live-scorecard-catalog` was already fully contained in that history. Deleted the local feature branch. Did not push; GitHub `main` was already up to date. Re-ran the Scorecard verify scripts after the update; they passed.
+
+**Why.** You asked to merge the Scorecard branch into main. GitHub main already had that work, plus a later criteria-table pull request, so a second merge commit was not needed.
+
+**What it affects.** Local `main` is the live app with Scorecard list-building and the newer criteria table. A 600 SAT design student still does not get Harvard. The remote feature branch may still exist on GitHub until someone deletes it.
+
 ## 2026-09-16 01:30 UTC — Merged criteria table into the live app
 
 **What changed.** Brought main (the Scorecard chat app) into this branch and kept only the criteria-table work: phrase first, a one-line “what I understood,” and grouped edit/delete. Confidence and Required/Preferred stay off the table. The rest of the app on main is unchanged.
@@ -539,3 +547,19 @@
 **Why.** Claude Design can now read the current app on the default branch. The catalog review fixes were still only local.
 
 **What it affects.** GitHub `main` and the feature branch now include the review fixes and this log. The local Geist font folder stays untracked.
+
+## 2026-09-15 18:30 PDT — Applied the Claude Design empty-state handoff
+
+**What changed.** The new-student screen now uses the 1a empty state: headline “Who are we helping today?”, rotating example prompts in the field, a mic control, and a black Create button that appears once there is text. Wired `NotesEntry` into the chat shell and added matching motion and size tokens. Create sits beside the mic with an 8px gap instead of sliding the mic with a fixed offset, because that offset overlapped the button and clipped the label.
+
+**Why.** The exported `PATCH.md` and `NotesEntry-empty-state.jsx` were the design for this first screen. Sample chips and the old “Tell me about the student” heading are gone from the empty state only.
+
+**What it affects.** The empty notes screen and the tokens/CSS that power its motion. The thread composer, list engine, and later steps are unchanged. Sending Create still starts extraction; a production build succeeded; a browser pass showed the rotating prompt, a full Create label on ink, no overlap, and the thread composer after send.
+
+## 2026-09-15 18:43 PDT — Committed the empty-state screen and pushed main
+
+**What changed.** Committed the NotesEntry empty state, chat-shell wiring, tokens, and this log, then pushed `main`. Left the local Geist font folder untracked.
+
+**Why.** The designed first screen was only on this machine after the Claude Design handoff.
+
+**What it affects.** GitHub `main` now shows the new empty notes screen. The font folder is still local only.

@@ -73,6 +73,15 @@
   --width-history-max: 480px; /* added: sidebar resize ceiling */
   --width-resize: var(--space-2); /* added: drag handle between sidebar and chat */
   --height-composer-max: 240px; /* added: composer auto-grow cap */
+  --width-notes-entry: 600px; /* added: empty-state composer from design 1a */
+  --height-notes-entry: 103px; /* added: design 1a textarea; off-grid like --text-15 */
+  --height-create: 33px; /* added: Create control row; design 1a, off-grid */
+  --duration-ph: 3.5s; /* added: rotating empty-state prompt */
+  --duration-btn-in: 240ms; /* added: Create button enter */
+  --ease-enter: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ph-from: 10px; /* added: prompt enter; design 1a */
+  --motion-ph-to: 14px; /* added: prompt exit; design 1a */
+  --motion-btn-from: var(--space-1); /* added: Create button enter distance */
   --print-margin-y: 0.6in;
   --print-margin-x: 0.75in;
   --duration-status: 1.2s; /* added: pulse on the current progress step */

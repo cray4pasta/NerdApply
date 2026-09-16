@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowUp } from 'lucide-react'
 import Icon from './ui/Icon.jsx'
-import { SAMPLE_A, SAMPLE_B, SAMPLE_SHORT } from '../lib/samples.js'
 import CaseloadSidebar from './CaseloadSidebar.jsx'
+import NotesEntry from './NotesEntry.jsx'
 
 function resizeComposer(el) {
   if (!el) return
@@ -157,22 +157,6 @@ export default function ChatShell({
     />
   )
 
-  const samples = (
-    <div className="mt-4 flex flex-wrap justify-center gap-2">
-      {[SAMPLE_A, SAMPLE_B, SAMPLE_SHORT].map((sample) => (
-        <button
-          key={sample.label}
-          type="button"
-          disabled={busy}
-          className="rounded-control border border-rule bg-surface px-3 py-2 text-12 text-ink-2 hover:border-ink-3 hover:text-ink disabled:opacity-40"
-          onClick={() => onSend(sample.notes)}
-        >
-          {sample.label}
-        </button>
-      ))}
-    </div>
-  )
-
   function onResizePointerDown(e) {
     e.preventDefault()
     const startX = e.clientX
@@ -226,16 +210,7 @@ export default function ChatShell({
 
       <main className="flex min-h-0 min-w-0 flex-1 flex-col">
         {empty ? (
-          <div className="flex flex-1 flex-col items-center justify-center px-6">
-            <div className="w-full max-w-chat">
-              <h1 className="mb-8 text-center font-sans text-28 font-normal text-ink">Tell me about the student</h1>
-              <p className="mb-6 text-center font-sans text-15 text-ink-2">
-                Paste the file in your own words. I will extract criteria for you to confirm before any school is chosen.
-              </p>
-              {composer}
-              {samples}
-            </div>
-          </div>
+          <NotesEntry onSend={onSend} disabled={busy} />
         ) : (
           <div className="mx-auto flex min-h-0 w-full max-w-chat flex-1 flex-col px-6">
             <div className="min-h-0 flex-1 overflow-y-auto py-8">
