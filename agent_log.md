@@ -912,3 +912,11 @@ Three smaller adjustments came with it so the step reads consistently. The messa
 
 **Checked** with the follow-up tests plus a direct check of those phrases: “hi” and “what’s up” classified as chat with a friendly reply; “write me a recommendation letter” got the exact fallback; school questions, “add a campus column,” “too many reaches,” and “put affordability first” stayed on their old paths. A live click-through in the browser tab could not be opened in this session, so the on-screen send was not re-clicked.
 
+## 2026-09-16 12:06 PDT — Live site on Vercel
+
+**What changed.** Linked a Vercel project named nerdapply and published the current app there. Gemini and Scorecard keys were copied into that project so extraction and the live catalog can work on the hosted site. Local ignore now also skips the Vercel link folder so it is not checked in.
+
+**Why.** Requested — commit the current work and put the demo on Vercel.
+
+**What it affects.** Counselors can open the hosted demo at https://nerdapply-xi.vercel.app. GitHub is not connected to Vercel yet, so later git pushes will not publish on their own. The unused Geist copy folder was left out of git. Nothing about list scoring or screens changed in this step.
+
