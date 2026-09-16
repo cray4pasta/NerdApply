@@ -483,3 +483,27 @@
 **Why.** The branch was already on GitHub; only the local log was still sitting uncommitted, so a second push needed that commit first.
 
 **What it affects.** Remote history now includes the session log. Local Geist font files are still not in the repository.
+
+## 2026-09-15 18:22 PDT — Added whole-branch review regressions
+
+**What changed.** Added focused checks for the language-model design instructions, snapshot design tags, one-time Scorecard sort fallback, null attendance-cost totals, and unknown enrollment not counting as small.
+
+**Why.** The review identified these behaviors as incorrect, so the checks must fail for the reviewed defects before production code changes.
+
+**What it affects.** Verification scripts only. The Scorecard and nullable-value checks failed on the intended missing behaviors.
+
+**Unexpected behavior.** The design check imported the browser-oriented college adapter, which made Node stop on its JSON import before reaching the intended missing-tag assertion. The check was supposed to inspect snapshot design coverage. It will instead read the snapshot tag JSON directly so the existing Node verification command remains compatible.
+
+**Second test-fixture issue.** The new sort scenario reused a deliberately minimal row whose program field was a string. Multiple pages caused that malformed mock value to be merged and the handler correctly returned an upstream failure before the sort-count assertion. The scenario is supposed to isolate pagination behavior, so its program field will be changed to the array shape Scorecard returns.
+
+**Verification typo.** After implementation, the prompt check found the correct design instruction but still failed because its regular expression required lowercase “graphic” while the prompt starts the quoted phrase with a capital letter. The assertion was intended to check wording, not capitalization, so it will be made case-insensitive before rerunning the full suite.
+
+## 2026-09-15 18:28 PDT — Fixed all whole-branch review items
+
+**What changed.** Missing enrollment now displays as unknown and does not score as small. Missing attendance-cost components now produce an unknown total. The Gemini prompt distinguishes design from art. Scorecard stops trying unsupported sorting after the first rejection. Snapshot recovery replaces stale live-catalog provenance. Five art-tagged snapshot schools now also have design labels. README describes the evidence limitation accurately. The Task 9 report includes this fix pass.
+
+**Why.** These changes close every critical, important, and cheap review item without adding dependencies, persistence, or invented course lists.
+
+**What it affects.** Printed documents, list highlights and fallback rationale wording, environment scoring rule 7.6, total annual cost, live Scorecard pagination, stuck-generation recovery, keyless design filtering, setup documentation, and the requested verification scripts.
+
+**Verification.** All five requested scripts passed: `verify-cip`, `verify-mismatch`, `verify-scorecard-map`, `verify-catalog-reasons`, and `verify-scorecard-handler`.
