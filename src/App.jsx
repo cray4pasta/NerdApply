@@ -10,7 +10,7 @@ import { loadSchoolsForList } from './lib/catalog.js'
 import { getColleges } from './lib/colleges.js'
 import { getRationales, templatesFor } from './lib/rationale.js'
 import { assertList } from './lib/guardrails.js'
-import { BUILD_STEPS, EXTRACT_STEPS, STEP_MS, holdForSteps } from './lib/progress.js'
+import { BUILD_STEPS, EXTRACT_STEPS, SCORECARD_MS, STEP_MS, holdForSteps } from './lib/progress.js'
 import ProgressLog from './components/ui/ProgressLog.jsx'
 import {
   createConversation,
@@ -171,7 +171,7 @@ export default function App() {
           return c
         })
       )
-    }, 5000)
+    }, SCORECARD_MS + STEP_MS * BUILD_STEPS.length + 3000)
     return () => {
       clearInterval(timer)
       clearTimeout(stuck)
