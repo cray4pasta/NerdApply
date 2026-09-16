@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import llmHandler from './api/llm.js'
 import scorecardHandler from './api/scorecard.js'
 
 function vercelStyleRes(res) {
@@ -11,6 +12,35 @@ function vercelStyleRes(res) {
     json(payload) {
       res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify(payload))
+    },
+  }
+}
+
+function localLlmApi(env) {
+  return {
+    name: 'local-llm-api',
+    configureServer(server) {
+      server.middlewares.use('/api/llm', (req, res) => {
+        if (env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY
+        if (req.method !== 'POST') {
+          llmHandler({ method: req.method, body: {} }, vercelStyleRes(res))
+          return
+        }
+        const chunks = []
+        req.on('data', (chunk) => chunks.push(chunk))
+        req.on('end', async () => {
+          try {
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : {}
+            await llmHandler({ method: 'POST', body }, vercelStyleRes(res))
+          } catch (err) {
+            console.error('[vite /api/llm]', err)
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'local_api_failed' }))
+          }
+        })
+      })
     },
   }
 }
@@ -47,6 +77,6 @@ function localScorecardApi(env) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
-    plugins: [react(), localScorecardApi(env)],
+    plugins: [react(), localLlmApi(env), localScorecardApi(env)],
   }
 })
