@@ -503,6 +503,7 @@ export default function App() {
         extraction={active.extraction}
         incomeBand={active.incomeBand}
         priorityOrder={active.priorityOrder}
+        catalogNote={active.catalogNote}
         onBack={goToChat}
       />
     )
@@ -572,6 +573,7 @@ export default function App() {
               counselorNotes={active.counselorNotes}
               priorityOrder={active.priorityOrder}
               maxOutOfPocket={active.maxOutOfPocket}
+              catalogNote={active.catalogNote}
               onNoteChange={(schoolId, value) =>
                 patch(active.id, (c) => ({
                   ...c,
