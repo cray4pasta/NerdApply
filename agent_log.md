@@ -427,3 +427,27 @@
 **Why.** The documentation needed to match the list-building behavior now implemented on this branch and make the keyless demo path and live-data limits explicit.
 
 **What it affects.** Contributor guidance, setup instructions, architecture notes, limitations, and the running decision record. Application behavior is unchanged.
+
+## 2026-09-15 18:04 PDT — Prepared the complete demo source
+
+**What changed.** Included the remaining conversation screens, criteria and priority steps, visual status components, guardrail and balance helpers, sample counselor notes, print styling, design tokens, deployment routing, optional key template, and the icon package files needed by the application. The local Geist font folder and local environment files remain excluded.
+
+**Why.** Earlier task commits intentionally stayed narrow, leaving shared demo files outside Git even though the finished list flow imports them.
+
+**What it affects.** A fresh checkout can install dependencies, render the complete counselor flow, print both documents, and build for deployment without relying on untracked application files.
+
+## 2026-09-15 18:04 PDT — Verified the complete demo build
+
+**What changed.** Ran the production build after assembling the remaining demo files. It completed successfully after transforming 1,911 modules.
+
+**Why.** The remaining files must be present and internally consistent before they are committed.
+
+**What it affects.** Verification records only. The build repeated the existing npm `devdir` notice and Vite mixed-import notice.
+
+## 2026-09-15 18:04 PDT — Source commit paused on whitespace
+
+**What changed.** The staged-file whitespace check stopped the source commit before Git created it.
+
+**Why.** The source commit was supposed to preserve the remaining demo files in a clean, reviewable state, but the included design spec had trailing spaces on three lines.
+
+**What it affects.** No application behavior and no commit. The next change removes only those trailing spaces before the check is rerun.

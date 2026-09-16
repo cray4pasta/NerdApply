@@ -23,8 +23,57 @@ export default {
         }
       },
       borderRadius: {
+        none: '0px',
+        DEFAULT: 'var(--r-control)',
+        sm: 'var(--r-control)',
+        md: 'var(--r-control)',
+        lg: 'var(--r-card)',
+        xl: 'var(--r-composer)',
+        '2xl': 'var(--r-composer)',
+        full: 'var(--r-control)',
         control: 'var(--r-control)',
-        card: 'var(--r-card)'
+        card: 'var(--r-card)',
+        composer: 'var(--r-composer)'
+      },
+      borderWidth: {
+        DEFAULT: 'var(--bw-hairline)',
+        8: 'var(--bw)'
+      },
+      maxWidth: {
+        notes: 'var(--width-notes)',
+        priorities: 'var(--width-priorities)',
+        wide: 'var(--width-wide)',
+        print: 'var(--width-print)',
+        chat: 'var(--width-chat)',
+        list: 'var(--width-list)'
+      },
+      width: {
+        history: 'var(--width-history)',
+        'icon-sm': 'var(--icon-sm)',
+        'icon-md': 'var(--icon-md)',
+        'icon-lg': 'var(--icon-lg)'
+      },
+      height: {
+        'icon-sm': 'var(--icon-sm)',
+        'icon-md': 'var(--icon-md)',
+        'icon-lg': 'var(--icon-lg)'
+      },
+      maxHeight: {
+        composer: 'var(--height-composer-max)'
+      },
+      minWidth: {
+        write: 'var(--width-write)',
+        list: 'var(--width-list)',
+        college: 'var(--col-college)',
+        match: 'var(--col-match)',
+        rate: 'var(--col-rate)',
+        highlights: 'var(--col-highlights)'
+      },
+      letterSpacing: {
+        label: 'var(--tracking-label)'
+      },
+      gridTemplateColumns: {
+        list: '1fr var(--width-sidebar)'
       },
       spacing: {
         1: 'var(--space-1)',
@@ -38,8 +87,8 @@ export default {
         12: 'var(--space-12)'
       },
       fontFamily: {
-        display: ['Libre Baskerville', 'Georgia', 'serif'],
-        sans: ['Albert Sans', 'system-ui', 'sans-serif']
+        display: ['Geist', 'system-ui', 'sans-serif'],
+        sans: ['Geist', 'system-ui', 'sans-serif']
       },
       fontSize: {
         12: 'var(--text-12)',
@@ -49,7 +98,15 @@ export default {
         18: 'var(--text-18)',
         22: 'var(--text-22)',
         28: 'var(--text-28)',
-        40: 'var(--text-40)'
+        40: 'var(--text-40)',
+        caption: 'var(--text-caption)',
+        'body-sm': 'var(--text-body-sm)',
+        body: 'var(--text-body)',
+        'body-lg': 'var(--text-body-lg)',
+        subtitle: 'var(--text-subtitle)',
+        title: 'var(--text-title)',
+        display: 'var(--text-display)',
+        'display-lg': 'var(--text-display-lg)'
       }
     }
   },
