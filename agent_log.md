@@ -451,3 +451,11 @@
 **Why.** The source commit was supposed to preserve the remaining demo files in a clean, reviewable state, but the included design spec had trailing spaces on three lines.
 
 **What it affects.** No application behavior and no commit. The next change removes only those trailing spaces before the check is rerun.
+
+## 2026-09-15 18:05 PDT — Completed Task 9 acceptance
+
+**What changed.** Ran a fresh production build, the SAT mismatch check, the design program mapping check, and a live Scorecard handler request for design followed by deterministic list building with a 600 SAT. The live request returned 300 schools, the final list contained five schools, and Harvard was absent. Wrote the exact commands and redacted outputs to the Task 9 report.
+
+**Why.** The handoff needs reproducible proof that the committed demo builds, the design mapping works, and the academic gate prevents program availability from restoring a severe SAT mismatch.
+
+**What it affects.** Verification and handoff records only. The live Scorecard sort was rejected, so the existing unsorted retry supplied all three pages successfully; no key value was printed or recorded.
