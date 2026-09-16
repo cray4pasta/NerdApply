@@ -24,10 +24,11 @@ theme exist, use only tokens from them — no Tailwind arbitrary values (`text-[
 
 ## Secrets and keys
 
-There is no Gemini key and no Scorecard key in this environment. The app must work fully on
-keyword extraction (`src/lib/extract.js` fallback path) and the hand-built `colleges.json` —
-these are not degraded placeholders, they are the primary path for this build. Never put a
-secret in client code; API calls that need a key go through `/api/llm.js` only.
+The app must work with both Gemini and Scorecard keys missing: keyword extraction falls back
+through `src/lib/extract.js`, and list generation uses the 40-school `colleges.json` snapshot
+with the same SAT gate as the live catalog. Never put a secret in client code. Extraction and
+rationale requests go through `/api/llm.js`; college catalog requests go through
+`/api/scorecard.js`.
 `.env.local` is gitignored. Commit `.env.example` with empty placeholders only.
 
 ## Scope
