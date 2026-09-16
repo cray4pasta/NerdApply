@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { isSatMismatch, buildList } from '../src/lib/engine.js'
+import { isSatMismatch, buildList, topMatchingDimensions } from '../src/lib/engine.js'
 
 assert.equal(isSatMismatch({ sat_p25: 1460 }, 600), true)
 assert.equal(isSatMismatch({ sat_p25: 720 }, 600), false)
@@ -72,5 +72,44 @@ const ranked = buildList({
 })
 assert.equal(ranked.some((s) => s.id === 'harvard'), false)
 assert.ok(ranked.findIndex((s) => s.id === 'large-design') < ranked.findIndex((s) => s.id === 'small-design'))
+
+const nullableSchool = {
+  ...openDesign,
+  id: 'nullable-design',
+  size: null,
+  cost_of_attendance: {
+    tuition_in_state: 12000,
+    room_board: null,
+    books_personal: 2000,
+  },
+}
+const nullableList = buildList({
+  schools: [nullableSchool],
+  criteria: [
+    { id: 'c1', category: 'academic_interest', value: 'design', strength: 'required' },
+    { id: 'c2', category: 'size', value: 'small', strength: 'preferred' },
+  ],
+  income_band: '75001-110000',
+  max_out_of_pocket: 25000,
+  home_state: 'PA',
+  academic: { sat: 600, gpa: 3.0 },
+  priorityOrder: ['environment', 'program', 'affordability', 'proximity', 'admissions_realism', 'support'],
+})
+assert.equal(nullableList[0].totalAnnualCost, null)
+assert.equal(
+  topMatchingDimensions(
+    nullableSchool,
+    {
+      criteria: [{ id: 'c2', category: 'size', value: 'small', strength: 'preferred' }],
+      admissions: { band: 'Target' },
+      affordability: { band: 'Unknown', netPrice: null },
+      priorityOrder: ['environment', 'program', 'affordability', 'proximity', 'admissions_realism', 'support'],
+      ceiling: 25000,
+    },
+    6
+  ).some((match) => match.dim === 'environment'),
+  false,
+  'unknown enrollment must not count as small'
+)
 
 console.log('verify-mismatch ok')

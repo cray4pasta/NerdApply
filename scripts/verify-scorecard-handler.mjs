@@ -4,7 +4,14 @@ import handler from '../api/scorecard.js'
 const sampleRow = {
   id: 166027,
   'school.name': 'Harvard University',
-  'latest.programs.cip_4_digit.code': '5004',
+  'latest.programs.cip_4_digit': [
+    {
+      code: '5004',
+      title: 'Design and Applied Arts',
+      credential: { level: 3 },
+      counts: { ipeds_awards2: 12 },
+    },
+  ],
 }
 
 function mockRes() {
@@ -62,6 +69,35 @@ try {
   assert.ok(
     errorLogs.some((args) => String(args[1]).includes('catalog completed')),
     'expected deadline expiry log before 502'
+  )
+
+  now = originalNow()
+  fetchCalls = 0
+  const requestedUrls = []
+  globalThis.fetch = async (url) => {
+    fetchCalls += 1
+    requestedUrls.push(String(url))
+    const sorted = new URL(url).searchParams.has('sort')
+    if (sorted) {
+      return { ok: false, status: 400 }
+    }
+    const page = Number(new URL(url).searchParams.get('page'))
+    return {
+      ok: true,
+      json: async () => ({
+        results: page < 3 ? [sampleRow] : [],
+        metadata: { page, per_page: 100, total: 250 },
+      }),
+    }
+  }
+
+  const sortRes = mockRes()
+  await handler({ method: 'POST', body: { programs: ['design'] } }, sortRes)
+  assert.equal(sortRes.statusCode, 200, JSON.stringify(errorLogs))
+  assert.equal(
+    requestedUrls.filter((url) => new URL(url).searchParams.has('sort')).length,
+    1,
+    'expected sort to be attempted only once after Scorecard rejects it'
   )
   console.log('verify-scorecard-handler ok')
 } finally {

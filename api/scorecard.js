@@ -88,13 +88,17 @@ async function fetchJson(url, deadline) {
   }
 }
 
-async function fetchPage(key, cips, page, deadline) {
-  let { response, data } = await fetchJson(requestUrl(key, cips, page, true), deadline)
-  if (!response.ok) {
+async function fetchPage(key, cips, page, deadline, sortState) {
+  let { response, data } = await fetchJson(
+    requestUrl(key, cips, page, sortState.available),
+    deadline
+  )
+  if (!response.ok && sortState.available) {
     console.error('[api/scorecard]', 'sorted request failed; retrying without sort', {
       page,
       status: response.status,
     })
+    sortState.available = false
     const fallback = await fetchJson(requestUrl(key, cips, page, false), deadline)
     response = fallback.response
     data = fallback.data
@@ -107,12 +111,12 @@ async function fetchPage(key, cips, page, deadline) {
   return data
 }
 
-async function fetchPages(key, cips, deadline) {
+async function fetchPages(key, cips, deadline, sortState) {
   const rows = []
   for (let page = 0; page < MAX_PAGES; page += 1) {
     let data
     try {
-      data = await fetchPage(key, cips, page, deadline)
+      data = await fetchPage(key, cips, page, deadline, sortState)
     } catch (err) {
       if (!(err instanceof ScorecardBudgetExpiredError)) throw err
       console.error('[api/scorecard]', 'time budget expired; stopping pagination', {
@@ -193,12 +197,13 @@ export default async function handler(req, res) {
   const cips = cipsForSlugs(queriedSlugs)
   const vintage = new Date().toISOString().slice(0, 10)
   const deadline = Date.now() + TIME_BUDGET_MS
+  const sortState = { available: true }
 
   try {
-    let { rows, budgetExpired } = await fetchPages(key, cips.join(','), deadline)
+    let { rows, budgetExpired } = await fetchPages(key, cips.join(','), deadline, sortState)
     if (!budgetExpired && rows.length === 0 && cips.length > 1) {
       for (const cip of cips) {
-        const result = await fetchPages(key, cip, deadline)
+        const result = await fetchPages(key, cip, deadline, sortState)
         rows.push(...result.rows)
         if (result.budgetExpired) {
           budgetExpired = true

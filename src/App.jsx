@@ -148,6 +148,8 @@ export default function App() {
                   list: built,
                   rationales: sentences,
                   counselorNotes: hadList ? c.counselorNotes : {},
+                  catalogSource: 'snapshot',
+                  catalogNote: 'College data is the local snapshot. Scorecard was unavailable.',
                   phase: 'list',
                   error: null,
                 },

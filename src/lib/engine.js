@@ -183,8 +183,8 @@ function dimensionContributions(school, ctx) {
     const val = typeof c.value === 'string' ? c.value : c.value?.setting || c.value?.size
     if (val && (school.setting === val || String(school.size) === String(val))) {
       environmentPoints += 8 * strengthOf(c)
-    } else if (val === 'small' && school.size < 5000) environmentPoints += 10 * strengthOf(c)
-    else if (val === 'large' && school.size > 20000) environmentPoints += 10 * strengthOf(c)
+    } else if (val === 'small' && school.size != null && school.size < 5000) environmentPoints += 10 * strengthOf(c)
+    else if (val === 'large' && school.size != null && school.size > 20000) environmentPoints += 10 * strengthOf(c)
     else if (val === 'warm' && WARM_STATES.has(school.state)) environmentPoints += 10 * strengthOf(c)
   }
 
@@ -377,9 +377,16 @@ export function buildList({ schools, criteria, income_band, max_out_of_pocket, h
       ceiling: max_out_of_pocket,
       awardsTerciles: awardsTercileCtx,
     })
+    const attendanceParts = school.cost_of_attendance
+      ? [
+          school.cost_of_attendance.tuition_in_state,
+          school.cost_of_attendance.room_board,
+          school.cost_of_attendance.books_personal,
+        ]
+      : null
     const totalAnnualCost =
-      school.cost_of_attendance != null
-        ? school.cost_of_attendance.tuition_in_state + school.cost_of_attendance.room_board + school.cost_of_attendance.books_personal
+      attendanceParts?.every((part) => typeof part === 'number')
+        ? attendanceParts.reduce((total, part) => total + part, 0)
         : null
 
     return { ...school, admissions, affordability, travel: burden, fit, totalAnnualCost }

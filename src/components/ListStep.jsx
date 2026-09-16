@@ -27,7 +27,8 @@ function matchValue(dim, school, criteria) {
     return hits.length ? hits.join(', ') : 'Programme fit'
   }
   if (dim === 'environment') {
-    const sizeWord = school.size < 5000 ? 'small' : school.size > 20000 ? 'large' : 'mid-sized'
+    const sizeWord =
+      school.size == null ? 'enrollment unknown' : school.size < 5000 ? 'small' : school.size > 20000 ? 'large' : 'mid-sized'
     return `${school.setting} · ${sizeWord}`
   }
   if (dim === 'support') return 'Support needs noted'

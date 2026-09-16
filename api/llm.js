@@ -37,10 +37,11 @@ Rules:
   see where each row came from, and it makes fabrication visible.
 - Do not infer race, religion, disability, immigration status, or sexuality. If the notes mention
   a support need explicitly, record it under "support_needs" with the literal phrase, nothing more.
-- academic_interest "value" must be one of these slugs, never a sentence: art, marine_biology,
+- academic_interest "value" must be one of these slugs, never a sentence: art, design, marine_biology,
   computer_science, engineering, nursing, biology, business, education, environmental_science,
   agriculture, law. "Interested in art", "art school", "fine arts", or "studio art" → slug "art",
-  label "Art", strength "required". Law / pre-law → slug "law", label "Law / pre-law",
+  label "Art", strength "required". "Graphic design", "industrial design", "visual design", or
+  "interested in design" → slug "design", label "Design", not "art". Law / pre-law → slug "law", label "Law / pre-law",
   strength "required" unless the notes hedge ("not sure", "maybe"), then "preferred". Never
   substitute marine_biology. A JD is graduate school; this slug means an undergraduate
   law-related major or catalog law courses, not a law school.

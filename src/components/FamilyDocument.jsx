@@ -40,7 +40,7 @@ function SchoolEntry({ school, rationale, note, variant, incomeBand }) {
       </header>
       <p className="mt-1 text-14 text-ink-2">
         {school.city}, {school.state} · {school.ownership === 'community_college' ? 'community college' : school.ownership} · about{' '}
-        {school.size.toLocaleString('en-US')} students
+        {school.size == null ? 'enrollment unknown' : `${school.size.toLocaleString('en-US')} students`}
       </p>
 
       {rationale && <p className="mt-3 text-15 text-ink">{rationale}</p>}

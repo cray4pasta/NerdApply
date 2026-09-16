@@ -44,7 +44,7 @@ Open the URL Vite prints. `npm run dev` now serves `/api/llm` locally so a Gemin
 - Live results cover U.S. Title IV institutions only and are capped at 300 Scorecard rows.
 - College Scorecard does not provide program-level admission rates. Admissions evidence remains institution-level.
 - When live lookup is unavailable, the seed set is about **40 schools**, biased for the two brief students, not a national catalog.
-- Test-optional SAT percentiles skew upward from self-reporting, so those schools cap at Moderate evidence.
+- In the local snapshot, test-optional SAT percentiles can skew upward from self-reporting, so those schools cap at Moderate evidence. Live Scorecard rows currently default to `test_optional: false`, so live evidence is not capped without a separate test-policy source.
 - Scorecard public net price is **in-state**. Out-of-state publics are forced to Needs Review.
 - Without `GEMINI_API_KEY`, extraction is keyword matching and is labelled as such.
 

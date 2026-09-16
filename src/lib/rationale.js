@@ -5,11 +5,15 @@ import { fetchWithTimeout } from './progress.js'
 
 function templateRationale(school, criteria) {
   const interest = criteria.find((c) => c.category === 'academic_interest' && school.programs?.includes(c.value))
-  const sizeWord = school.size < 5000 ? 'small' : school.size > 20000 ? 'large' : 'mid-sized'
+  const sizeWord =
+    school.size == null ? null : school.size < 5000 ? 'small' : school.size > 20000 ? 'large' : 'mid-sized'
   const programPhrase = interest ? `${interest.label.toLowerCase()}` : 'a broad range of programs'
   const travel = school.travel?.text ? school.travel.text.toLowerCase() : 'distance from home is estimated'
+  const schoolPhrase = sizeWord
+    ? `A ${sizeWord} ${school.ownership} school`
+    : `A ${school.ownership} school with unknown enrollment`
 
-  return `A ${sizeWord} ${school.ownership} school in ${school.setting} ${school.state} with ${programPhrase}, ${travel}.`
+  return `${schoolPhrase} in ${school.setting} ${school.state} with ${programPhrase}, ${travel}.`
 }
 
 export function templatesFor(schools, criteria) {

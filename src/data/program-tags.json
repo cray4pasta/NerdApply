@@ -64,12 +64,14 @@
       "education",
       "nursing",
       "art",
+      "design",
       "law"
     ],
     "tags": [
       "research_university"
     ],
     "program_names": {
+      "design": "Graphic and Interactive Design",
       "law": "Legal Studies BBA"
     },
     "courses": {
@@ -139,12 +141,14 @@
       "nursing",
       "business",
       "art",
+      "design",
       "law"
     ],
     "tags": [
       "regional_public"
     ],
     "program_names": {
+      "design": "Graphic and Interactive Design",
       "law": "Law, Politics, and Society minor"
     },
     "courses": {
@@ -164,11 +168,15 @@
       "education",
       "business",
       "computer_science",
-      "art"
+      "art",
+      "design"
     ],
     "tags": [
       "regional_public"
-    ]
+    ],
+    "program_names": {
+      "design": "Interactive and Graphic Design"
+    }
   },
   "udel": {
     "programs": [
@@ -384,12 +392,14 @@
       "education",
       "art",
       "computer_science",
+      "design",
       "law"
     ],
     "tags": [
       "regional_public"
     ],
     "program_names": {
+      "design": "Graphic Design",
       "law": "Law & Politics minor"
     },
     "courses": {
@@ -411,12 +421,14 @@
       "nursing",
       "computer_science",
       "art",
+      "design",
       "law"
     ],
     "tags": [
       "regional_public"
     ],
     "program_names": {
+      "design": "Art and Design",
       "law": "Law and American Civilization BA"
     },
     "courses": {
