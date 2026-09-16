@@ -26,7 +26,8 @@ Return JSON only, matching this exact shape, and nothing else:
   "academic": { "gpa": number | null, "sat": number | null, "act": number | null, "rigor_notes": string | null },
   "home_state": string | null,
   "criteria": [ { "id": string, "category": one of ${JSON.stringify(CATEGORIES)}, "label": string,
-    "value": string | object, "confidence": "high" | "medium" | "low", "source_phrase": string, "strength": "required" | "preferred" | "flexible" } ],
+    "value": string | object, "confidence": "high" | "medium" | "low", "source_phrase": string,
+    "strength": "required" | "preferred" | "flexible", "understood": string } ],
   "affordability_signal": { "aid_needed": boolean, "confidence": "high" | "medium" | "low", "source_phrase": string | null },
   "unresolved": [string]
 }
@@ -35,6 +36,11 @@ Rules:
 - Never guess a value. If it isn't in the notes, omit it or mark confidence "low".
 - "source_phrase" must be a literal substring of the notes below. This is what lets the counselor
   see where each row came from, and it makes fabrication visible.
+- "understood" must be exactly one sentence. Paraphrase what source_phrase means for the college
+  search — the implication, not a slug or a restatement of the label. Example: source_phrase
+  "wants to pursue law but not sure" → understood "Exploring law without locking into a pre-law
+  major — look for flexible programs and low-stakes ways to test legal work."
+- Never name a college in "understood". Never use percentages, "best," "safety," or "guaranteed."
 - Do not infer race, religion, disability, immigration status, or sexuality. If the notes mention
   a support need explicitly, record it under "support_needs" with the literal phrase, nothing more.
 - academic_interest "value" must be one of these slugs, never a sentence: art, design, marine_biology,

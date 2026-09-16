@@ -41,9 +41,33 @@ const INTEREST_KEYWORDS = [
 
 const LABEL_FOR = Object.fromEntries(PROGRAM_CHOICES.map((p) => [p.value, p.label]))
 
+const PROGRAM_UNDERSTOOD = {
+  art: 'Art is the academic focus — prioritize schools with a real studio or fine-arts program.',
+  design: 'Design is the academic focus for this search.',
+  marine_biology: 'Marine biology is the academic focus for this search.',
+  computer_science: 'Computer science is the academic focus for this search.',
+  engineering: 'Engineering is the academic focus for this search.',
+  nursing: 'Nursing is the academic focus for this search.',
+  biology: 'Biology is the academic focus for this search.',
+  business: 'Business is the academic focus for this search.',
+  education: 'Education is the academic focus for this search.',
+  environmental_science: 'Environmental science is the academic focus for this search.',
+  agriculture: 'Agriculture is the academic focus for this search.',
+  law: 'Looking for colleges with a path toward law, including pre-law advising and related majors.',
+}
+
 let nextId = 1
-function makeCriterion(category, label, value, confidence, sourcePhrase, strength) {
-  return { id: `c${nextId++}`, category, label, value, confidence, source_phrase: sourcePhrase, strength }
+function makeCriterion(category, label, value, confidence, sourcePhrase, strength, understood) {
+  return {
+    id: `c${nextId++}`,
+    category,
+    label,
+    value,
+    confidence,
+    source_phrase: sourcePhrase,
+    strength,
+    understood: understood || PROGRAM_UNDERSTOOD[value] || label,
+  }
 }
 
 function findState(notes) {
@@ -116,32 +140,59 @@ export function extractFallback(notes) {
       if (SUBSUMED_BY[value] && matchedValues.has(SUBSUMED_BY[value])) continue
       matchedValues.add(value)
       const flexible = Boolean(hedge) && value === 'nursing'
+      const label = flexible ? 'Nursing (may change direction)' : LABEL_FOR[value] ?? value
+      const understood = flexible
+        ? 'Interested in nursing but may change direction — keep related health majors and other paths in play.'
+        : PROGRAM_UNDERSTOOD[value] ?? label
       criteria.push(
         makeCriterion(
           'academic_interest',
-          flexible ? 'Nursing (may change direction)' : LABEL_FOR[value] ?? value,
+          label,
           value,
           'low',
           m[0],
-          flexible ? 'flexible' : 'required'
+          flexible ? 'flexible' : 'required',
+          understood
         )
       )
     }
   }
   if (hedge && matchedValues.has('nursing') && !matchedValues.has('biology')) {
-    criteria.push(makeCriterion('academic_interest', 'Related health majors', 'biology', 'low', hedge[0], 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'academic_interest',
+        'Related health majors',
+        'biology',
+        'low',
+        hedge[0],
+        'preferred',
+        'Keep related health majors available if nursing does not stick.'
+      )
+    )
     matchedValues.add('biology')
   }
 
   const law = notes.match(/\blaw\b|pre-?law|lawyer/i)
   if (law) {
     const strength = hedge ? 'preferred' : 'required'
+    const clause = notes.match(/[^.\n]*\b(?:law|pre-?law|lawyer)\b[^.\n]*/i)
+    const phrase = (clause?.[0] || law[0]).trim()
     criteria.push(
-      makeCriterion('academic_interest', hedge ? 'Law (not sure)' : 'Law / pre-law', 'law', 'low', law[0], strength)
+      makeCriterion(
+        'academic_interest',
+        hedge ? 'Law (not sure)' : 'Law / pre-law',
+        'law',
+        'low',
+        phrase,
+        strength,
+        hedge
+          ? 'Exploring law without locking in — look for flexible majors and low-stakes ways to test legal work.'
+          : PROGRAM_UNDERSTOOD.law
+      )
     )
     if (hedge) {
       unresolved.push(
-        'Law is Preferred because the notes say they are not sure. Mark it Required to keep only schools with an undergraduate law-related major.'
+        'Law is treated as preferred because the notes say they are not sure. Undergraduate law-related majors stay in play without emptying the list.'
       )
     } else {
       unresolved.push(
@@ -152,50 +203,142 @@ export function extractFallback(notes) {
 
   if (sat != null) {
     const satPhrase = notes.match(/\bsat[^.]{0,24}\d{3,4}/i) || notes.match(/\b1[0-6]\d{2}\s*SAT\b/i) || String(sat)
-    criteria.push(makeCriterion('other', `SAT ${sat}`, sat, 'low', typeof satPhrase === 'string' ? satPhrase : satPhrase[0], 'required'))
+    criteria.push(
+      makeCriterion(
+        'other',
+        `SAT ${sat}`,
+        sat,
+        'low',
+        typeof satPhrase === 'string' ? satPhrase : satPhrase[0],
+        'required',
+        `SAT ${sat} is on file for admissions comparison.`
+      )
+    )
   }
   if (gpa != null) {
     const gpaPhrase = notes.match(/\bGPA[:\s]*[0-4](?:\.\d{1,2})?\b/i) || notes.match(/\b[0-4]\.\d{1,2}\b/)
-    criteria.push(makeCriterion('other', `GPA ${gpa}`, gpa, 'low', gpaPhrase ? gpaPhrase[0] : String(gpa), 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'other',
+        `GPA ${gpa}`,
+        gpa,
+        'low',
+        gpaPhrase ? gpaPhrase[0] : String(gpa),
+        'preferred',
+        `GPA ${gpa} is on file for admissions comparison.`
+      )
+    )
   }
 
   const handsOn = notes.match(/practical and hands-on|hands-on|practical/i)
   if (handsOn) {
-    criteria.push(makeCriterion('other', 'Practical, hands-on learning style', 'hands_on', 'low', handsOn[0], 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'other',
+        'Practical, hands-on learning style',
+        'hands_on',
+        'low',
+        handsOn[0],
+        'preferred',
+        'Prefers practical, hands-on learning rather than a purely theoretical campus.'
+      )
+    )
   }
   const quiet = notes.match(/\bquiet\b|introverted|keeps to (himself|herself|themselves)/i)
   if (quiet) {
-    criteria.push(makeCriterion('other', 'Quiet / introverted', 'introverted', 'low', quiet[0], 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'other',
+        'Quiet / introverted',
+        'introverted',
+        'low',
+        quiet[0],
+        'preferred',
+        'A quieter campus culture will fit better than a high-social one.'
+      )
+    )
   }
   const extro = notes.match(/\bextroverted\b|\boutgoing\b|\bsocial\b/i)
   if (extro) {
-    criteria.push(makeCriterion('other', 'Extroverted / outgoing', 'extroverted', 'low', extro[0], 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'other',
+        'Extroverted / outgoing',
+        'extroverted',
+        'low',
+        extro[0],
+        'preferred',
+        'An outgoing, social campus environment is a better fit.'
+      )
+    )
   }
   const basketball = notes.match(/basketball|athletics|sports/i)
   if (basketball) {
-    criteria.push(makeCriterion('other', 'Loves basketball', 'basketball', 'low', basketball[0], 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'other',
+        'Loves basketball',
+        'basketball',
+        'low',
+        basketball[0],
+        'preferred',
+        'Athletics matter, especially basketball — confirm sports on campus.'
+      )
+    )
     unresolved.push('Athletics are not in the federal snapshot — confirm campus sports with the school.')
   }
   const noEc = notes.match(/no extra[\s-]?curriculars|no extracurriculars|no activities/i)
   if (noEc) {
-    criteria.push(makeCriterion('other', 'No extracurriculars on file', 'no_ec', 'low', noEc[0], 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'other',
+        'No extracurriculars on file',
+        'no_ec',
+        'low',
+        noEc[0],
+        'preferred',
+        'No extracurriculars are on file, so academic and campus fit have to carry more of the list.'
+      )
+    )
   }
 
   const warm = notes.match(/\bwarm\b|somewhere warm|hot climate|the south|southern|beach town/i)
   if (warm) {
-    criteria.push(makeCriterion('environment', 'Warm climate', 'warm', 'low', warm[0], 'preferred'))
+    criteria.push(
+      makeCriterion('environment', 'Warm climate', 'warm', 'low', warm[0], 'preferred', 'Prefer a warm climate.')
+    )
   }
 
   const closeKnit = notes.match(/close-knit|not too large|intimate|small campus/i)
   const settingMatch = !closeKnit && notes.match(/\b(small|large|big school|city|rural|urban|suburban)\b/i)
   if (closeKnit) {
-    criteria.push(makeCriterion('size', 'Close-knit, not too large', 'small', 'low', closeKnit[0], 'preferred'))
+    criteria.push(
+      makeCriterion(
+        'size',
+        'Close-knit, not too large',
+        'small',
+        'low',
+        closeKnit[0],
+        'preferred',
+        'Prefer a close-knit campus that is not too large.'
+      )
+    )
   } else if (settingMatch) {
     const raw = settingMatch[1].toLowerCase()
     const sizeWords = ['small', 'large', 'big school']
     const category = sizeWords.includes(raw) ? 'size' : 'environment'
     const value = raw === 'big school' ? 'large' : raw
-    criteria.push(makeCriterion(category, `Prefers a ${value} school`, value, 'low', settingMatch[0], 'flexible'))
+    criteria.push(
+      makeCriterion(
+        category,
+        `Prefers a ${value} school`,
+        value,
+        'low',
+        settingMatch[0],
+        'flexible',
+        `Prefers a ${value} school.`
+      )
+    )
   }
 
   const driving = notes.match(/driving distance|drivable|can drive|within driving/i)
@@ -209,9 +352,19 @@ export function extractFallback(notes) {
     const maxMiles = driving ? 180 : nearHome ? 300 : null
     const phrase = farFrom ? farFrom[0] : driving ? driving[0] : nearHome ? nearHome[0] : state.phrase
     let label = `Home state: ${state ? STATE_NAMES[state.abbr] : 'unknown'}`
-    if (farFrom) label = 'Out of state — far from home'
-    else if (driving) label = 'Driving distance'
-    else if (nearHome) label = `Within ~${maxMiles} miles of home`
+    let understood = state
+      ? `Home state is ${STATE_NAMES[state.abbr]}, which is the starting point for distance.`
+      : 'Home state is the starting point for distance.'
+    if (farFrom) {
+      label = 'Out of state — far from home'
+      understood = 'Wants to be far from home, so the search should prefer out-of-state schools.'
+    } else if (driving) {
+      label = 'Driving distance'
+      understood = 'Stay within driving distance of home.'
+    } else if (nearHome) {
+      label = `Within ~${maxMiles} miles of home`
+      understood = 'Stay relatively close to home — roughly within a few hundred miles.'
+    }
     criteria.push(
       makeCriterion(
         'geography',
@@ -219,14 +372,15 @@ export function extractFallback(notes) {
         { home_state: state?.abbr ?? null, max_miles: maxMiles, prefer_far: Boolean(farFrom) },
         'low',
         phrase,
-        'preferred'
+        'preferred',
+        understood
       )
     )
     if ((driving || nearHome || farFrom) && !state) {
       unresolved.push('Set home state below — distance needs a starting point.')
     }
     if (farFrom && state) {
-      unresolved.push(`Far from home excludes ${STATE_NAMES[state.abbr]} schools. Mark that row Flexible if in-state should stay.`)
+      unresolved.push(`Far from home excludes ${STATE_NAMES[state.abbr]} schools.`)
     }
   }
 
@@ -235,17 +389,41 @@ export function extractFallback(notes) {
   )
   if (aidMatch) {
     criteria.push(
-      makeCriterion('family_constraint', 'Needs strong financial support', 'aid_needed', 'low', aidMatch[0], 'required')
+      makeCriterion(
+        'family_constraint',
+        'Needs strong financial support',
+        'aid_needed',
+        'low',
+        aidMatch[0],
+        'required',
+        'Needs strong financial support, so net price has to be visible and realistic.'
+      )
     )
   }
 
   const reachAnxiety = notes.match(/anxious about reaches|afraid of reaches|too many reaches|reach-heavy|worried about reaches/i)
   if (reachAnxiety) {
     criteria.push(
-      makeCriterion('risk_tolerance', 'Cautious about Reach schools', 'cautious_reach', 'low', reachAnxiety[0], 'preferred')
+      makeCriterion(
+        'risk_tolerance',
+        'Cautious about Reach schools',
+        'cautious_reach',
+        'low',
+        reachAnxiety[0],
+        'preferred',
+        'Go easy on Reach schools.'
+      )
     )
     criteria.push(
-      makeCriterion('support_needs', 'Student support services', 'support', 'low', reachAnxiety[0], 'preferred')
+      makeCriterion(
+        'support_needs',
+        'Student support services',
+        'support',
+        'low',
+        reachAnxiety[0],
+        'preferred',
+        'Student support services should weigh more than usual.'
+      )
     )
   }
 
@@ -327,6 +505,12 @@ function normalizeAiExtraction(data, notes) {
       }
       if (far) next.label = 'Out of state — far from home'
     }
+    if (!next.understood || !String(next.understood).trim()) {
+      const fbMatch = fallback.criteria.find(
+        (row) => row.category === next.category && JSON.stringify(row.value) === JSON.stringify(next.value)
+      )
+      next.understood = fbMatch?.understood || next.label
+    }
     return next
   })
 
@@ -357,6 +541,7 @@ function normalizeAiExtraction(data, notes) {
         max_miles: geo.value?.max_miles ?? null,
       }
       geo.label = 'Out of state — far from home'
+      if (!geo.understood) geo.understood = fbFar.understood
     }
   }
 

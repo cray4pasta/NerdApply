@@ -1,5 +1,21 @@
 # Agent log
 
+## 2026-09-16 01:30 UTC — Merged criteria table into the live app
+
+**What changed.** Brought main (the Scorecard chat app) into this branch and kept only the criteria-table work: phrase first, a one-line “what I understood,” and grouped edit/delete. Confidence and Required/Preferred stay off the table. The rest of the app on main is unchanged.
+
+**Why.** The pull request could not merge because main had moved forward with the real app while this branch still had a standalone preview.
+
+**What it affects.** The criteria review screen after notes are pasted. Scoring still uses the hidden category, value, and importance on each row.
+
+## 2026-09-15 22:35 UTC — Criteria table: phrase, understood, edit/delete
+
+**What changed.** The criteria table no longer shows confidence dots or Required/Preferred/Flexible. Each row now starts with the exact phrase from the notes, then a one-line paraphrase of what that phrase means for the search, then edit and delete icons sitting together.
+
+**Why.** Confidence and importance did not help anyone audit the notes. A phrase such as “wants to pursue law but not sure” should read as exploring law without locking in, with flexible majors and low-stakes ways to test legal work.
+
+**What it affects.** The criteria review screen and the extract step.
+
 ## 2026-09-15 18:00 PT — Task 6 client catalog adapter
 
 **What changed.** Added `src/lib/catalog.js` with `loadSchoolsForList` and pure catalog reason helpers, plus `scripts/verify-catalog-reasons.mjs`. Committed as `eed7928`.
