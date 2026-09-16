@@ -207,7 +207,10 @@ export default async function handler(req, res) {
       }
     }
 
-    if (budgetExpired && rows.length === 0) {
+    if (budgetExpired) {
+      console.error('[api/scorecard]', 'time budget expired before catalog completed', {
+        rawRows: rows.length,
+      })
       res.status(502).json({ error: 'upstream_failed' })
       return
     }
