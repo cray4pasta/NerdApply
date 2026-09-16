@@ -16,6 +16,7 @@ export const BUILD_STEPS = [
 
 export const STEP_MS = 700
 export const LLM_MS = 4000
+export const CATALOG_MS = 14000
 export const SCORECARD_MS = 12000
 
 export function wait(ms) {

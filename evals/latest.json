@@ -1,0 +1,2409 @@
+{
+  "ran_at": "2026-09-16T07:59:35.188Z",
+  "model": "gemini-3.6-flash",
+  "case_source": "gemini",
+  "headline": "Prototype relies on a rigid, repetitive school template and repeatedly ignores critical student constraints.",
+  "prototype_risk": "The system has a severe 'hardcoded template' bias, frequently recommending the same subset of schools (Temple, West Chester, Millersville, Cornell, CMU, NYU) regardless of the student's major, budget, or emotional needs. It also routinely misclassifies highly selective schools as 'Targets' for low-to-mid-range students, posing a massive liability risk for counselors.",
+  "pass": 0,
+  "fail": 10,
+  "unjudged": 0,
+  "cases": [
+    {
+      "id": "conflicting-geography",
+      "title": "Conflicting Geography",
+      "why_hard": "The student and family have stated geographic requirements that are physically mutually exclusive.",
+      "notes": "Liam wants to stay within a 3-hour drive of family in Chicago, but his mother is demanding warm coastal weather year-round in California or Florida. Looking for business or engineering programs. Unweighted GPA 3.7, ACT 29. Needs an urban or suburban setting with strong internship access.",
+      "extraction": {
+        "degraded": true,
+        "student_name": "Liam",
+        "home_state": "CA",
+        "academic": {
+          "gpa": 3.7,
+          "sat": null,
+          "act": 29,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Engineering",
+            "value": "engineering",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "engineering",
+            "understood": "Engineering is the academic focus for this search."
+          },
+          {
+            "category": "academic_interest",
+            "label": "Business",
+            "value": "business",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "business",
+            "understood": "Business is the academic focus for this search."
+          },
+          {
+            "category": "other",
+            "label": "GPA 3.7",
+            "value": 3.7,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "GPA 3.7",
+            "understood": "GPA 3.7 is on file for admissions comparison."
+          },
+          {
+            "category": "environment",
+            "label": "Warm climate",
+            "value": "warm",
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "warm",
+            "understood": "Prefer a warm climate."
+          },
+          {
+            "category": "environment",
+            "label": "Prefers a urban school",
+            "value": "urban",
+            "strength": "flexible",
+            "confidence": "low",
+            "source_phrase": "urban",
+            "understood": "Prefers a urban school."
+          },
+          {
+            "category": "geography",
+            "label": "Home state: California",
+            "value": {
+              "home_state": "CA",
+              "max_miles": null,
+              "prefer_far": false
+            },
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "California",
+            "understood": "Home state is California, which is the starting point for distance."
+          }
+        ],
+        "unresolved": [],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 8,
+      "mix": {
+        "likely": 4,
+        "target": 4,
+        "reach": 0,
+        "affordable": 0
+      },
+      "warnings": [
+        "This list has no school the family is likely to afford. Consider adding an in-state public or a school that meets full need."
+      ],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Arizona State University",
+          "city": "Tempe",
+          "state": "AZ",
+          "ownership": "public",
+          "size": 55000,
+          "admit_rate": 0.81,
+          "sat_p25": 974,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 19620,
+          "rationale": "A large public school in city AZ with engineering, undergraduate engineering society and a career club, one direct flight, roughly 3h door to door."
+        },
+        {
+          "name": "University of North Carolina at Chapel Hill",
+          "city": "Chapel Hill",
+          "state": "NC",
+          "ownership": "public",
+          "size": 20000,
+          "admit_rate": 0.47,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 24459,
+          "rationale": "A mid-sized public school in town NC with engineering, undergraduate engineering society and a career club, one direct flight, roughly 7h door to door."
+        },
+        {
+          "name": "University of Southern California",
+          "city": "Los Angeles",
+          "state": "CA",
+          "ownership": "private",
+          "size": 21000,
+          "admit_rate": 0.17,
+          "sat_p25": 1255,
+          "sat_p75": 1395,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 33951,
+          "rationale": "A large private school in city CA with engineering, engineering club, about a 4-hour drive, or a short flight."
+        },
+        {
+          "name": "University of California, Los Angeles",
+          "city": "Los Angeles",
+          "state": "CA",
+          "ownership": "public",
+          "size": 32000,
+          "admit_rate": 0.17,
+          "sat_p25": 1277,
+          "sat_p75": 1417,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 32129,
+          "rationale": "A large public school in city CA with engineering, undergraduate engineering society and a career club, about a 4-hour drive, or a short flight."
+        },
+        {
+          "name": "University of Pittsburgh",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "public",
+          "size": 19000,
+          "admit_rate": 0.38,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 27456,
+          "rationale": "A mid-sized public school in city PA with engineering, project teams in engineering, one direct flight, roughly 7h door to door."
+        },
+        {
+          "name": "Rochester Institute of Technology",
+          "city": "Rochester",
+          "state": "NY",
+          "ownership": "private",
+          "size": 14000,
+          "admit_rate": 0.43,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 26963,
+          "rationale": "A mid-sized private school in suburban NY with engineering, project teams in engineering, one direct flight, roughly 7h door to door."
+        },
+        {
+          "name": "University of Texas at Austin",
+          "city": "Austin",
+          "state": "TX",
+          "ownership": "public",
+          "size": 40000,
+          "admit_rate": 0.16,
+          "sat_p25": 1305,
+          "sat_p75": 1445,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 39555,
+          "rationale": "A large public school in city TX with engineering, undergraduate engineering society and a career club, one direct flight, roughly 5h door to door."
+        },
+        {
+          "name": "Emory University",
+          "city": "Atlanta",
+          "state": "GA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.13,
+          "sat_p25": 1262,
+          "sat_p75": 1402,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 30579,
+          "rationale": "A mid-sized private school in suburban GA with engineering, undergraduate engineering society and a career club, one direct flight, roughly 6h door to door."
+        }
+      ],
+      "judgment": {
+        "id": "conflicting-geography",
+        "scores": {
+          "extraction_fidelity": 2,
+          "list_fit": 2,
+          "balance": 2,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Identified Liam's interest in Business and Engineering.",
+        "what_broke": "Completely failed to resolve the geographic conflict. It set his home state to CA (ignoring Chicago), and then recommended schools in NY, PA, NC, GA, and TX, none of which are within a 3-hour drive of Chicago or strictly 'warm coastal' (RIT in Rochester, NY is freezing). It also labeled highly selective schools like UCLA and USC (17% admit rates) as 'Targets' for a 3.7 GPA and 29 ACT.",
+        "issues": [
+          "Mislabeled home state as CA instead of IL",
+          "Included freezing-cold schools (RIT, Pitt) despite 'warm climate' preference",
+          "Labeled reach schools (UCLA, USC, UT Austin, Emory) as Targets",
+          "Ignored the 3-hour drive constraint entirely"
+        ]
+      }
+    },
+    {
+      "id": "high-stats-need-aid",
+      "title": "High Stats with Critical Need-Based Aid",
+      "why_hard": "High academic stats require balancing top-tier selectivity with strict, unyielding financial need constraints.",
+      "notes": "Maya has a 4.0 UW GPA and 1560 SAT with stellar robotics ECs, aiming for engineering. However, family expected contribution is $0 and she cannot take on loans, requiring 100% demonstrated need met or heavy merit guarantees while keeping academic rigor high.",
+      "extraction": {
+        "degraded": true,
+        "student_name": "Maya",
+        "home_state": null,
+        "academic": {
+          "gpa": 4,
+          "sat": 1560,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Engineering",
+            "value": "engineering",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "engineering",
+            "understood": "Engineering is the academic focus for this search."
+          },
+          {
+            "category": "other",
+            "label": "SAT 1560",
+            "value": 1560,
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "1560 SAT",
+            "understood": "SAT 1560 is on file for admissions comparison."
+          },
+          {
+            "category": "other",
+            "label": "GPA 4",
+            "value": 4,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "4.0",
+            "understood": "GPA 4 is on file for admissions comparison."
+          },
+          {
+            "category": "other",
+            "label": "Robotics club",
+            "value": "robotics",
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "robotics",
+            "understood": "Look for an active robotics club or competitive robotics team."
+          }
+        ],
+        "unresolved": [
+          "No home state detected; distance cannot be estimated."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 7
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.83,
+          "sat_p25": 1341,
+          "sat_p75": 1550,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 16698,
+          "rationale": "A large public school in city PA with engineering, robotics club plus design-build teams that recruit first-years, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.81,
+          "sat_p25": 1361,
+          "sat_p75": 1550,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 19171,
+          "rationale": "A mid-sized public school in suburban PA with engineering, robotics club plus design-build teams that recruit first-years, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.62,
+          "sat_p25": 1362,
+          "sat_p75": 1550,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 18616,
+          "rationale": "A mid-sized public school in town PA with engineering, robotics club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Penn State University Park",
+          "city": "State College",
+          "state": "PA",
+          "ownership": "public",
+          "size": 40000,
+          "admit_rate": 0.48,
+          "sat_p25": 1490,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 23118,
+          "rationale": "A large public school in town PA with engineering, active robotics club and a engineering makerspace, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Howard University",
+          "city": "Washington",
+          "state": "DC",
+          "ownership": "private",
+          "size": 10000,
+          "admit_rate": 0.43,
+          "sat_p25": 1490,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 23019,
+          "rationale": "A mid-sized private school in city DC with engineering, active robotics club and a engineering makerspace, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Rutgers University–New Brunswick",
+          "city": "New Brunswick",
+          "state": "NJ",
+          "ownership": "public",
+          "size": 36000,
+          "admit_rate": 0.4,
+          "sat_p25": 1490,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 23100,
+          "rationale": "A large public school in city NJ with engineering, robotics club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Rochester Institute of Technology",
+          "city": "Rochester",
+          "state": "NY",
+          "ownership": "private",
+          "size": 14000,
+          "admit_rate": 0.43,
+          "sat_p25": 1490,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 24467,
+          "rationale": "A mid-sized private school in suburban NY with engineering, active robotics club and a engineering makerspace, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Carnegie Mellon University",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.13,
+          "sat_p25": 1560,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 37682,
+          "rationale": "A mid-sized private school in city PA with engineering, active robotics club and a engineering makerspace, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.09,
+          "sat_p25": 1560,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 34556,
+          "rationale": "A mid-sized private school in town NY with engineering, robotics club plus design-build teams that recruit first-years, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "New York University",
+          "city": "New York",
+          "state": "NY",
+          "ownership": "private",
+          "size": 26000,
+          "admit_rate": 0.14,
+          "sat_p25": 1560,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 30899,
+          "rationale": "A large private school in city NY with engineering, robotics club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "high-stats-need-aid",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 2,
+          "balance": 2,
+          "affordability_honesty": 1,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Recognized Maya's high academic stats (1560 SAT, 4.0 GPA) and interest in Engineering.",
+        "what_broke": "Completely ignored the $0 EFC and 'no loans' constraint. It marked state schools like Penn State, Rutgers, and Temple as 'Likely Affordable' with net prices of $16k-$23k, which is a financial disaster for a $0 EFC student. It also labeled mid-tier safeties (Temple, West Chester) as 'Likelies' but failed to suggest schools that actually meet 100% of demonstrated need.",
+        "issues": [
+          "Marked 'aid_needed' as false despite $0 EFC in notes",
+          "Mislabeled expensive out-of-state public universities as 'Likely Affordable'",
+          "Under-matched academically by filling the list with regional public schools",
+          "Failed to target institutions with generous meet-full-need financial aid policies"
+        ]
+      }
+    },
+    {
+      "id": "missing-test-scores",
+      "title": "Test-Optional with Missing Scores",
+      "why_hard": "The system must evaluate academic fit and aid eligibility without standardized test benchmarks.",
+      "notes": "Julian has a 3.85 GPA with rigorous AP coursework in AP Bio and AP Env Sci, targeting biology or environmental_science. He has no SAT or ACT scores due to repeated test center cancellations and needs schools where test-optional policies carry zero penalty for institutional aid.",
+      "extraction": {
+        "degraded": true,
+        "student_name": "Julian",
+        "home_state": null,
+        "academic": {
+          "gpa": 3.85,
+          "sat": null,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Biology",
+            "value": "biology",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "biology",
+            "understood": "Biology is the academic focus for this search."
+          },
+          {
+            "category": "other",
+            "label": "GPA 3.85",
+            "value": 3.85,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "3.85",
+            "understood": "GPA 3.85 is on file for admissions comparison."
+          }
+        ],
+        "unresolved": [
+          "No home state detected; distance cannot be estimated.",
+          "No test score detected; academic strength will use GPA only, at limited evidence."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 8,
+      "mix": {
+        "likely": 5,
+        "target": 3,
+        "reach": 0,
+        "affordable": 5
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.82,
+          "sat_p25": 987,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 13859,
+          "rationale": "A large public school in city PA with biology, project teams in biology, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.78,
+          "sat_p25": 993,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 19047,
+          "rationale": "A mid-sized public school in suburban PA with biology, biology club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.79,
+          "sat_p25": 997,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 21020,
+          "rationale": "A mid-sized public school in town PA with biology, undergraduate biology society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Drexel University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "private",
+          "size": 14000,
+          "admit_rate": 0.68,
+          "sat_p25": 975,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 14940,
+          "rationale": "A mid-sized private school in city PA with biology, biology club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Delaware",
+          "city": "Newark",
+          "state": "DE",
+          "ownership": "public",
+          "size": 18000,
+          "admit_rate": 0.48,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 22868,
+          "rationale": "A mid-sized public school in suburban DE with biology, project teams in biology, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Carnegie Mellon University",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.1,
+          "sat_p25": 1318,
+          "sat_p75": 1458,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 36036,
+          "rationale": "A mid-sized private school in city PA with biology, project teams in biology, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.14,
+          "sat_p25": 1272,
+          "sat_p75": 1412,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 37897,
+          "rationale": "A mid-sized private school in town NY with biology, undergraduate biology society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "New York University",
+          "city": "New York",
+          "state": "NY",
+          "ownership": "private",
+          "size": 26000,
+          "admit_rate": 0.09,
+          "sat_p25": 1263,
+          "sat_p75": 1403,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 36824,
+          "rationale": "A large private school in city NY with biology, biology club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "missing-test-scores",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 2,
+          "balance": 2,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 2
+        },
+        "overall": "fail",
+        "what_worked": "Identified the Biology major and Julian's 3.85 GPA.",
+        "what_broke": "Missed his Environmental Science interest. More critically, it labeled hyper-selective schools like Cornell (14% admit), NYU (9% admit), and CMU (10% admit) as 'Targets' for a test-optional student with a 3.85 GPA. This is a dangerous misrepresentation of admissions chances.",
+        "issues": [
+          "Missed Environmental Science major",
+          "Classified single-digit and low double-digit acceptance rate schools as 'Targets'",
+          "Relied on a repetitive template list of Pennsylvania/New York schools"
+        ]
+      }
+    },
+    {
+      "id": "unmapped-major",
+      "title": "Program Not in Tool Directory",
+      "why_hard": "The student's desired field does not map directly to the tool's pre-defined list of supported majors.",
+      "notes": "Sienna is set on studying Game Development and Sound Architecture with a complete digital portfolio. GPA 3.5, SAT 1280. She is unsure whether to select art, design, or computer_science in system drop-downs to capture her target major.",
+      "extraction": {
+        "degraded": true,
+        "student_name": "Sienna",
+        "home_state": null,
+        "academic": {
+          "gpa": 3.5,
+          "sat": 1280,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Design",
+            "value": "design",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "design",
+            "understood": "Design is the academic focus for this search."
+          },
+          {
+            "category": "academic_interest",
+            "label": "Art",
+            "value": "art",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "art",
+            "understood": "Art is the academic focus — prioritize schools with a real studio or fine-arts program."
+          },
+          {
+            "category": "other",
+            "label": "SAT 1280",
+            "value": 1280,
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "SAT 1280",
+            "understood": "SAT 1280 is on file for admissions comparison."
+          },
+          {
+            "category": "other",
+            "label": "GPA 3.5",
+            "value": 3.5,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "GPA 3.5",
+            "understood": "GPA 3.5 is on file for admissions comparison."
+          }
+        ],
+        "unresolved": [
+          "No home state detected; distance cannot be estimated."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 4
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.72,
+          "sat_p25": 1079,
+          "sat_p75": 1270,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 13227,
+          "rationale": "A large public school in city PA with design, project teams in design, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.63,
+          "sat_p25": 1055,
+          "sat_p75": 1270,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 17024,
+          "rationale": "A mid-sized public school in suburban PA with design, design club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.63,
+          "sat_p25": 1058,
+          "sat_p75": 1270,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 18389,
+          "rationale": "A mid-sized public school in town PA with design, undergraduate design society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Boston University",
+          "city": "Boston",
+          "state": "MA",
+          "ownership": "private",
+          "size": 18000,
+          "admit_rate": 0.46,
+          "sat_p25": 1210,
+          "sat_p75": 1370,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 24546,
+          "rationale": "A mid-sized private school in city MA with design, design club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Ohio State University",
+          "city": "Columbus",
+          "state": "OH",
+          "ownership": "public",
+          "size": 46000,
+          "admit_rate": 0.39,
+          "sat_p25": 1210,
+          "sat_p75": 1370,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 27392,
+          "rationale": "A large public school in city OH with design, project teams in design, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of North Carolina at Chapel Hill",
+          "city": "Chapel Hill",
+          "state": "NC",
+          "ownership": "public",
+          "size": 20000,
+          "admit_rate": 0.37,
+          "sat_p25": 1210,
+          "sat_p75": 1370,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 26630,
+          "rationale": "A mid-sized public school in town NC with design, undergraduate design society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Illinois Urbana-Champaign",
+          "city": "Champaign",
+          "state": "IL",
+          "ownership": "public",
+          "size": 35000,
+          "admit_rate": 0.43,
+          "sat_p25": 1210,
+          "sat_p75": 1370,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 25372,
+          "rationale": "A large public school in city IL with design, undergraduate design society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Carnegie Mellon University",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.16,
+          "sat_p25": 1348,
+          "sat_p75": 1488,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 38712,
+          "rationale": "A mid-sized private school in city PA with design, project teams in design, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.14,
+          "sat_p25": 1348,
+          "sat_p75": 1488,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 29880,
+          "rationale": "A mid-sized private school in town NY with design, undergraduate design society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Michigan",
+          "city": "Ann Arbor",
+          "state": "MI",
+          "ownership": "public",
+          "size": 32000,
+          "admit_rate": 0.14,
+          "sat_p25": 1381,
+          "sat_p75": 1521,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 39782,
+          "rationale": "A large public school in city MI with design, design club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "unmapped-major",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 2,
+          "balance": 2,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Extracted the basic GPA and SAT scores.",
+        "what_broke": "The tool could not handle 'Game Development and Sound Architecture' and defaulted to generic 'Design' and 'Art'. It then recommended standard liberal arts and state schools (like Millersville and West Chester) that do not have specialized programs in game design or sound architecture. It also labeled highly selective schools like UNC and UIUC as 'Targets' for a 3.5 GPA and 1280 SAT.",
+        "issues": [
+          "Failed to map specialized majors to appropriate institutions",
+          "Recommended schools without relevant programs",
+          "Overestimated admissions chances at competitive public universities (UNC, UIUC)"
+        ]
+      }
+    },
+    {
+      "id": "hedging-interests",
+      "title": "Wide Open and Hedging Majors",
+      "why_hard": "The majors spanned have radically different admissions thresholds, college structures, and internal transfer restrictions.",
+      "notes": "Ethan is torn between nursing, business, and art. GPA 3.4, ACT 24. Wants a mid-sized university where he can easily switch majors or complete pre-requisites without getting locked out by capped or direct-entry program rules.",
+      "extraction": {
+        "degraded": true,
+        "student_name": "Ethan",
+        "home_state": null,
+        "academic": {
+          "gpa": 3.4,
+          "sat": null,
+          "act": 24,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Art",
+            "value": "art",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "art",
+            "understood": "Art is the academic focus — prioritize schools with a real studio or fine-arts program."
+          },
+          {
+            "category": "academic_interest",
+            "label": "Nursing",
+            "value": "nursing",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "nursing",
+            "understood": "Nursing is the academic focus for this search."
+          },
+          {
+            "category": "academic_interest",
+            "label": "Business",
+            "value": "business",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "business",
+            "understood": "Business is the academic focus for this search."
+          },
+          {
+            "category": "other",
+            "label": "GPA 3.4",
+            "value": 3.4,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "GPA 3.4",
+            "understood": "GPA 3.4 is on file for admissions comparison."
+          }
+        ],
+        "unresolved": [
+          "No home state detected; distance cannot be estimated."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 5
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.85,
+          "sat_p25": 970,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 17120,
+          "rationale": "A large public school in city PA with art, project teams in art, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.83,
+          "sat_p25": 985,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 18040,
+          "rationale": "A mid-sized public school in suburban PA with art, art club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.83,
+          "sat_p25": 996,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 16387,
+          "rationale": "A mid-sized public school in town PA with art, undergraduate art society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Howard University",
+          "city": "Washington",
+          "state": "DC",
+          "ownership": "private",
+          "size": 10000,
+          "admit_rate": 0.35,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 24806,
+          "rationale": "A mid-sized private school in city DC with art, art club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of North Carolina at Chapel Hill",
+          "city": "Chapel Hill",
+          "state": "NC",
+          "ownership": "public",
+          "size": 20000,
+          "admit_rate": 0.45,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 22352,
+          "rationale": "A mid-sized public school in town NC with art, undergraduate art society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Pittsburgh",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "public",
+          "size": 19000,
+          "admit_rate": 0.44,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 27113,
+          "rationale": "A mid-sized public school in city PA with art, art club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Delaware",
+          "city": "Newark",
+          "state": "DE",
+          "ownership": "public",
+          "size": 18000,
+          "admit_rate": 0.42,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 26192,
+          "rationale": "A mid-sized public school in suburban DE with art, project teams in art, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Lehigh University",
+          "city": "Bethlehem",
+          "state": "PA",
+          "ownership": "private",
+          "size": 5000,
+          "admit_rate": 0.1,
+          "sat_p25": 1295,
+          "sat_p75": 1435,
+          "admissions": "Reach",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 32096,
+          "rationale": "A mid-sized private school in suburban PA with art, undergraduate art society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.16,
+          "sat_p25": 1254,
+          "sat_p75": 1394,
+          "admissions": "Reach",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 34533,
+          "rationale": "A mid-sized private school in town NY with art, undergraduate art society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "New York University",
+          "city": "New York",
+          "state": "NY",
+          "ownership": "private",
+          "size": 26000,
+          "admit_rate": 0.17,
+          "sat_p25": 1255,
+          "sat_p75": 1395,
+          "admissions": "Reach",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 37664,
+          "rationale": "A large private school in city NY with art, art club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "hedging-interests",
+        "scores": {
+          "extraction_fidelity": 4,
+          "list_fit": 1,
+          "balance": 1,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Successfully extracted the three disparate majors (Art, Nursing, Business).",
+        "what_broke": "The list is a logistical nightmare. It recommends schools like Cornell, NYU, and UNC for a student with a 3.4 GPA and 24 ACT. Furthermore, these schools have incredibly rigid, capped, or direct-entry programs for Business and Nursing, making it virtually impossible for a student to 'easily switch' between them as requested.",
+        "issues": [
+          "Recommended academically impossible schools (Cornell, NYU) for a 3.4 GPA / 24 ACT",
+          "Ignored internal transfer restrictions and direct-entry barriers for Nursing and Business",
+          "Failed to find mid-sized universities that facilitate flexible major exploration"
+        ]
+      }
+    },
+    {
+      "id": "extremely-sparse",
+      "title": "Extremely Sparse Notes",
+      "why_hard": "Minimal details force the tool to make broad assumptions without clear context on test scores, preferences, or profile strength.",
+      "notes": "Chloe. GPA around 3.2. Wants agriculture or marine_biology. East Coast preferred. Budget around $35k total per year.",
+      "extraction": {
+        "degraded": true,
+        "student_name": null,
+        "home_state": null,
+        "academic": {
+          "gpa": 3.2,
+          "sat": null,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Agriculture",
+            "value": "agriculture",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "agriculture",
+            "understood": "Agriculture is the academic focus for this search."
+          },
+          {
+            "category": "other",
+            "label": "GPA 3.2",
+            "value": 3.2,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "3.2",
+            "understood": "GPA 3.2 is on file for admissions comparison."
+          }
+        ],
+        "unresolved": [
+          "No home state detected; distance cannot be estimated.",
+          "No test score detected; academic strength will use GPA only, at limited evidence."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 5
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.85,
+          "sat_p25": 971,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 19680,
+          "rationale": "A large public school in city PA with agriculture, project teams in agriculture, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.66,
+          "sat_p25": 991,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 16389,
+          "rationale": "A mid-sized public school in suburban PA with agriculture, agriculture club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.8,
+          "sat_p25": 978,
+          "sat_p75": 1190,
+          "admissions": "Likely",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 19653,
+          "rationale": "A mid-sized public school in town PA with agriculture, undergraduate agriculture society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Ohio State University",
+          "city": "Columbus",
+          "state": "OH",
+          "ownership": "public",
+          "size": 46000,
+          "admit_rate": 0.45,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 24384,
+          "rationale": "A large public school in city OH with agriculture, project teams in agriculture, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Illinois Urbana-Champaign",
+          "city": "Champaign",
+          "state": "IL",
+          "ownership": "public",
+          "size": 35000,
+          "admit_rate": 0.45,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Likely Affordable",
+          "net_price": 23241,
+          "rationale": "A large public school in city IL with agriculture, undergraduate agriculture society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Boston University",
+          "city": "Boston",
+          "state": "MA",
+          "ownership": "private",
+          "size": 18000,
+          "admit_rate": 0.47,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 27126,
+          "rationale": "A mid-sized private school in city MA with agriculture, agriculture club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Penn State University Park",
+          "city": "State College",
+          "state": "PA",
+          "ownership": "public",
+          "size": 40000,
+          "admit_rate": 0.47,
+          "sat_p25": 1130,
+          "sat_p75": 1290,
+          "admissions": "Target",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 28916,
+          "rationale": "A large public school in town PA with agriculture, undergraduate agriculture society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Lehigh University",
+          "city": "Bethlehem",
+          "state": "PA",
+          "ownership": "private",
+          "size": 5000,
+          "admit_rate": 0.15,
+          "sat_p25": 1275,
+          "sat_p75": 1415,
+          "admissions": "Reach",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 33791,
+          "rationale": "A mid-sized private school in suburban PA with agriculture, undergraduate agriculture society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.13,
+          "sat_p25": 1275,
+          "sat_p75": 1415,
+          "admissions": "Reach",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 33221,
+          "rationale": "A mid-sized private school in town NY with agriculture, undergraduate agriculture society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Northeastern University",
+          "city": "Boston",
+          "state": "MA",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.12,
+          "sat_p25": 1292,
+          "sat_p75": 1432,
+          "admissions": "Reach",
+          "evidence": "limited",
+          "affordability": "Needs Review",
+          "net_price": 36091,
+          "rationale": "A mid-sized private school in city MA with agriculture, project teams in agriculture, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "extremely-sparse",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 2,
+          "balance": 2,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Identified the 3.2 GPA and the Agriculture interest.",
+        "what_broke": "Missed the Marine Biology interest entirely. It recommended schools like Temple, West Chester, Millersville, BU, Lehigh, and Northeastern, which do not even offer Agriculture majors. It also ignored the East Coast preference by including Ohio State and UIUC.",
+        "issues": [
+          "Missed Marine Biology major",
+          "Recommended schools that do not offer the extracted major (Agriculture)",
+          "Ignored East Coast geographic preference",
+          "Mislabeled highly selective schools (BU, UIUC, Penn State) as Targets for a 3.2 GPA"
+        ]
+      }
+    },
+    {
+      "id": "overconstrained-criteria",
+      "title": "Overconstrained Criteria",
+      "why_hard": "The combination of low academic scores, hyper-specific geography, competitive major, and low budget yields zero mathematical matches.",
+      "notes": "Noah insists on direct-entry nursing in downtown Boston for under $15,000 total net price per year, but currently holds a 2.7 GPA and 980 SAT. He refuses community college pathways or non-urban options.",
+      "extraction": {
+        "degraded": true,
+        "student_name": null,
+        "home_state": null,
+        "academic": {
+          "gpa": 2.7,
+          "sat": 980,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Nursing",
+            "value": "nursing",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "nursing",
+            "understood": "Nursing is the academic focus for this search."
+          },
+          {
+            "category": "other",
+            "label": "SAT 980",
+            "value": 980,
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "980",
+            "understood": "SAT 980 is on file for admissions comparison."
+          },
+          {
+            "category": "other",
+            "label": "GPA 2.7",
+            "value": 2.7,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "2.7",
+            "understood": "GPA 2.7 is on file for admissions comparison."
+          },
+          {
+            "category": "environment",
+            "label": "Prefers a urban school",
+            "value": "urban",
+            "strength": "flexible",
+            "confidence": "low",
+            "source_phrase": "urban",
+            "understood": "Prefers a urban school."
+          }
+        ],
+        "unresolved": [
+          "No home state detected; distance cannot be estimated."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 5
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.82,
+          "sat_p25": 783,
+          "sat_p75": 970,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 13684,
+          "rationale": "A large public school in city PA with nursing, project teams in nursing, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.63,
+          "sat_p25": 763,
+          "sat_p75": 970,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 20991,
+          "rationale": "A mid-sized public school in suburban PA with nursing, nursing club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.77,
+          "sat_p25": 753,
+          "sat_p75": 970,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 13833,
+          "rationale": "A mid-sized public school in town PA with nursing, undergraduate nursing society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Delaware",
+          "city": "Newark",
+          "state": "DE",
+          "ownership": "public",
+          "size": 18000,
+          "admit_rate": 0.34,
+          "sat_p25": 910,
+          "sat_p75": 1070,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 23963,
+          "rationale": "A mid-sized public school in suburban DE with nursing, project teams in nursing, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Howard University",
+          "city": "Washington",
+          "state": "DC",
+          "ownership": "private",
+          "size": 10000,
+          "admit_rate": 0.34,
+          "sat_p25": 910,
+          "sat_p75": 1070,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 23427,
+          "rationale": "A mid-sized private school in city DC with nursing, nursing club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Penn State University Park",
+          "city": "State College",
+          "state": "PA",
+          "ownership": "public",
+          "size": 40000,
+          "admit_rate": 0.36,
+          "sat_p25": 910,
+          "sat_p75": 1070,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 26199,
+          "rationale": "A large public school in town PA with nursing, undergraduate nursing society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Rochester Institute of Technology",
+          "city": "Rochester",
+          "state": "NY",
+          "ownership": "private",
+          "size": 14000,
+          "admit_rate": 0.36,
+          "sat_p25": 910,
+          "sat_p75": 1070,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 26933,
+          "rationale": "A mid-sized private school in suburban NY with nursing, undergraduate nursing society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Lehigh University",
+          "city": "Bethlehem",
+          "state": "PA",
+          "ownership": "private",
+          "size": 5000,
+          "admit_rate": 0.16,
+          "sat_p25": 1086,
+          "sat_p75": 1226,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 29539,
+          "rationale": "A mid-sized private school in suburban PA with nursing, undergraduate nursing society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Carnegie Mellon University",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.1,
+          "sat_p25": 1046,
+          "sat_p75": 1186,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 38729,
+          "rationale": "A mid-sized private school in city PA with nursing, project teams in nursing, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.16,
+          "sat_p25": 1091,
+          "sat_p75": 1231,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 35487,
+          "rationale": "A mid-sized private school in town NY with nursing, undergraduate nursing society and a career club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "overconstrained-criteria",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 1,
+          "balance": 1,
+          "affordability_honesty": 2,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Extracted the low GPA (2.7) and SAT (980).",
+        "what_broke": "Completely failed on every constraint. It recommended zero schools in Boston. It recommended Cornell, CMU, and Lehigh—none of which offer Nursing, and all of which are academically impossible for a 2.7 GPA. It also failed to address the under-$15k budget constraint.",
+        "issues": [
+          "Recommended schools that do not offer Nursing",
+          "Recommended Ivy League and hyper-selective schools for a 2.7 GPA",
+          "Ignored the Boston geographic constraint entirely",
+          "Failed to address the strict $15,000 budget limit"
+        ]
+      }
+    },
+    {
+      "id": "homeschool-missing-gpa",
+      "title": "Homeschool Without Standard GPA",
+      "why_hard": "The lack of a traditional GPA breaks standard admissibility filter algorithms.",
+      "notes": "Freya has been homeschooled through high school without official letter grades or a GPA, but submitted a project narrative and a 1420 SAT. She wants computer_science or law pathways at institutions comfortable evaluating narrative transcript portfolios.",
+      "extraction": {
+        "degraded": true,
+        "student_name": "Freya",
+        "home_state": null,
+        "academic": {
+          "gpa": null,
+          "sat": 1420,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Law / pre-law",
+            "value": "law",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "She wants computer_science or law pathways at institutions comfortable evaluating narrative transcript portfolios",
+            "understood": "Looking for colleges with a path toward law, including pre-law advising and related majors."
+          },
+          {
+            "category": "other",
+            "label": "SAT 1420",
+            "value": 1420,
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "1420 SAT",
+            "understood": "SAT 1420 is on file for admissions comparison."
+          }
+        ],
+        "unresolved": [
+          "Law here means an undergraduate law-related major from a published catalog. A JD is graduate school and is not the filter.",
+          "No home state detected; distance cannot be estimated."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 4
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.66,
+          "sat_p25": 1220,
+          "sat_p75": 1410,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 19867,
+          "rationale": "A large public school in city PA with law / pre-law, project teams in law / pre-law, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.73,
+          "sat_p25": 1229,
+          "sat_p75": 1410,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 16182,
+          "rationale": "A mid-sized public school in suburban PA with law / pre-law, law / pre-law club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.72,
+          "sat_p25": 1201,
+          "sat_p75": 1410,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 15566,
+          "rationale": "A mid-sized public school in town PA with law / pre-law, undergraduate law / pre-law society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Illinois Urbana-Champaign",
+          "city": "Champaign",
+          "state": "IL",
+          "ownership": "public",
+          "size": 35000,
+          "admit_rate": 0.36,
+          "sat_p25": 1350,
+          "sat_p75": 1510,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 22299,
+          "rationale": "A large public school in city IL with law / pre-law, undergraduate law / pre-law society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Penn State University Park",
+          "city": "State College",
+          "state": "PA",
+          "ownership": "public",
+          "size": 40000,
+          "admit_rate": 0.4,
+          "sat_p25": 1350,
+          "sat_p75": 1510,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 27118,
+          "rationale": "A large public school in town PA with law / pre-law, undergraduate law / pre-law society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Howard University",
+          "city": "Washington",
+          "state": "DC",
+          "ownership": "private",
+          "size": 10000,
+          "admit_rate": 0.43,
+          "sat_p25": 1350,
+          "sat_p75": 1510,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 25856,
+          "rationale": "A mid-sized private school in city DC with law / pre-law, law / pre-law club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Rochester Institute of Technology",
+          "city": "Rochester",
+          "state": "NY",
+          "ownership": "private",
+          "size": 14000,
+          "admit_rate": 0.36,
+          "sat_p25": 1350,
+          "sat_p75": 1510,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 25786,
+          "rationale": "A mid-sized private school in suburban NY with law / pre-law, undergraduate law / pre-law society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Carnegie Mellon University",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.11,
+          "sat_p25": 1496,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 38247,
+          "rationale": "A mid-sized private school in city PA with law / pre-law, project teams in law / pre-law, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.12,
+          "sat_p25": 1514,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 35440,
+          "rationale": "A mid-sized private school in town NY with law / pre-law, undergraduate law / pre-law society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "New York University",
+          "city": "New York",
+          "state": "NY",
+          "ownership": "private",
+          "size": 26000,
+          "admit_rate": 0.1,
+          "sat_p25": 1487,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 34558,
+          "rationale": "A large private school in city NY with law / pre-law, law / pre-law club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "homeschool-missing-gpa",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 2,
+          "balance": 2,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Extracted the 1420 SAT score.",
+        "what_broke": "Missed the Computer Science major. It recommended massive, rigid public universities (UIUC, Penn State) and highly selective private universities (Cornell, CMU, NYU) that are notoriously difficult for homeschoolers without official GPAs to access, completely ignoring the request for institutions comfortable with narrative portfolios.",
+        "issues": [
+          "Missed Computer Science major",
+          "Ignored the request for narrative-transcript-friendly schools",
+          "Served up the same generic template list of schools used in other cases"
+        ]
+      }
+    },
+    {
+      "id": "high-stats-risk-averse",
+      "title": "High Stats and Extremely Risk-Averse",
+      "why_hard": "The student's high profile suggests highly selective reach options, but emotional preferences require filtering for high-admit options with strong honors features.",
+      "notes": "Caleb holds a 3.98 UW GPA and 1540 SAT in heavy STEM coursework. Interested in engineering. He feels intense anxiety around rejection and refuses to apply to hyper-selective schools, wanting a list dominated by highly predictable options with top honors colleges and auto-merit.",
+      "extraction": {
+        "degraded": true,
+        "student_name": null,
+        "home_state": null,
+        "academic": {
+          "gpa": 3.98,
+          "sat": 1540,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Engineering",
+            "value": "engineering",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "engineering",
+            "understood": "Engineering is the academic focus for this search."
+          },
+          {
+            "category": "other",
+            "label": "SAT 1540",
+            "value": 1540,
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "1540 SAT",
+            "understood": "SAT 1540 is on file for admissions comparison."
+          },
+          {
+            "category": "other",
+            "label": "GPA 3.98",
+            "value": 3.98,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "3.98",
+            "understood": "GPA 3.98 is on file for admissions comparison."
+          }
+        ],
+        "unresolved": [
+          "No home state detected; distance cannot be estimated."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 3
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.65,
+          "sat_p25": 1312,
+          "sat_p75": 1530,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 14770,
+          "rationale": "A large public school in city PA with engineering, project teams in engineering, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.77,
+          "sat_p25": 1332,
+          "sat_p75": 1530,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 14664,
+          "rationale": "A mid-sized public school in suburban PA with engineering, engineering club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.75,
+          "sat_p25": 1338,
+          "sat_p75": 1530,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 16100,
+          "rationale": "A mid-sized public school in town PA with engineering, undergraduate engineering society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Boston University",
+          "city": "Boston",
+          "state": "MA",
+          "ownership": "private",
+          "size": 18000,
+          "admit_rate": 0.45,
+          "sat_p25": 1470,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 27159,
+          "rationale": "A mid-sized private school in city MA with engineering, engineering club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of North Carolina at Chapel Hill",
+          "city": "Chapel Hill",
+          "state": "NC",
+          "ownership": "public",
+          "size": 20000,
+          "admit_rate": 0.44,
+          "sat_p25": 1470,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 26004,
+          "rationale": "A mid-sized public school in town NC with engineering, undergraduate engineering society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Pittsburgh",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "public",
+          "size": 19000,
+          "admit_rate": 0.37,
+          "sat_p25": 1470,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 30304,
+          "rationale": "A mid-sized public school in city PA with engineering, engineering club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Penn State University Park",
+          "city": "State College",
+          "state": "PA",
+          "ownership": "public",
+          "size": 40000,
+          "admit_rate": 0.4,
+          "sat_p25": 1470,
+          "sat_p75": 1600,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 30118,
+          "rationale": "A large public school in town PA with engineering, undergraduate engineering society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Lehigh University",
+          "city": "Bethlehem",
+          "state": "PA",
+          "ownership": "private",
+          "size": 5000,
+          "admit_rate": 0.15,
+          "sat_p25": 1560,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 39299,
+          "rationale": "A mid-sized private school in suburban PA with engineering, undergraduate engineering society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Carnegie Mellon University",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.18,
+          "sat_p25": 1560,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 36873,
+          "rationale": "A mid-sized private school in city PA with engineering, project teams in engineering, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Cornell University",
+          "city": "Ithaca",
+          "state": "NY",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.11,
+          "sat_p25": 1560,
+          "sat_p75": 1600,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 39994,
+          "rationale": "A mid-sized private school in town NY with engineering, undergraduate engineering society and a career club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "high-stats-risk-averse",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 1,
+          "balance": 2,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Extracted the high academic profile (3.98 GPA, 1540 SAT).",
+        "what_broke": "Completely ignored the student's intense rejection anxiety and explicit refusal to apply to hyper-selective schools. The tool recommended Cornell, Carnegie Mellon, Lehigh, and Boston University—all highly selective schools that would trigger the student's anxiety. It failed to find predictable options with strong honors colleges and auto-merit.",
+        "issues": [
+          "Ignored the student's emotional and psychological constraints",
+          "Included hyper-selective Ivy and near-Ivy institutions",
+          "Failed to identify auto-merit or predictable honors college pathways"
+        ]
+      }
+    },
+    {
+      "id": "parental-brand-mismatch",
+      "title": "Parental Brand Pressure vs. Low Stats",
+      "why_hard": "Unrealistic parental demands for prestige directly contradict the student's actual academic metrics.",
+      "notes": "Zara's parents demand she only apply to nationally recognizable, household-name universities for business or law. However, Zara has an unweighted GPA of 2.9, SAT of 1050, and minimal extracurricular involvement.",
+      "extraction": {
+        "degraded": true,
+        "student_name": null,
+        "home_state": null,
+        "academic": {
+          "gpa": 2.9,
+          "sat": 1050,
+          "act": null,
+          "rigor_notes": null
+        },
+        "aid_needed": false,
+        "criteria": [
+          {
+            "category": "academic_interest",
+            "label": "Business",
+            "value": "business",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "business",
+            "understood": "Business is the academic focus for this search."
+          },
+          {
+            "category": "academic_interest",
+            "label": "Law / pre-law",
+            "value": "law",
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "Zara's parents demand she only apply to nationally recognizable, household-name universities for business or law",
+            "understood": "Looking for colleges with a path toward law, including pre-law advising and related majors."
+          },
+          {
+            "category": "other",
+            "label": "SAT 1050",
+            "value": 1050,
+            "strength": "required",
+            "confidence": "low",
+            "source_phrase": "SAT of 1050",
+            "understood": "SAT 1050 is on file for admissions comparison."
+          },
+          {
+            "category": "other",
+            "label": "GPA 2.9",
+            "value": 2.9,
+            "strength": "preferred",
+            "confidence": "low",
+            "source_phrase": "2.9",
+            "understood": "GPA 2.9 is on file for admissions comparison."
+          }
+        ],
+        "unresolved": [
+          "Law here means an undergraduate law-related major from a published catalog. A JD is graduate school and is not the filter.",
+          "No home state detected; distance cannot be estimated."
+        ],
+        "invented_rows": 0
+      },
+      "catalog_source": "overlay",
+      "list_size": 10,
+      "mix": {
+        "likely": 3,
+        "target": 4,
+        "reach": 3,
+        "affordable": 5
+      },
+      "warnings": [],
+      "guardrail_errors": [],
+      "default_priorities": [
+        "affordability",
+        "program",
+        "proximity",
+        "admissions_realism",
+        "environment",
+        "support"
+      ],
+      "overlay_pool_size": 20,
+      "schools": [
+        {
+          "name": "Temple University",
+          "city": "Philadelphia",
+          "state": "PA",
+          "ownership": "public",
+          "size": 27000,
+          "admit_rate": 0.82,
+          "sat_p25": 841,
+          "sat_p75": 1040,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 20109,
+          "rationale": "A large public school in city PA with business, project teams in business, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "West Chester University of Pennsylvania",
+          "city": "West Chester",
+          "state": "PA",
+          "ownership": "public",
+          "size": 17000,
+          "admit_rate": 0.82,
+          "sat_p25": 857,
+          "sat_p75": 1040,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 19338,
+          "rationale": "A mid-sized public school in suburban PA with business, business club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Millersville University",
+          "city": "Millersville",
+          "state": "PA",
+          "ownership": "public",
+          "size": 6000,
+          "admit_rate": 0.78,
+          "sat_p25": 859,
+          "sat_p75": 1040,
+          "admissions": "Likely",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 20220,
+          "rationale": "A mid-sized public school in town PA with business, undergraduate business society and a career club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Howard University",
+          "city": "Washington",
+          "state": "DC",
+          "ownership": "private",
+          "size": 10000,
+          "admit_rate": 0.43,
+          "sat_p25": 980,
+          "sat_p75": 1140,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 22014,
+          "rationale": "A mid-sized private school in city DC with business, business club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Ohio State University",
+          "city": "Columbus",
+          "state": "OH",
+          "ownership": "public",
+          "size": 46000,
+          "admit_rate": 0.35,
+          "sat_p25": 980,
+          "sat_p75": 1140,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Likely Affordable",
+          "net_price": 22425,
+          "rationale": "A large public school in city OH with business, project teams in business, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Pittsburgh",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "public",
+          "size": 19000,
+          "admit_rate": 0.42,
+          "sat_p25": 980,
+          "sat_p75": 1140,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 26098,
+          "rationale": "A mid-sized public school in city PA with business, business club, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Delaware",
+          "city": "Newark",
+          "state": "DE",
+          "ownership": "public",
+          "size": 18000,
+          "admit_rate": 0.4,
+          "sat_p25": 980,
+          "sat_p75": 1140,
+          "admissions": "Target",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 25131,
+          "rationale": "A mid-sized public school in suburban DE with business, project teams in business, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Carnegie Mellon University",
+          "city": "Pittsburgh",
+          "state": "PA",
+          "ownership": "private",
+          "size": 7000,
+          "admit_rate": 0.14,
+          "sat_p25": 1119,
+          "sat_p75": 1259,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 37528,
+          "rationale": "A mid-sized private school in city PA with business, project teams in business, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "Northeastern University",
+          "city": "Boston",
+          "state": "MA",
+          "ownership": "private",
+          "size": 15000,
+          "admit_rate": 0.11,
+          "sat_p25": 1141,
+          "sat_p75": 1281,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 36155,
+          "rationale": "A mid-sized private school in city MA with business, project teams in business, distance unknown — home state not resolved.."
+        },
+        {
+          "name": "University of Michigan",
+          "city": "Ann Arbor",
+          "state": "MI",
+          "ownership": "public",
+          "size": 32000,
+          "admit_rate": 0.11,
+          "sat_p25": 1133,
+          "sat_p75": 1273,
+          "admissions": "Reach",
+          "evidence": "moderate",
+          "affordability": "Needs Review",
+          "net_price": 28890,
+          "rationale": "A large public school in city MI with business, business club, distance unknown — home state not resolved.."
+        }
+      ],
+      "judgment": {
+        "id": "parental-brand-mismatch",
+        "scores": {
+          "extraction_fidelity": 3,
+          "list_fit": 2,
+          "balance": 1,
+          "affordability_honesty": 3,
+          "counselor_usefulness": 1
+        },
+        "overall": "fail",
+        "what_worked": "Extracted the 2.9 GPA and 1050 SAT.",
+        "what_broke": "The list is a dangerous mix of non-brand safeties (West Chester, Millersville) that won't satisfy the parents, and impossible reaches (UMich, CMU, Northeastern) that are completely out of reach for a 2.9 GPA / 1050 SAT. It labeled competitive public schools like Ohio State and Pitt as 'Targets', which is highly unrealistic.",
+        "issues": [
+          "Mislabeled highly selective brand-name schools as Targets",
+          "Included regional state schools that do not meet the 'household-name' requirement",
+          "Failed to find realistic, recognizable brand-name schools that accept a 2.9 GPA"
+        ]
+      }
+    }
+  ]
+}

@@ -33,14 +33,27 @@
   }
 
   .history-resize {
+    position: relative;
     width: var(--width-resize);
     cursor: col-resize;
     background: transparent;
   }
 
-  .history-resize:hover,
-  .history-resize:focus-visible {
-    background-color: var(--brand);
+  .history-resize::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: var(--bw-hairline);
+    transform: translateX(-50%);
+    background-color: transparent;
+  }
+
+  .history-resize:hover::before,
+  .history-resize:focus-visible::before,
+  body.is-resizing-history .history-resize::before {
+    background-color: var(--ink);
   }
 
   body.is-resizing-history {
@@ -96,11 +109,129 @@
     animation: btn-in var(--duration-btn-in) var(--ease-enter) both;
   }
 
+  @keyframes row-in {
+    0% {
+      opacity: 0;
+      transform: translateY(var(--motion-row-in));
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes row-out {
+    0% {
+      opacity: 1;
+      transform: translateX(0);
+      max-height: var(--height-criteria-row);
+    }
+    55% {
+      opacity: 0;
+      transform: translateX(calc(-1 * var(--motion-row-out)));
+      max-height: var(--height-criteria-row);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(calc(-1 * var(--motion-row-out)));
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-bottom-width: 0;
+    }
+  }
+
+  @keyframes pulse-dim {
+    50% {
+      opacity: 0.45;
+    }
+  }
+
+  .row-in {
+    animation: row-in var(--duration-row-in) var(--ease-enter) both;
+  }
+
+  .row-out {
+    overflow: hidden;
+    animation: row-out var(--duration-row-out) var(--ease-exit) both;
+  }
+
+  .pulse-dim {
+    animation: pulse-dim var(--duration-pulse-dim) ease-in-out infinite;
+  }
+
+  @keyframes card-in {
+    0% {
+      opacity: 0;
+      transform: translateY(var(--motion-card-in));
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-in {
+    animation: card-in var(--duration-card-in) var(--ease-enter) both;
+  }
+
+  .card-in-sm {
+    animation: card-in var(--duration-card-in-sm) var(--ease-enter) both;
+  }
+
+  .card-in-lg {
+    animation: card-in var(--duration-card-in-lg) var(--ease-enter) both;
+  }
+
+  .build-dot {
+    aspect-ratio: 1;
+    border-radius: var(--r-card);
+    transition: background-color var(--duration-dot) ease, transform var(--duration-dot) ease;
+  }
+
+  .drag-row {
+    cursor: grab;
+    transition: background-color var(--duration-drag) ease, box-shadow var(--duration-drag) ease;
+  }
+
+  .drag-row-source {
+    opacity: 0.6;
+    box-shadow: var(--shadow-drag);
+  }
+
+  .drag-row-over {
+    background-color: var(--rail);
+  }
+
+  .print-preview-root {
+    background-color: var(--desk);
+    z-index: var(--z-preview);
+  }
+
+  .z-sticky {
+    z-index: var(--z-sticky);
+  }
+
+  .grid-cols-32 {
+    grid-template-columns: repeat(32, minmax(0, 1fr));
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .status-now,
     .ph-rise,
-    .btn-in {
+    .btn-in,
+    .row-in,
+    .row-out,
+    .pulse-dim,
+    .card-in,
+    .card-in-sm,
+    .card-in-lg {
       animation: none;
+    }
+
+    .build-dot,
+    .drag-row {
+      transition: none;
     }
   }
 }

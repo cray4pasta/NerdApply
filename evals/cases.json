@@ -1,0 +1,65 @@
+{
+  "source": "gemini",
+  "cases": [
+    {
+      "id": "conflicting-geography",
+      "title": "Conflicting Geography",
+      "notes": "Liam wants to stay within a 3-hour drive of family in Chicago, but his mother is demanding warm coastal weather year-round in California or Florida. Looking for business or engineering programs. Unweighted GPA 3.7, ACT 29. Needs an urban or suburban setting with strong internship access.",
+      "why_hard": "The student and family have stated geographic requirements that are physically mutually exclusive."
+    },
+    {
+      "id": "high-stats-need-aid",
+      "title": "High Stats with Critical Need-Based Aid",
+      "notes": "Maya has a 4.0 UW GPA and 1560 SAT with stellar robotics ECs, aiming for engineering. However, family expected contribution is $0 and she cannot take on loans, requiring 100% demonstrated need met or heavy merit guarantees while keeping academic rigor high.",
+      "why_hard": "High academic stats require balancing top-tier selectivity with strict, unyielding financial need constraints."
+    },
+    {
+      "id": "missing-test-scores",
+      "title": "Test-Optional with Missing Scores",
+      "notes": "Julian has a 3.85 GPA with rigorous AP coursework in AP Bio and AP Env Sci, targeting biology or environmental_science. He has no SAT or ACT scores due to repeated test center cancellations and needs schools where test-optional policies carry zero penalty for institutional aid.",
+      "why_hard": "The system must evaluate academic fit and aid eligibility without standardized test benchmarks."
+    },
+    {
+      "id": "unmapped-major",
+      "title": "Program Not in Tool Directory",
+      "notes": "Sienna is set on studying Game Development and Sound Architecture with a complete digital portfolio. GPA 3.5, SAT 1280. She is unsure whether to select art, design, or computer_science in system drop-downs to capture her target major.",
+      "why_hard": "The student's desired field does not map directly to the tool's pre-defined list of supported majors."
+    },
+    {
+      "id": "hedging-interests",
+      "title": "Wide Open and Hedging Majors",
+      "notes": "Ethan is torn between nursing, business, and art. GPA 3.4, ACT 24. Wants a mid-sized university where he can easily switch majors or complete pre-requisites without getting locked out by capped or direct-entry program rules.",
+      "why_hard": "The majors spanned have radically different admissions thresholds, college structures, and internal transfer restrictions."
+    },
+    {
+      "id": "extremely-sparse",
+      "title": "Extremely Sparse Notes",
+      "notes": "Chloe. GPA around 3.2. Wants agriculture or marine_biology. East Coast preferred. Budget around $35k total per year.",
+      "why_hard": "Minimal details force the tool to make broad assumptions without clear context on test scores, preferences, or profile strength."
+    },
+    {
+      "id": "overconstrained-criteria",
+      "title": "Overconstrained Criteria",
+      "notes": "Noah insists on direct-entry nursing in downtown Boston for under $15,000 total net price per year, but currently holds a 2.7 GPA and 980 SAT. He refuses community college pathways or non-urban options.",
+      "why_hard": "The combination of low academic scores, hyper-specific geography, competitive major, and low budget yields zero mathematical matches."
+    },
+    {
+      "id": "homeschool-missing-gpa",
+      "title": "Homeschool Without Standard GPA",
+      "notes": "Freya has been homeschooled through high school without official letter grades or a GPA, but submitted a project narrative and a 1420 SAT. She wants computer_science or law pathways at institutions comfortable evaluating narrative transcript portfolios.",
+      "why_hard": "The lack of a traditional GPA breaks standard admissibility filter algorithms."
+    },
+    {
+      "id": "high-stats-risk-averse",
+      "title": "High Stats and Extremely Risk-Averse",
+      "notes": "Caleb holds a 3.98 UW GPA and 1540 SAT in heavy STEM coursework. Interested in engineering. He feels intense anxiety around rejection and refuses to apply to hyper-selective schools, wanting a list dominated by highly predictable options with top honors colleges and auto-merit.",
+      "why_hard": "The student's high profile suggests highly selective reach options, but emotional preferences require filtering for high-admit options with strong honors features."
+    },
+    {
+      "id": "parental-brand-mismatch",
+      "title": "Parental Brand Pressure vs. Low Stats",
+      "notes": "Zara's parents demand she only apply to nationally recognizable, household-name universities for business or law. However, Zara has an unweighted GPA of 2.9, SAT of 1050, and minimal extracurricular involvement.",
+      "why_hard": "Unrealistic parental demands for prestige directly contradict the student's actual academic metrics."
+    }
+  ]
+}

@@ -46,7 +46,7 @@ export default function NotesEntry({ onSend, disabled }) {
         <h1 className="text-center font-sans text-28 font-normal text-ink">Who are we helping today?</h1>
 
         <form
-          className="mt-5 w-full max-w-notes-entry rounded-composer border border-rule bg-surface focus-within:border-ink"
+          className="mt-5 w-full max-w-notes-entry rounded-composer border border-rule bg-surface"
           onSubmit={(e) => {
             e.preventDefault()
             submit()

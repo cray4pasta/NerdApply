@@ -1,5 +1,176 @@
 # Agent log
 
+## 2026-09-16 11:12 PT — Follow-ups can change the major and rebuild
+
+**What changed.** After a list exists, a message like “I think he wants to pursue sports” is treated as a conversation, not a trivia question. The builder says it will look for a strong sports program, replaces the old major, keeps SAT, GPA, football, and the rest, and rebuilds the table. Asking why a named school is on the list still just answers from the sheet.
+
+**Why.** Follow-ups only talked about the current table. A new academic direction never changed the list unless you started over.
+
+**What it affects.** The composer after a list is built. Code still picks the schools. Figures on the sheet are still invented stand-ins.
+
+## 2026-09-16 10:48 PT — Any named major can fill Programme
+
+**What changed.** The short list of majors is now a dictionary of nicer labels, not a gate. If the notes name a major that is not on that list — journalism, architecture, kinesiology, and so on — it still becomes a criterion and the Programme column shows that name instead of “not published.” Known names (politics, acting, nursing) still map to their usual labels. Gemini is told never to drop a named major or shove it into the closest listed slug.
+
+**Why.** Every new major was falling through unless someone added it by hand. Politics was the latest example.
+
+**What it affects.** Criteria review, overlay lists, and the extract prompt. Club activities such as football are still not treated as majors. Numbers on the list are still invented stand-ins.
+
+## 2026-09-16 10:38 PT — Politics is a real programme
+
+**What changed.** Notes that say politics, political science, poli sci, public policy, or international relations now become a Political science criterion. The Programme column shows Political science instead of “not published.” Politics is not treated as law.
+
+**Why.** Politics was not a known major, so the overlay left programs blank and the sheet said the programme was unpublished.
+
+**What it affects.** Criteria review, overlay lists, and the Gemini extract prompt. Numbers on the list are still invented stand-ins.
+
+## 2026-09-16 10:08 PT — Plays football no longer invents design clubs
+
+**What changed.** “Plays football” is now its own criterion, not basketball. Club lines are built from clubs named in the notes. If football is in the notes, every school’s clubs line says football. Design-build teams, makerspaces, and other invented clubs are gone unless the notes actually name them.
+
+**Why.** Notes that said plays football still showed design clubs. Football never matched a club hook, and the filler line always added design-build teams.
+
+**What it affects.** Criteria review, overlay club text, the Football on campus column, and the Gemini catalog prompt. Athletics still are not in the federal snapshot — the sheet flags that for confirmation.
+
+## 2026-09-16 09:54 PT — Acting/entertainment, and no silent close-to-home
+
+**What changed.** Notes that say acting, theatre, film, or entertainment now become an Acting / entertainment criterion instead of being dropped. Naming a home state no longer adds a “stay close” row. Distance only affects the list when the notes ask to stay close, stay within driving distance, or go far. Without that, the overlay picks a national mix and nearby schools do not get extra ranking points.
+
+**Why.** A prompt for acting and entertainment never matched a major. And any mentioned state was treated as “close to home,” so Pennsylvania files kept surfacing local schools even when nobody asked for that.
+
+**What it affects.** Criteria review, overlay lists, and ranking. “Close to home” / driving distance still works when you say it. Numbers on the list are still invented stand-ins.
+
+## 2026-09-16 09:44 PT — No PA default; $0 EFC counts as aid
+
+**What changed.** If the notes do not name a home state, the overlay catalog no longer starts in Pennsylvania. It spreads across the country, one state at a time, west to east. “Needs financial aid” still counts, and so do $0 EFC, cannot take loans, no loans, meet full need, and demonstrated need. Those now pre-fill the lower income band and $15,000 cap the same way “needs aid” already did.
+
+**Why.** The evals kept opening Temple, West Chester, and Millersville whenever home was unknown, and Maya’s $0 EFC never counted as aid needed.
+
+**What it affects.** Keyword extraction, the Gemini extract prompt, and overlay lists when home state is blank. A student actually from Pennsylvania still gets the Pennsylvania anchors. Numbers on the list are still invented stand-ins.
+
+## 2026-09-16 09:41 PT — Eval summary, synthetic data called out
+
+**What changed.** Wrote a plain-language summary of the Gemini counselor evals. It separates judge comments that treat school names as real College Scorecard rows from problems that still hold when the catalog is invented: Pennsylvania default, missed aid language, constraints that never change the list. Suggested saying the overlay is fake on screen, stopping the PA default, tightening extraction, and judging the sheet’s facts separately from name-collision risk. Also added that caveat to the evals canvas.
+
+**Why.** You asked for a summary and improvements with the reminder that this data is synthetic, not real.
+
+**What it affects.** Nothing in the live app. The write-up is `evals/summary.md`. The canvas now opens with the same distinction.
+
+## 2026-09-16 00:59 PT — Gemini counselor evals, 0 of 10 pass
+
+**What changed.** Added a script that asks Gemini to write ten counselor edge-case notes, runs each through the list builder, then asks Gemini to judge the lists. The first full run hit Gemini’s free-tier cap, so extract and catalog fell back to keywords and the overlay school pool. A second judge call on Gemini 3.5 Flash scored all ten as fail.
+
+**Why.** You asked to eval the prototype with Gemini as a college counselor: invent hard cases, then judge whether the lists are a usable first draft.
+
+**What it affects.** Nothing in the live app. Results live in `evals/latest.json` and `evals/latest.md`. Run again with `node scripts/run-gemini-evals.mjs`.
+
+**What went wrong on the first pass.** Gemini 3.6 Flash wrote the cases, then quota and timeouts stopped extract, catalog, rationale, and the first judge call. The lists still built. After switching the judge to 3.5 Flash, scoring completed.
+
+## 2026-09-16 00:32 PT — Aid question no longer scolds
+
+**What changed.** The Ask menu no longer offers “What would the aid letter look like?” It asks “What would this cost after aid?” instead. The reply now uses the estimated yearly cost, tuition line, income band, and cap from the sheet, and says there is no award letter on file — it does not open with “this is not an aid letter.”
+
+**Why.** That menu item asked for a document we do not have, then answered by refusing the question. The useful fact we do have is the estimated cost after typical aid.
+
+**What it affects.** The Ask menu on each school, and follow-ups about aid letters or cost after aid. Asking the old wording still gets the new reply.
+
+## 2026-09-16 00:08 PT — Follow-ups stay open after the list is built
+
+**What changed.** After a list exists, the composer still takes questions, column requests, and a request for a new list. Asking about a school now gets an answer from the facts on the sheet. “Add a campus column” actually adds that column. “Revise” on the ranking line opens the ranking card without hiding the current list, so you can rebuild with different priorities. Typing “too many reaches” or “put affordability first” rebuilds from the same notes.
+
+**Why.** The list used to be a dead end. Follow-ups only got a canned reply, and changing priorities took the table away. The conversation needed to keep going.
+
+**What it affects.** The list view only. Criteria, ranking, and print are the same. A missing API key still answers from the sheet instead of inventing facts.
+
+
+## 2026-09-16 00:00 PT — List columns follow the top three priorities
+
+**What changed.** The college list no longer always opens with estimated cost, distance, and the admissions band. After the school name, the first three columns are now whatever the counselor ranked highest. Admit rate still always appears, and the remaining ranking items can be added from the plus menu. Print summary uses the same columns.
+
+**Why.** You asked for the table to reflect the ranking, not a fixed set of cost and distance columns, while still showing admission rate every time.
+
+**What it affects.** The list table and the first page of print preview. Rebuild or reopen a list to see it. Default ranking (affordability, programme, closeness to home) now shows Est. cost, Programme, Distance, then Admit rate.
+
+
+
+## 2026-09-15 23:50 PT — Copy toggle uses dark gray, not black
+
+**What changed.** The selected Counselor copy / Student copy button now fills with ink-2 (the cool dark gray) and white text. It is no longer black and no longer the light paper fill. The unselected button stays outlined. Preview & print is still ink.
+
+**Why.** Black read as a primary action. A darker gray is enough to show which copy is on, without matching the print button.
+
+**What it affects.** Only those two copy controls under the college list.
+
+
+## 2026-09-15 23:47 PT — Copy toggle uses paper highlight
+
+**What changed.** The selected Counselor copy / Student copy control is now the light paper fill with dark text, not a dark ink pill. The unselected one stays outlined and empty. Paper was already the #fafafa token, so nothing new was added to the palette.
+
+**Why.** The dark fill read as a primary action, not a highlight. The light fill is meant to show which document is active.
+
+**What it affects.** The two copy buttons under the college list. Preview & print is still the dark button.
+
+
+## 2026-09-15 23:46 PT — Build dots loop for five seconds; table scrolls to its top
+
+**What changed.** The 256-dot build grid still ticks at the same speed, but it repeats until five seconds have passed, then the list appears. When that table appears, the thread now scrolls smoothly to the College header instead of dumping you at the last row. Earlier copy fixes stay in place: student copy cannot delete College, the composer says “Start typing…”, Unfiled is New Conversation, and home state stays blank unless the notes named one.
+
+**Why.** The dots finished in about three and a half seconds. The list opened scrolled to the bottom because the thread always jumped to its end.
+
+**What it affects.** The build animation, then the list view. Rebuild or open an existing list to see the scroll. Reduced-motion still skips the wait.
+
+
+## 2026-09-15 23:44 PT — Student copy keeps College; empty home state; copy tweaks
+
+**What changed.** On the student copy, the College column stays put — no delete control, and it comes back if it was hidden on counselor copy. The composer under criteria and ranking now says “Start typing…”. The leftover-student folder is labeled New Conversation. If the notes never named a home state, the ranking card’s state menu starts blank instead of Pennsylvania.
+
+**Why.** A student-facing list without school names is unusable. Pennsylvania was a leftover demo default. The other two lines were labeled in the live preview.
+
+**What it affects.** Student copy of the table, the ranking card when no state was extracted, the composer placeholder before the list exists, and the left-column folder for students not in a school.
+
+
+## 2026-09-15 23:36 PT — Honor a requested list size such as 15 schools
+
+**What changed.** If the notes say “15 colleges” (or another count between 6 and 24), that number is kept as a criterion and the ranking step fills to that count instead of stopping at eight to ten. The invented catalog grows so there are enough schools to choose from. A prompt with no count still returns a short balanced list.
+
+**Why.** The table was capped at 8–10 by the original mix rule, so asking for 15 still produced nine.
+
+**What it affects.** Build and rebuild. Rebuild an existing student if the notes already asked for 15.
+
+
+## 2026-09-15 22:55 PT — List now follows the notes instead of one canned CS demo
+
+**What changed.** After the counselor confirms criteria, the app invents a plausible catalog for this student — recognizable school names with made-up but realistic stats, programs, clubs, and campus life stamped from the notes. Ranking still assigns Likely / Target / Reach and affordability from those numbers. The table, the “what put these schools on the list” recap, extra columns, and print pages all use that result. The old eight Pennsylvania computer-science schools are no longer the source of truth.
+
+**Why.** Filtering the 40-school snapshot would go empty when a major was missing, and it could not invent a robotics club. You asked for output that looks real and stays relevant even if a fact is wrong.
+
+**What it affects.** Build onward: a design + social life + robotics prompt from California produced Cal Poly, UC San Diego, USC, and similar rows framed around design and robotics, not CS hackathons. A different prompt produces different names and columns. Figures are labeled as demo estimates. Refresh localhost if an old saved list is still open.
+
+
+## 2026-09-15 21:52 PT — Closed remaining post-criteria gaps and checked the live path
+
+**What changed.** The criteria card now uses the same enter animation as the rank-and-money card. The settled criteria line spells out the full home-state name from the two-letter code, so “PA” no longer hides inside words like “Practical.” Checked the live path in the browser: eight canned schools, student-copy columns, add/put-back column, ask fills the composer, Mix/Money recount after removing two schools (4 of 6 under the cap, 3 likely / 1 target / 2 reach), counselor vs student print, print overlay covers the pane, and “Sent to John Smith · 6 schools · student copy” with View.
+
+**Why.** A second pass against the handoff folder found no remaining user-visible misses except the criteria enter animation and the home-state abbreviation matching bug.
+
+**What it affects.** Criteria → Priorities → Build → List → Preview & print. Unused older step/print screens are still on disk but not opened. Ask menus stay portaled so they are not clipped by the table. Nothing is committed.
+
+## 2026-09-15 21:40 PT — Finished remaining post-criteria handoff gaps
+
+**What changed.** The live app now follows the handoff path only: criteria, then rank-and-money, then the dot build, then the canned eight-school table, then the in-pane print overlay. The old Scorecard generate-list function and the separate /print pages are no longer on that path. Print now returns to the thread so the “sent” receipt can show. The overlay uses the desk color and sits above the list. Home state on the settled criteria line uses the full state name, so “PA” no longer hides inside words like “Practical.” Build skips the long animation when the user prefers reduced motion.
+
+**Why.** A full comparison against the handoff folder showed leftover print/Scorecard routing, a print overlay that never closed, and a few token gaps. Those had to be closed so the designed five steps are what actually runs.
+
+**What it affects.** After criteria approval through preview and print. Unused older list/print screens remain in the repo but are not opened by the chat. Canned demonstration schools are still what the table shows.
+
+## 2026-09-15 21:30 PT — Post-criteria flow from the handoff folder
+
+**What changed.** Built the five steps after criteria approval: rank-and-money card, 256-dot build animation, wide schools table with add/remove columns, “what put these schools on the list” recap, and a two-document print overlay. The list uses the eight canned schools from the handoff, not live Scorecard. Print preview was sitting under the table and composer because the overlay had no fill; the desk color and stacking are now set on the overlay itself, the list is hidden while preview is open, and the overlay covers the chat pane.
+
+**Why.** The handoff folder is the visual source of truth for Criteria → Priorities → Build → List → Preview & print. The product should look like that sequence even where the ranking engine cannot yet drive every column.
+
+**What it affects.** The chat pane after the counselor confirms criteria. Switching students still uses the caseload column. Scorecard list generation is unused on this path. Nothing is committed.
+
 ## 2026-09-15 18:25 PT — Local main now has the Scorecard work
 
 **What changed.** Checked out `main`, fast-forwarded to match GitHub (`origin/main`), and confirmed `feat/live-scorecard-catalog` was already fully contained in that history. Deleted the local feature branch. Did not push; GitHub `main` was already up to date. Re-ran the Scorecard verify scripts after the update; they passed.
@@ -563,3 +734,112 @@
 **Why.** The designed first screen was only on this machine after the Claude Design handoff.
 
 **What it affects.** GitHub `main` now shows the new empty notes screen. The font folder is still local only.
+
+## 2026-09-15 18:48 PDT — Stopped the notes box border from changing on click
+
+**What changed.** Removed the focus border color change on the empty-state notes box and on the later thread composer, so both stay the same light rule color when clicked.
+
+**Why.** Clicking into the box was darkening or purpling the outline, which was not wanted.
+
+**What it affects.** Only the composer outline on focus. Typing, Create, and the rest of the flow are unchanged. A local check confirmed the focused and unfocused border matched.
+
+## 2026-09-15 18:49 PDT — Page fill, white search, collapse the caseload column
+
+**What changed.** Page background is now FAFAFA. The caseload search field is white and no longer turns purple on focus. The plus at the top of the column is a collapse control that hides the caseload; a matching control brings it back. New school moved to a row at the bottom of the list so adding a school is still possible.
+
+**Why.** Those three chrome details were requested against the current sidebar and canvas.
+
+**What it affects.** Page fill, search field, and whether the left column is showing. School folders still have their own plus to add a student. Refresh localhost to see it.
+
+## 2026-09-15 18:58 PDT — Selected student row uses page fill instead of purple
+
+**What changed.** The active student in the caseload column now uses the FAFAFA page fill instead of the purple brand tint.
+
+**Why.** The selected row was reading as a purple box, which did not match the rest of the chrome.
+
+**What it affects.** Only the selected student highlight in the left column. Hover, collapse, and the rest of the list are unchanged.
+
+## 2026-09-15 20:05 PDT — Applied the second Claude Design handoff (reading + criteria popup)
+
+**What changed.** After Create, the notes sit on the right as a “You” bubble. Status is a dimming line, not a card in the thread. The criteria table is a 600px popup docked above the composer, with phrase / understood / delete columns, rows arriving one at a time over skeleton bars, a header pencil that turns the understood column into fields, Save in edit mode, and delete that slides a row out. The composer is pre-filled with “Looks good, prepare the list.” Kept the earlier chrome: page fill FAFAFA, white search, collapse instead of the top plus, selected row FAFAFA, and no focus border color change. Create still sits beside the mic instead of sliding it, because the slide clipped the label.
+
+**Why.** The second handoff folder was the design for the reading moment and the criteria popup. Arbitrary pixel classes from the export were mapped to tokens. A first pass showed the header and footer with no rows; the reveal now starts with a row on screen and unfinished rows stay as bars. Deleting a row no longer restarts the whole reveal. The 600px cap is on the inner pane so padding does not shrink the popup.
+
+**What it affects.** Empty notes, extraction, and criteria review in the chat. Scoring, school picking, and later steps are unchanged. Affordability and home state still live only on the old table, which is not shown in the thread. Refresh localhost to see it.
+
+## 2026-09-15 22:22 PDT — Chat composer side padding matched to the empty-state composer
+
+**What changed.** The message box at the bottom of the reading thread now has 24 pixels of space on its left and right instead of 20. The hint line and mic row underneath moved with it so everything in the box still lines up on the same edge.
+
+**Why.** The empty-state notes box already used 24 pixels, so the two composers did not match once the thread view opened.
+
+**What it affects.** Only the spacing inside the bottom message box in the chat. Nothing about the text, the send behaviour, or any other screen changes. The 20-pixel spacing value is still used by the numbered priorities list and the printed sheet, so those were left alone. Checked in the live browser: both sides now read 24 pixels.
+
+## 2026-09-15 22:23 PDT — Left column heading now reads "Nerd Apply"
+
+**What changed.** The word at the top of the left column changed from "Caseload" to "Nerd Apply".
+
+**Why.** Requested — the top of the column reads as the product name rather than a section label.
+
+**What it affects.** Only that one line of text. The search field, the school folders, the student list, and the collapse control all behave exactly as before. The collapse button's spoken description still refers to hiding the caseload column, since that describes the action rather than the title. Confirmed on screen.
+
+## 2026-09-15 22:34 PDT — Oversized arrows on the "What matters most" step
+
+**What went wrong.** On the priorities step, the small arrows that mark the Home state and Family income dropdowns were drawing far larger than their boxes — measured at 92 and 145 pixels across inside boxes only 41 pixels tall — so each arrow spilled across the box and over the text beside it.
+
+**Why it happened.** Two separate causes, one in the code and one in the running preview.
+
+First, that arrow was hand-drawn rather than built with the shared icon component, and it carried no size of its own. It relied entirely on a styling rule for its size, so when that rule was missing it stretched to fill whatever space it sat in.
+
+Second, the rule really was missing. The preview server had been running for roughly eight and a half hours, since before the extra-small and compact icon sizes were added to the style settings. A long-running preview does not always pick up changes to that settings file, so the stylesheet it was serving had no extra-small icon size in it at all. Other icons were unaffected because the icon library they come from carries a built-in fallback size; the hand-drawn arrow had none.
+
+**What changed.** The arrow now uses the same shared icon component as every other icon in the app, at the extra-small size, so it always carries an explicit size and can never stretch to fill its container again. The stale preview servers on ports 5173 and 5174 were stopped and a single fresh one was started on 5173.
+
+**What it affects.** The two dropdown arrows on the priorities step now measure 12 pixels and sit neatly inside their boxes, twelve pixels in from the right edge and centred top to bottom. Verified by measuring the live page. Restarting the preview also brought several other recently added size settings into effect for the first time, so a few small icons elsewhere — most visibly the column-remove marks on the list table — now render at their intended smaller size instead of the oversized fallback. No behaviour, wording, or data changed anywhere.
+
+**One session-state note.** To see this step I reopened the priorities card on the John Smith record, so that record now sits on "Setting priorities" instead of showing its finished list. Choosing "Build the list" returns it to the list.
+
+## 2026-09-15 22:38 PDT — Criteria review moves forward with a "Next" button in the card
+
+**What changed.** On the criteria review step, moving to the next step is now a dark "Next" button in the bottom-right corner of the criteria card itself, in the same position and style as "Build the list" on the priorities card. Previously the message box below was pre-filled with the words "Looks good, prepare the list" and the counsellor had to press Send to continue.
+
+Three smaller adjustments came with it so the step reads consistently. The message box no longer pre-fills itself with that phrase, and is left empty like every other step. Its grey hint text now reads "Or just tell me what to change", matching the priorities step. And when someone types something the assistant cannot act on, its reply now says to edit the table and press Next, rather than telling them to type the word continue.
+
+**Why.** Requested. The two review steps were inconsistent: one had its own forward button inside the card, the other hid the same action behind a pre-written message. The button makes the forward path obvious and matches the pattern already in place one step later.
+
+**What it affects.** Only how the criteria step advances. Typing to continue still works exactly as before — words like "continue", "next", "yes", and "looks good" are all still accepted, so nobody's habit breaks. Nothing about extraction, the criteria themselves, editing, deleting rows, scoring, or school selection changed. Pressing Next no longer leaves a "Looks good, prepare the list" line in the conversation, which matches how "Build the list" already behaved.
+
+**Checked end to end** on a throwaway student: notes entered, criteria appeared with Next in the corner, pressing Next moved to the priorities step with no stray message. The throwaway student was then deleted and the John Smith record was returned to its finished list, so the caseload is back to how it started.
+
+## 2026-09-16 10:05 PDT — Hide Next while editing criteria, and allow adding a row
+
+**What changed.** On the "From this phrase / What I understood" card, the dark Next button now only appears when the table is not being edited. While the pencil is on, or after adding a row, Next is gone and Save is the way out. There is also an "Add a criterion" control under the table. It opens a blank row (phrase and understood) and puts the card into editing so Next stays hidden until Save.
+
+**Why.** Requested. Next should not move the counselor forward while the table is still in flux, and the spec already asked for a way to add a criterion that extraction missed.
+
+**What it affects.** Only the criteria review card in chat. Extraction, scoring, school selection, and the later priorities and list steps are unchanged. Empty added rows are dropped on Save, so a stray blank line does not become a criterion. If the understood line matches a known program name, that row is treated as an academic interest; otherwise it is kept as a free-text criterion.
+
+**Checked in the live browser** on a throwaway nursing-notes student: after extraction, Next and Add a criterion were both visible. Pencil hid Next and showed Save. Add a criterion made a blank row and kept Next hidden. Filling "also wants a small honors program" / "Look for a small honors program." and saving brought Next back with the new row kept. Adding again from the settled view also hid Next; saving the empty extra row dropped it and Next returned. That throwaway student is still sitting on reviewing criteria in this session.
+
+## 2026-09-16 10:45 PDT — Prompt stays on screen while ranking priorities
+
+**What went wrong.** On the ranking step, changing home state, family income, or the yearly cap made the prompt box slide off the bottom of the window. The ranking card and the prompt were glued together in a footer that was not allowed to shrink, so any extra height from those fields went below the visible area instead of staying on screen.
+
+**What changed.** The prompt now stays pinned to the bottom of the window. If the ranking card is taller than the space above it, that card scrolls on its own. Home state, family income, and the cap sit in a two-column layout so picking a longer state or income band no longer shoves a third row into the card.
+
+**Why.** Requested — the counselor still needs to type while adjusting those fields.
+
+**What it affects.** The ranking card and the prompt under it, including when someone revises priorities on an existing list. Scoring, school selection, and the list itself are unchanged. The same pinning also applies when the criteria table is docked above the prompt, so a long criteria table cannot hide it either.
+
+**Checked in the live browser** on Maya: opening Revise showed the prompt fully, including the “Enter to send” line. Setting home state to District of Columbia and family income to the highest band left the prompt fully visible. At a shorter 700-pixel window the prompt stayed on screen and the ranking card scrolled above it. Closing Revise returned Maya’s list and prompt to the usual list view.
+
+## 2026-09-16 11:10 PDT — Column resize handle is a thin black line
+
+**What changed.** The drag strip between the student list and the chat is thinner, and when you hover or drag it the line is black instead of purple. The grab area is still a little wider than the line so it is not harder to catch.
+
+**Why.** Requested — the old handle filled eight pixels of purple, which read as a thick brand bar rather than a column edge.
+
+**What it affects.** Only that resize control. Column width still has the same min and max. Nothing about students, lists, or chat behaviour changed.
+
+**Checked in the live browser.** The handle is four pixels wide to grab and paints a one-pixel black line while dragging. The previous purple fill is gone.
+

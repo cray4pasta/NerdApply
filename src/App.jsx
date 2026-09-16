@@ -1,17 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ChatShell from './components/ChatShell.jsx'
-import CriteriaStep from './components/CriteriaStep.jsx'
-import PrioritiesStep from './components/PrioritiesStep.jsx'
-import ListStep from './components/ListStep.jsx'
-import FamilyDocument from './components/FamilyDocument.jsx'
+import CriteriaCard from './components/CriteriaCard.jsx'
 import { extractCriteria, extractFallback } from './lib/extract.js'
+import { EXTRACT_STEPS, STEP_MS, holdForSteps } from './lib/progress.js'
+import { STATE_NAMES } from './lib/geo.js'
 import { buildList } from './lib/engine.js'
-import { loadSchoolsForList } from './lib/catalog.js'
-import { getColleges } from './lib/colleges.js'
-import { getRationales, templatesFor } from './lib/rationale.js'
 import { assertList } from './lib/guardrails.js'
-import { BUILD_STEPS, EXTRACT_STEPS, SCORECARD_MS, STEP_MS, holdForSteps } from './lib/progress.js'
-import ProgressLog from './components/ui/ProgressLog.jsx'
+import { getRationales } from './lib/rationale.js'
+import { loadSyntheticCatalog } from './lib/synthesize.js'
+import { engineInputs, settingsFromConversation, toTableRow } from './lib/listRows.js'
 import {
   createConversation,
   createSchool,
@@ -23,19 +20,35 @@ import {
   schoolIdForNotes,
   titleFrom,
 } from './lib/caseload.js'
+import { answerFollowup, bumpPriority, classifyFollowup } from './lib/followup.js'
 
-const CONTINUE_PHRASE = /^(continue|yes|yep|yeah|y|ok|okay|sure|looks good|looks right|confirm|next|done)$/i
+const CONTINUE_PHRASE =
+  /^(continue|yes|yep|yeah|y|ok|okay|sure|looks good(?:[,\s].*)?|looks right|confirm|next|done)$/i
 const BUILD_PHRASE = /^(build|build (the|my) list|continue|yes|yep|yeah|y|ok|okay|sure|go|generate|done)$/i
-
-function viewFromPath() {
-  const path = window.location.pathname
-  if (path === '/print/student') return 'print-student'
-  if (path === '/print/counselor') return 'print-counselor'
-  return null
-}
 
 function addMessage(c, msg) {
   return { ...c, messages: [...c.messages, { id: newId(), ...msg }] }
+}
+
+function displayHomeState(c) {
+  const raw = c.listSettings?.homeState || c.homeState || c.extraction?.home_state
+  if (!raw) return null
+  if (String(raw).length === 2) return STATE_NAMES[String(raw).toUpperCase()] || raw
+  return raw
+}
+
+function settledCriteriaText(c) {
+  const phrases = (c.criteria ?? []).map((r) => r.understood || r.label).filter(Boolean)
+  const home = displayHomeState(c)
+  const hasHome =
+    home &&
+    phrases.some((p) => {
+      const lower = p.toLowerCase()
+      return lower.includes('home state') || lower.includes(String(home).toLowerCase())
+    })
+  const withHome = home && !hasHome ? [phrases[0], `Home state: ${home}`, ...phrases.slice(1)].filter(Boolean) : phrases
+  if (withHome.length) return withHome.slice(0, 6).join(' · ')
+  return 'Criteria as reviewed'
 }
 
 function statusMessage(steps, activeIndex = 0) {
@@ -57,32 +70,23 @@ export default function App() {
   const [schools, setSchools] = useState(saved.schools)
   const [activeId, setActiveId] = useState(saved.activeId ?? saved.conversations[0].id)
   const [sidebarWidth, setSidebarWidth] = useState(saved.sidebarWidth)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(saved.sidebarCollapsed)
   const [query, setQuery] = useState('')
-  const [printView, setPrintView] = useState(() => viewFromPath())
+  const [followupBusy, setFollowupBusy] = useState(false)
+  const draftSettingsRef = useRef(null)
 
   const active = conversations.find((c) => c.id === activeId) ?? conversations[0]
-  const busy = active.phase === 'extracting' || active.phase === 'generating'
-  const canRebuild = active.phase === 'list' || Boolean(active.list?.length)
 
   useEffect(() => {
-    function onPop() {
-      setPrintView(viewFromPath())
-    }
-    window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
-  }, [])
-
-  useEffect(() => {
-    saveCaseload({ schools, conversations, activeId, sidebarWidth })
-  }, [schools, conversations, activeId, sidebarWidth])
+    saveCaseload({ schools, conversations, activeId, sidebarWidth, sidebarCollapsed })
+  }, [schools, conversations, activeId, sidebarWidth, sidebarCollapsed])
 
   useEffect(() => {
     setConversations((prev) => prev.map(recoverInFlight))
   }, [])
 
   useEffect(() => {
-    if (active.phase !== 'extracting' && active.phase !== 'generating') return undefined
-    const steps = active.phase === 'extracting' ? EXTRACT_STEPS : BUILD_STEPS
+    if (active.phase !== 'extracting') return undefined
     const id = active.id
     const timer = setInterval(() => {
       setConversations((prev) =>
@@ -90,9 +94,9 @@ export default function App() {
           if (c.id !== id) return c
           const status = c.messages.find((m) => m.card === 'status')
           if (!status) return c
-          const next = Math.min((status.activeIndex ?? 0) + 1, steps.length - 1)
+          const next = Math.min((status.activeIndex ?? 0) + 1, EXTRACT_STEPS.length - 1)
           if (next === status.activeIndex) return c
-          return { ...setStatusStep(c, steps, next), updatedAt: Date.now() }
+          return { ...setStatusStep(c, EXTRACT_STEPS, next), updatedAt: Date.now() }
         })
       )
     }, STEP_MS)
@@ -100,80 +104,33 @@ export default function App() {
       setConversations((prev) =>
         prev.map((c) => {
           if (c.id !== id) return c
-          if (c.phase === 'extracting' && c.notes) {
-            const result = extractFallback(c.notes)
-            const aid = result.affordability_signal?.aid_needed
-            const messages = c.messages.filter((m) => m.card !== 'status' && m.card !== 'criteria')
-            return addMessage(
-              {
-                ...c,
-                messages,
-                extraction: result,
-                criteria: result.criteria ?? [],
-                homeState: result.home_state ?? c.homeState,
-                incomeBand: aid ? '30001-48000' : c.incomeBand,
-                maxOutOfPocket: aid ? 15000 : c.maxOutOfPocket,
-                phase: 'criteria',
-                title: titleFrom(c.notes, result),
-                error: null,
-              },
-              {
-                role: 'assistant',
-                text: 'Here is what I understood. Review and edit before anything generates. A row with no source phrase is a row the model invented.',
-                card: 'criteria',
-                locked: false,
-              }
-            )
-          }
-          if (c.phase === 'generating') {
-            try {
-              console.warn('[app] generate recover used local snapshot')
-              const built = buildList({
-                schools: getColleges(),
-                criteria: c.criteria,
-                income_band: c.incomeBand,
-                max_out_of_pocket: c.maxOutOfPocket,
-                home_state: c.homeState,
-                academic: c.extraction?.academic ?? {},
-                priorityOrder: c.priorityOrder,
-              })
-              assertList(built)
-              const sentences = templatesFor(built, c.criteria)
-              const hadList = Boolean(c.list?.length)
-              const messages = c.messages.filter((m) => m.card !== 'status' && m.card !== 'list')
-              return addMessage(
-                {
-                  ...c,
-                  messages,
-                  list: built,
-                  rationales: sentences,
-                  counselorNotes: hadList ? c.counselorNotes : {},
-                  catalogSource: 'snapshot',
-                  catalogNote: 'College data is the local snapshot. Scorecard was unavailable.',
-                  phase: 'list',
-                  error: null,
-                },
-                {
-                  role: 'assistant',
-                  text: hadList
-                    ? 'Updated the list from your current table and ranking. This student stays in the school folder so you can come back and edit it.'
-                    : 'Here is the list. Admissions and affordability are separate labels. Remove a school if it does not belong — the balance check will update.',
-                  card: 'list',
-                }
-              )
-            } catch (err) {
-              console.error('[app] stuck list generation failed', err)
-              const messages = c.messages.filter((m) => m.card !== 'status')
-              return addMessage(
-                { ...c, messages, phase: 'priorities', error: err.message },
-                { role: 'assistant', text: err.message, tone: 'flag' }
-              )
+          if (c.phase !== 'extracting' || !c.notes) return c
+          const result = extractFallback(c.notes)
+          const aid = result.affordability_signal?.aid_needed
+          const messages = c.messages.filter((m) => m.card !== 'status' && m.card !== 'criteria')
+          return addMessage(
+            {
+              ...c,
+              messages,
+              extraction: result,
+              criteria: result.criteria ?? [],
+              homeState: result.home_state ?? c.homeState,
+              incomeBand: aid ? '30001-48000' : c.incomeBand,
+              maxOutOfPocket: aid ? 15000 : c.maxOutOfPocket,
+              phase: 'criteria',
+              title: titleFrom(c.notes, result),
+              error: null,
+            },
+            {
+              role: 'assistant',
+              text: 'Here is what I understood. Review and edit before anything generates. A row with no source phrase is a row the model invented.',
+              card: 'criteria',
+              locked: false,
             }
-          }
-          return c
+          )
         })
       )
-    }, SCORECARD_MS + STEP_MS * BUILD_STEPS.length + 3000)
+    }, STEP_MS * EXTRACT_STEPS.length + 3000)
     return () => {
       clearInterval(timer)
       clearTimeout(stuck)
@@ -182,24 +139,6 @@ export default function App() {
 
   function patch(id, fn) {
     setConversations((prev) => prev.map((c) => (c.id === id ? { ...fn(c), updatedAt: Date.now() } : c)))
-  }
-
-  function goToChat() {
-    window.history.pushState({}, '', '/')
-    setPrintView(null)
-  }
-
-  function requestPrint(variant) {
-    const affordable = active.list.filter((s) => s.affordability.band === 'Likely Affordable').length
-    if (affordable === 0) {
-      const ok = window.confirm(
-        'This list has no school the family is likely to afford. Print anyway? The counselor copy will still show the warning.'
-      )
-      if (!ok) return
-    }
-    const path = variant === 'counselor' ? '/print/counselor' : '/print/student'
-    window.history.pushState({}, '', path)
-    setPrintView(variant === 'counselor' ? 'print-counselor' : 'print-student')
   }
 
   function startNewConversation(schoolId = null) {
@@ -249,101 +188,224 @@ export default function App() {
     patch(id, (c) => {
       let next = { ...c, phase: 'priorities' }
       if (userText) next = addMessage(next, { role: 'user', text: userText })
-      return addMessage(next, {
-        role: 'assistant',
-        text: 'What matters most for this student? Rank these, then I will score the schools. Code does the deciding — not the model.',
-        card: 'priorities',
-        locked: false,
-      })
+      return next
     })
   }
 
-  async function generateList(id, userText) {
-    let snapshot = null
-    setConversations((prev) =>
-      prev.map((c) => {
-        if (c.id !== id) return c
-        snapshot = c
-        let next = { ...c, phase: 'generating', error: null, updatedAt: Date.now() }
-        if (userText) next = addMessage(next, { role: 'user', text: userText })
-        return addMessage(next, statusMessage(BUILD_STEPS, 0))
-      })
-    )
-    if (!snapshot) return
-
-    try {
-      const started = Date.now()
-      const catalog = await loadSchoolsForList({
+  function startBuilding(id, settings, userText, assistantText, snapshotPatch = null) {
+    const conv = conversations.find((c) => c.id === id)
+    const nextSettings = settings ?? draftSettingsRef.current ?? settingsFromConversation(conv ?? {})
+    const snapshot = {
+      notes: snapshotPatch?.notes ?? conv?.notes ?? '',
+      criteria: snapshotPatch?.criteria ?? conv?.criteria ?? [],
+      extraction: {
+        ...(conv?.extraction ?? {}),
+        list_size: nextSettings.listSize ?? conv?.extraction?.list_size,
+      },
+      homeState: conv?.homeState,
+      incomeBand: conv?.incomeBand,
+      maxOutOfPocket: conv?.maxOutOfPocket,
+    }
+    patch(id, (c) => {
+      let next = {
+        ...c,
+        notes: snapshot.notes,
         criteria: snapshot.criteria,
-        incomeBand: snapshot.incomeBand,
-      })
-      if (catalog.reason === 'empty') {
-        throw new Error(catalog.error)
+        phase: 'building',
+        listSettings: nextSettings,
+        removedSchoolIds: [],
+        listSent: false,
+        list: [],
+        listReady: false,
+        animationDone: false,
+        extras: { columnLibrary: [], studentColumns: [] },
+        pendingColumn: nextSettings.pendingColumn ?? null,
+        editingPriorities: false,
+        homeState: nextSettings.homeState,
+        maxOutOfPocket: Number(String(nextSettings.maxOop).replace(/[^0-9]/g, '')) || 25000,
+        error: null,
       }
-      const built = buildList({
-        schools: catalog.schools,
+      if (userText) next = addMessage(next, { role: 'user', text: userText, chapter: c.phase === 'list' ? 'list' : undefined })
+      if (assistantText) next = addMessage(next, { role: 'assistant', text: assistantText, chapter: 'list' })
+      return next
+    })
+    void runGenerate(id, snapshot, nextSettings)
+  }
+
+  async function runGenerate(id, snapshot, settings) {
+    try {
+      const inputs = engineInputs(snapshot, settings)
+      const catalog = await loadSyntheticCatalog({
+        notes: snapshot.notes,
         criteria: snapshot.criteria,
-        income_band: snapshot.incomeBand,
-        max_out_of_pocket: snapshot.maxOutOfPocket,
-        home_state: snapshot.homeState,
-        academic: snapshot.extraction?.academic ?? {},
-        priorityOrder: snapshot.priorityOrder,
+        academic: inputs.academic,
+        homeState: inputs.home_state,
+        incomeBand: inputs.income_band,
+        cap: inputs.max_out_of_pocket,
+        listSize: inputs.listSize,
       })
-      assertList(built)
-      const sentences = templatesFor(built, snapshot.criteria)
-      await holdForSteps(started, BUILD_STEPS.length)
+      let built = buildList({
+        schools: catalog.schools,
+        criteria: inputs.criteria,
+        income_band: inputs.income_band,
+        max_out_of_pocket: inputs.max_out_of_pocket,
+        home_state: inputs.home_state,
+        academic: inputs.academic,
+        priorityOrder: inputs.priorityOrder,
+        listSize: inputs.listSize,
+      })
+      if (!built.length || (inputs.listSize && built.length < inputs.listSize)) {
+        const filled = buildList({
+          schools: catalog.schools,
+          criteria: inputs.criteria.map((c) => (c.category === 'geography' ? { ...c, strength: 'flexible' } : c)),
+          income_band: inputs.income_band,
+          max_out_of_pocket: inputs.max_out_of_pocket,
+          home_state: inputs.home_state,
+          academic: inputs.academic,
+          priorityOrder: inputs.priorityOrder,
+          listSize: inputs.listSize,
+        })
+        if (filled.length > built.length) built = filled
+      }
+      const rationales = await getRationales(built, snapshot.criteria)
+      const labelled = built.map((s) => ({ ...s, rationale: rationales[s.id] ?? '' }))
+      assertList(labelled)
+      const rows = labelled.map((s) =>
+        toTableRow(s, s.rationale, inputs.max_out_of_pocket, inputs.home_state, inputs.criteria),
+      )
       patch(id, (c) => {
-        const hadList = Boolean(snapshot.list?.length)
-        const messages = c.messages.filter((m) => m.card !== 'status' && m.card !== 'list')
-        return addMessage(
-          {
-            ...c,
-            messages,
-            list: built,
-            rationales: sentences,
-            counselorNotes: hadList ? c.counselorNotes : {},
-            catalogSource: catalog.source,
-            catalogNote:
-              catalog.reason === 'ok'
-                ? `Catalog: College Scorecard (live)${catalog.vintage ? ` · ${catalog.vintage}` : ''}.`
-                : catalog.reason === 'no_required_major'
-                  ? 'No required major — using the local college snapshot.'
-                  : 'College data is the local snapshot. Scorecard was unavailable.',
-            phase: 'list',
-            error: null,
-          },
-          {
-            role: 'assistant',
-            text: hadList
-              ? 'Updated the list from your current table and ranking. This student stays in the school folder so you can come back and edit it.'
-              : 'Here is the list. Admissions and affordability are separate labels. Remove a school if it does not belong — the balance check will update.',
-            card: 'list',
-          }
-        )
+        if (c.phase !== 'building' && c.phase !== 'list') return c
+        return {
+          ...c,
+          list: rows,
+          rationales,
+          extras: catalog.extras,
+          catalogSource: catalog.source,
+          catalogNote: catalog.source === 'llm' ? 'Catalog invented for this prompt.' : 'Catalog overlaid for this prompt.',
+          listReady: true,
+          phase: c.animationDone || c.phase === 'list' ? 'list' : 'building',
+          error: null,
+        }
       })
-      getRationales(built, snapshot.criteria)
-        .then((aiSentences) => {
-          try {
-            assertList(built.map((s) => ({ ...s, rationale: aiSentences[s.id] })))
-          } catch (err) {
-            console.warn('[app] skipping AI sentences', err)
-            return
-          }
-          patch(id, (c) => (c.phase === 'list' ? { ...c, rationales: aiSentences } : c))
-        })
-        .catch((err) => {
-          console.warn('[app] rationale skipped', err)
-        })
     } catch (err) {
       console.error('[app] list generation failed', err)
       patch(id, (c) => {
-        const withoutStatus = { ...c, messages: c.messages.filter((m) => m.card !== 'status'), phase: 'priorities', error: err.message }
-        return addMessage(withoutStatus, {
-          role: 'assistant',
-          text: err.message,
-          tone: 'flag',
-        })
+        if (c.phase !== 'building') return c
+        return addMessage(
+          { ...c, phase: 'priorities', listReady: false, animationDone: false, error: err.message },
+          {
+            role: 'assistant',
+            text: 'I could not finish that list. Check the priorities and build again.',
+            tone: 'flag',
+          }
+        )
       })
+    }
+  }
+
+  function finishBuilding(id) {
+    patch(id, (c) => {
+      if (c.phase !== 'building') return c
+      if (c.listReady && c.list?.length) return { ...c, animationDone: true, phase: 'list' }
+      return { ...c, animationDone: true }
+    })
+  }
+
+  function rebuildList(id, settings) {
+    const conv = conversations.find((c) => c.id === id)
+    startBuilding(id, settings ?? conv?.listSettings ?? draftSettingsRef.current ?? settingsFromConversation(conv ?? {}))
+  }
+
+  async function handleListFollowup(id, text) {
+    const conv = conversations.find((c) => c.id === id)
+    if (!conv) return
+    const removedIds = conv.removedSchoolIds ?? []
+    const live = (conv.list ?? []).filter((s) => !removedIds.includes(s.id))
+    const removed = (conv.list ?? []).filter((s) => removedIds.includes(s.id))
+    const settings = conv.listSettings ?? settingsFromConversation(conv)
+    const action = classifyFollowup(text, { schools: live, removed, extras: conv.extras, criteria: conv.criteria })
+
+    function note(update, assistant) {
+      patch(id, (c) => {
+        let next = addMessage(c, { role: 'user', text, chapter: 'list' })
+        if (update) next = { ...next, ...update(next) }
+        if (assistant) next = addMessage(next, { role: 'assistant', text: assistant, chapter: 'list' })
+        return next
+      })
+    }
+
+    if (action.type === 'remove') {
+      note((c) => ({ removedSchoolIds: [...(c.removedSchoolIds ?? []), action.school.id] }), `Removed ${action.school.name}. Money and mix update on the card above.`)
+      return
+    }
+
+    if (action.type === 'restore') {
+      note((c) => ({ removedSchoolIds: (c.removedSchoolIds ?? []).filter((x) => x !== action.school.id) }), `Put ${action.school.name} back.`)
+      return
+    }
+
+    if (action.type === 'add_column') {
+      note(() => ({ pendingColumn: action.column }), `Added “${action.column.label}”. Missing values are flagged rather than guessed.`)
+      return
+    }
+
+    if (action.type === 'reopen_priorities') {
+      note(() => ({ editingPriorities: true }), 'Revise the ranking below, then build a new list. This one stays until you do.')
+      return
+    }
+
+    if (action.type === 'reopen_criteria') {
+      note(() => ({ phase: 'criteria', editingPriorities: false }))
+      return
+    }
+
+    if (action.type === 'new_conversation') {
+      startNewConversation(conv.schoolId)
+      return
+    }
+
+    if (action.type === 'new_notes') {
+      await runExtraction(id, `${conv.notes}\n\n${text}`.trim())
+      return
+    }
+
+    if (action.type === 'revise_criteria') {
+      const notes = `${conv.notes}\n\n${text}`.trim()
+      startBuilding(id, settings, text, action.message, { notes, criteria: action.criteria })
+      return
+    }
+
+    if (action.type === 'rebuild') {
+      const order = action.priority ? bumpPriority(settings.order, action.priority) : settings.order
+      const nextSettings = {
+        ...settings,
+        order,
+        listSize: action.listSize ?? settings.listSize,
+        pendingColumn: action.column || null,
+      }
+      const why = [
+        action.priority ? `${action.priority.toLowerCase()} first` : null,
+        action.listSize ? `${action.listSize} schools` : null,
+        action.column ? `“${action.column.label}” column` : null,
+      ]
+        .filter(Boolean)
+        .join(', ')
+      startBuilding(
+        id,
+        nextSettings,
+        text,
+        why ? `Building a new list — ${why}.` : 'Building a new list from the same criteria.'
+      )
+      return
+    }
+
+    setFollowupBusy(true)
+    patch(id, (c) => addMessage(c, { role: 'user', text, chapter: 'list' }))
+    try {
+      const answer = await answerFollowup(text, { schools: live, criteria: conv.criteria, settings })
+      patch(id, (c) => addMessage(c, { role: 'assistant', text: answer, chapter: 'list' }))
+    } finally {
+      setFollowupBusy(false)
     }
   }
 
@@ -422,7 +484,7 @@ export default function App() {
     const id = active.id
     const trimmed = text.trim()
     if (!trimmed) return
-    if (active.phase === 'extracting' || active.phase === 'generating') return
+    if (active.phase === 'extracting' || active.phase === 'building' || followupBusy) return
 
     if (active.phase === 'idle') {
       await runExtraction(id, trimmed)
@@ -431,13 +493,12 @@ export default function App() {
 
     if (active.phase === 'criteria') {
       if (CONTINUE_PHRASE.test(trimmed)) {
-        if (canRebuild) await generateList(id, trimmed)
-        else openPriorities(id, trimmed)
+        openPriorities(id, trimmed)
       } else {
         patch(id, (c) =>
           addMessage(addMessage(c, { role: 'user', text: trimmed }), {
             role: 'assistant',
-            text: 'Edit the table above, then type continue. I will not pick schools until you confirm.',
+            text: 'Edit the table above, then press Next. I will not pick schools until you confirm.',
           })
         )
       }
@@ -445,12 +506,12 @@ export default function App() {
     }
 
     if (active.phase === 'priorities') {
-      if (BUILD_PHRASE.test(trimmed)) await generateList(id, trimmed)
+      if (BUILD_PHRASE.test(trimmed)) startBuilding(id, draftSettingsRef.current ?? settingsFromConversation(active), trimmed)
       else {
         patch(id, (c) =>
           addMessage(addMessage(c, { role: 'user', text: trimmed }), {
             role: 'assistant',
-            text: 'Reorder the priorities above, then type build. That ranking is what the scoring engine uses.',
+            text: 'Reorder the rows on the card, or tell me what to change. Then press Build the list.',
           })
         )
       }
@@ -458,15 +519,7 @@ export default function App() {
     }
 
     if (active.phase === 'list') {
-      if (BUILD_PHRASE.test(trimmed) || CONTINUE_PHRASE.test(trimmed)) {
-        await generateList(id, trimmed)
-        return
-      }
-      const reply =
-        trimmed.length > 180
-          ? 'That reads like another student. Press + on a school folder, then paste it there.'
-          : 'This list stays with the student. Edit the table or ranking above and rebuild, or open another student from the school folders.'
-      patch(id, (c) => addMessage(addMessage(c, { role: 'user', text: trimmed }), { role: 'assistant', text: reply }))
+      await handleListFollowup(id, trimmed)
     }
   }
 
@@ -479,42 +532,12 @@ export default function App() {
     }
   }
 
-  if (printView) {
-    if (active.list.length === 0) {
-      return (
-        <div className="mx-auto max-w-notes px-6 py-12">
-          <p className="font-sans text-15 text-ink-2">This student does not have a list yet. Open them from the school folder and build one.</p>
-          <button
-            type="button"
-            className="mt-4 rounded-control bg-brand px-5 py-3 font-sans text-15 font-medium text-surface hover:bg-brand-hover"
-            onClick={goToChat}
-          >
-            Back to chat
-          </button>
-        </div>
-      )
-    }
-
-    return (
-      <FamilyDocument
-        variant={printView === 'print-counselor' ? 'counselor' : 'student'}
-        studentName={guessName(active.notes, active.extraction)}
-        list={active.list}
-        rationales={active.rationales}
-        counselorNotes={active.counselorNotes}
-        extraction={active.extraction}
-        incomeBand={active.incomeBand}
-        priorityOrder={active.priorityOrder}
-        catalogNote={active.catalogNote}
-        onBack={goToChat}
-      />
-    )
-  }
-
   return (
     <ChatShell
       sidebarWidth={sidebarWidth}
       onSidebarWidth={setSidebarWidth}
+      sidebarCollapsed={sidebarCollapsed}
+      onSidebarCollapsed={setSidebarCollapsed}
       conversations={conversations}
       schools={schools}
       activeId={active.id}
@@ -530,65 +553,48 @@ export default function App() {
       onDeleteSchool={deleteSchool}
       messages={active.messages}
       phase={active.phase}
-      progressIndex={active.messages.find((m) => m.card === 'status')?.activeIndex}
       onSend={handleSend}
-      renderCard={(message) => {
-        if (message.card === 'status') {
-          return <ProgressLog steps={message.steps} activeIndex={message.activeIndex} />
-        }
-        if (message.card === 'criteria') {
-          return (
-            <CriteriaStep
-              extraction={active.extraction}
-              criteria={active.criteria}
-              setCriteria={fieldSetter(active.id, 'criteria')}
-              incomeBand={active.incomeBand}
-              setIncomeBand={fieldSetter(active.id, 'incomeBand')}
-              maxOutOfPocket={active.maxOutOfPocket}
-              setMaxOutOfPocket={fieldSetter(active.id, 'maxOutOfPocket')}
-              homeState={active.homeState}
-              setHomeState={fieldSetter(active.id, 'homeState')}
-              locked={busy}
-              continueLabel={canRebuild ? 'Rebuild the list' : 'Looks right — continue'}
-              onContinue={() => (canRebuild ? generateList(active.id) : openPriorities(active.id))}
-            />
-          )
-        }
-        if (message.card === 'priorities') {
-          return (
-            <PrioritiesStep
-              priorityOrder={active.priorityOrder}
-              setPriorityOrder={fieldSetter(active.id, 'priorityOrder')}
-              locked={busy}
-              continueLabel={canRebuild ? 'Rebuild the list' : 'Build the list'}
-              onContinue={() => generateList(active.id)}
-            />
-          )
-        }
-        if (message.card === 'list') {
-          return (
-            <ListStep
-              list={active.list}
-              setList={fieldSetter(active.id, 'list')}
-              criteria={active.criteria}
-              rationales={active.rationales}
-              counselorNotes={active.counselorNotes}
-              priorityOrder={active.priorityOrder}
-              maxOutOfPocket={active.maxOutOfPocket}
-              catalogNote={active.catalogNote}
-              onNoteChange={(schoolId, value) =>
-                patch(active.id, (c) => ({
-                  ...c,
-                  counselorNotes: { ...c.counselorNotes, [schoolId]: value },
-                }))
-              }
-              onPrintStudent={() => requestPrint('student')}
-              onPrintCounselor={() => requestPrint('counselor')}
-            />
-          )
-        }
-        return null
+      listSettings={active.listSettings ?? settingsFromConversation(active)}
+      criteriaSummary={settledCriteriaText(active)}
+      criteria={active.criteria ?? []}
+      academic={active.extraction?.academic ?? {}}
+      generatedList={active.list ?? []}
+      extras={active.extras}
+      studentName={guessName(active.notes, active.extraction) || 'Student'}
+      schoolLabel={schools.find((s) => s.id === active.schoolId)?.name || 'Central High'}
+      removedSchoolIds={active.removedSchoolIds ?? []}
+      studentCopy={Boolean(active.studentCopy)}
+      onStudentCopy={(value) => patch(active.id, (c) => ({ ...c, studentCopy: value }))}
+      listSent={Boolean(active.listSent)}
+      onMarkSent={() => patch(active.id, (c) => ({ ...c, listSent: true }))}
+      onBuildList={(settings) => startBuilding(active.id, settings)}
+      onBuildDone={() => finishBuilding(active.id)}
+      onReopenCriteria={() => patch(active.id, (c) => ({ ...c, phase: 'criteria', editingPriorities: false }))}
+      onReopenPriorities={() =>
+        patch(active.id, (c) => ({
+          ...c,
+          editingPriorities: !c.editingPriorities,
+          phase: c.phase === 'list' ? 'list' : 'priorities',
+        }))
+      }
+      editingPriorities={Boolean(active.editingPriorities)}
+      pendingColumn={active.pendingColumn ?? null}
+      onConsumeColumn={() => patch(active.id, (c) => ({ ...c, pendingColumn: null }))}
+      followupBusy={followupBusy}
+      onPrioritiesDraft={(settings) => {
+        draftSettingsRef.current = settings
       }}
+      onRebuild={() => rebuildList(active.id)}
+      dockedCard={
+        active.phase === 'extracting' || active.phase === 'criteria' ? (
+          <CriteriaCard
+            pending={active.phase === 'extracting' ? 4 : 0}
+            criteria={active.phase === 'criteria' ? active.criteria : []}
+            onChange={active.phase === 'criteria' ? fieldSetter(active.id, 'criteria') : undefined}
+            onNext={active.phase === 'criteria' ? () => openPriorities(active.id) : undefined}
+          />
+        ) : null
+      }
     />
   )
 }

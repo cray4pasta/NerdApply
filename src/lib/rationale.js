@@ -13,7 +13,8 @@ function templateRationale(school, criteria) {
     ? `A ${sizeWord} ${school.ownership} school`
     : `A ${school.ownership} school with unknown enrollment`
 
-  return `${schoolPhrase} in ${school.setting} ${school.state} with ${programPhrase}, ${travel}.`
+  const club = school.clubs ? `, ${String(school.clubs).split(',')[0].trim().toLowerCase()}` : ''
+  return `${schoolPhrase} in ${school.setting} ${school.state} with ${programPhrase}${club}, ${travel}.`
 }
 
 export function templatesFor(schools, criteria) {
@@ -39,6 +40,8 @@ export async function getRationales(schools, criteria) {
           programs: s.programs,
           program_names: s.program_names ?? null,
           program_awards: s.program_awards ?? null,
+          clubs: s.clubs ?? null,
+          campus_life: s.campus_life ?? null,
         })),
       }),
     })

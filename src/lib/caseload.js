@@ -28,8 +28,15 @@ export function createConversation(schoolId = SCHOOL_UNFILED) {
     maxOutOfPocket: 25000,
     priorityOrder: [...DIMENSIONS],
     list: [],
+    listSettings: null,
+    removedSchoolIds: [],
+    studentCopy: false,
+    listSent: false,
     catalogSource: null,
     catalogNote: null,
+    extras: { columnLibrary: [], studentColumns: [] },
+    listReady: false,
+    animationDone: false,
     rationales: {},
     counselorNotes: {},
     homeState: null,
@@ -52,6 +59,7 @@ export function defaultCaseload() {
     conversations: [first],
     activeId: first.id,
     sidebarWidth: null,
+    sidebarCollapsed: false,
   }
 }
 
@@ -74,7 +82,12 @@ export function titleFrom(notes, extracted) {
 
 export function statusLabel(c) {
   if (c.phase === 'extracting') return 'Reading profile'
-  if (c.phase === 'generating') return 'Building list'
+  if (c.phase === 'generating' || c.phase === 'building') return 'Building list'
+  if (c.phase === 'list') {
+    const live = (c.list ?? []).filter((s) => !(c.removedSchoolIds ?? []).includes(s.id))
+    const n = live.length
+    return `${n} school${n === 1 ? '' : 's'}`
+  }
   if (c.list?.length) return `${c.list.length} schools`
   if (c.phase === 'criteria') return 'Reviewing criteria'
   if (c.phase === 'priorities') return 'Setting priorities'
@@ -100,8 +113,14 @@ export function conversationMatches(c, schoolName, query) {
 
 export function recoverInFlight(c) {
   const hadStatus = (c.messages ?? []).some((m) => m.card === 'status')
-  if (c.phase !== 'extracting' && c.phase !== 'generating' && !hadStatus) return c
+  if (c.phase !== 'extracting' && c.phase !== 'generating' && c.phase !== 'building' && !hadStatus) return c
   const messages = (c.messages ?? []).filter((m) => m.card !== 'status')
+  if (c.phase === 'building') {
+    return { ...c, messages, phase: c.listReady && c.list?.length ? 'list' : 'priorities', animationDone: false }
+  }
+  if (c.phase === 'list' && !c.list?.length) {
+    return { ...c, messages, phase: 'priorities' }
+  }
   if (c.phase === 'generating') {
     return { ...c, messages, phase: c.list?.length ? 'list' : 'priorities' }
   }
@@ -131,6 +150,7 @@ export function loadCaseload() {
       ),
       activeId: data.activeId,
       sidebarWidth: typeof data.sidebarWidth === 'number' ? data.sidebarWidth : null,
+      sidebarCollapsed: Boolean(data.sidebarCollapsed),
     }
   } catch (err) {
     console.error('[caseload] could not read saved lists', err)
@@ -147,6 +167,7 @@ export function saveCaseload(payload) {
         conversations: payload.conversations.map(recoverInFlight),
         activeId: payload.activeId,
         sidebarWidth: payload.sidebarWidth,
+        sidebarCollapsed: Boolean(payload.sidebarCollapsed),
       })
     )
   } catch (err) {

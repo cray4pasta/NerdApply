@@ -20,8 +20,11 @@ assert.equal(row?.value, 'design')
 assert.equal(row?.label, 'Design')
 
 const llmSource = readFileSync(new URL('../api/llm.js', import.meta.url), 'utf8')
-assert.match(llmSource, /art,\s*design,\s*marine_biology/)
+assert.match(llmSource, /art,\s*performing_arts,\s*design,\s*marine_biology/)
 assert.match(llmSource, /"graphic design".*slug "design".*label "Design"/is)
+assert.ok(CIP_BY_SLUG.political_science?.includes('4510'), 'politics should map to CIP 4510')
+assert.match(llmSource, /never omit a named major/i)
+assert.equal(extractFallback('Interested in journalism').criteria.find((c) => c.category === 'academic_interest')?.value, 'journalism')
 
 const snapshotTags = JSON.parse(
   readFileSync(new URL('../src/data/program-tags.json', import.meta.url), 'utf8')

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ChevronDown, ChevronRight, Plus, Search, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, PanelLeftClose, Plus, Search, X } from 'lucide-react'
 import { conversationMatches, statusLabel } from '../lib/caseload.js'
 import Icon from './ui/Icon.jsx'
+
+const UNFILED_LABEL = 'New Conversation'
 
 function FolderIcon({ open }) {
   return <Icon icon={open ? ChevronDown : ChevronRight} size="sm" className="text-ink-3" />
@@ -16,7 +18,7 @@ function StudentRow({ conversation, schoolName, active, onSelect, onMove, school
         e.dataTransfer.effectAllowed = 'move'
       }}
       className={`group mb-1 flex items-center rounded-control ${
-        active ? 'bg-brand-tint text-ink' : 'text-ink-2 hover:bg-paper hover:text-ink'
+        active ? 'bg-paper text-ink' : 'text-ink-2 hover:bg-paper hover:text-ink'
       }`}
     >
       <button
@@ -37,7 +39,7 @@ function StudentRow({ conversation, schoolName, active, onSelect, onMove, school
         onChange={(e) => onMove(conversation.id, e.target.value || null)}
         onClick={(e) => e.stopPropagation()}
       >
-        <option value="">Unfiled</option>
+        <option value="">{UNFILED_LABEL}</option>
         {schoolOptions.map((s) => (
           <option key={s.id} value={s.id}>
             {s.name}
@@ -74,6 +76,7 @@ export default function CaseloadSidebar({
   onMoveStudent,
   onDeleteStudent,
   onDeleteSchool,
+  onCollapse,
 }) {
   const [renamingId, setRenamingId] = useState(null)
   const [draftName, setDraftName] = useState('')
@@ -95,7 +98,7 @@ export default function CaseloadSidebar({
       .filter((c) => (c.schoolId ?? null) === (schoolId ?? null))
       .filter((c) => {
         const school = schools.find((s) => s.id === c.schoolId)
-        return conversationMatches(c, school?.name ?? 'Unfiled', query)
+        return conversationMatches(c, school?.name ?? UNFILED_LABEL, query)
       })
       .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
   }
@@ -120,14 +123,14 @@ export default function CaseloadSidebar({
     <aside className="history-pane flex h-full shrink-0 flex-col border-r border-rule bg-surface">
       <div className="border-b border-rule px-3 py-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="font-sans text-14 font-medium text-ink">Caseload</p>
+          <p className="font-sans text-14 font-medium text-ink">Nerd Apply</p>
           <button
             type="button"
             className="rounded-control p-2 text-ink-3 hover:bg-paper hover:text-ink"
-            aria-label="New school"
-            onClick={onNewSchool}
+            aria-label="Hide the caseload column"
+            onClick={onCollapse}
           >
-            <Icon icon={Plus} size="sm" />
+            <Icon icon={PanelLeftClose} size="sm" />
           </button>
         </div>
         <label className="sr-only" htmlFor="caseload-search">
@@ -145,7 +148,7 @@ export default function CaseloadSidebar({
             value={query}
             onChange={(e) => onQuery(e.target.value)}
             placeholder="Search students"
-            className="w-full rounded-control border border-rule bg-paper py-2 pl-10 pr-3 font-sans text-body-sm text-ink placeholder:text-ink-3 focus:border-brand focus:outline-none"
+            className="w-full rounded-control border border-rule bg-surface py-2 pl-10 pr-3 font-sans text-body-sm text-ink placeholder:text-ink-3 focus:border-rule focus:outline-none"
           />
         </div>
       </div>
@@ -246,11 +249,11 @@ export default function CaseloadSidebar({
             onDrop={(e) => onDropStudent(null, e)}
           >
             <div className="flex items-center justify-between px-3 py-2">
-              <p className="font-sans text-14 font-medium text-ink">Unfiled</p>
+              <p className="font-sans text-14 font-medium text-ink">{UNFILED_LABEL}</p>
               <button
                 type="button"
                 className="rounded-control px-2 py-1 text-ink-3 hover:bg-paper hover:text-ink"
-                aria-label="Add an unfiled student"
+                aria-label="Add a new conversation"
                 onClick={() => onNewStudent(null)}
               >
                 <Icon icon={Plus} size="sm" />
@@ -260,7 +263,7 @@ export default function CaseloadSidebar({
               <StudentRow
                 key={c.id}
                 conversation={c}
-                schoolName="Unfiled"
+                schoolName={UNFILED_LABEL}
                 active={c.id === activeId}
                 onSelect={onSelectStudent}
                 onMove={onMoveStudent}
@@ -274,6 +277,15 @@ export default function CaseloadSidebar({
         {query.trim() && schools.filter(showSchool).length === 0 && unfiled.length === 0 && (
           <p className="px-3 py-4 font-sans text-14 text-ink-3">No students match that search.</p>
         )}
+
+        <button
+          type="button"
+          className="mt-1 flex w-full items-center gap-2 rounded-control px-3 py-2 text-left font-sans text-14 text-ink-3 hover:bg-paper hover:text-ink"
+          onClick={onNewSchool}
+        >
+          <Icon icon={Plus} size="sm" />
+          New school
+        </button>
       </nav>
 
       <p className="border-t border-rule px-4 py-3 font-sans text-12 text-ink-3">Saved on this device.</p>

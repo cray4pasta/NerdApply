@@ -18,13 +18,16 @@ export const PROGRAM_CHOICES = [
   { value: 'business', label: 'Business' },
   { value: 'education', label: 'Education' },
   { value: 'art', label: 'Art' },
+  { value: 'performing_arts', label: 'Acting / entertainment' },
   { value: 'design', label: 'Design' },
   { value: 'environmental_science', label: 'Environmental science' },
   { value: 'agriculture', label: 'Agriculture' },
   { value: 'law', label: 'Law / pre-law' },
+  { value: 'political_science', label: 'Political science' },
 ]
 
 const INTEREST_KEYWORDS = [
+  [/acting|\bactor\b|\bactress\b|\btheatre\b|\btheater\b|\bdrama\b|musical theatre|musical theater|performing arts|\bentertainment\b|\bfilm\b/i, 'performing_arts'],
   [/graphic design|industrial design|visual design|\bUX\b|interested in design|\bdesign\b/i, 'design'],
   [/interested in (the )?arts?|art school|fine arts|studio art|drawing|painting|\barts\b|\bart\b/i, 'art'],
   [/marine biology|marine science|oceanography|\bocean\b/i, 'marine_biology'],
@@ -37,12 +40,116 @@ const INTEREST_KEYWORDS = [
   [/business|finance|entrepreneur|accounting|economics/i, 'business'],
   [/teaching|\beducation\b/i, 'education'],
   [/\bagriculture\b/i, 'agriculture'],
+  [/political science|\bpoli[\s.-]?sci\b|\bpolitics\b|public policy|international relations/i, 'political_science'],
 ]
 
 const LABEL_FOR = Object.fromEntries(PROGRAM_CHOICES.map((p) => [p.value, p.label]))
 
+const NOT_A_MAJOR = new Set([
+  'football',
+  'basketball',
+  'robotics',
+  'athletics',
+  'club',
+  'clubs',
+  'aid',
+  'home',
+  'college',
+  'colleges',
+  'school',
+  'schools',
+  'list',
+  'gpa',
+  'sat',
+  'act',
+  'campus',
+  'life',
+])
+
+function slugFromPhrase(text) {
+  return String(text ?? '')
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '')
+    .slice(0, 48)
+}
+
+function humanizeSlug(slug) {
+  const s = String(slug ?? '').replaceAll('_', ' ').trim()
+  if (!s) return String(slug ?? '')
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+function cleanMajorChunk(raw) {
+  return String(raw ?? '')
+    .trim()
+    .replace(/^(the|a|an)\s+/i, '')
+    .replace(/\s+major$/i, '')
+    .replace(/\b\d{3,4}\b.*$/, '')
+    .replace(/\b(?:gpa|sat|act)\b.*$/i, '')
+    .trim()
+}
+
+function addFreeformMajors(notes, criteria, matchedValues) {
+  const cues = [
+    /interested in ([^.,;\n]+)/gi,
+    /wants to (?:study|major in|pursue) ([^.,;\n]+)/gi,
+    /aiming for (?:a |an )?([^.,;\n]+)/gi,
+    /\bmajoring in ([^.,;\n]+)/gi,
+    /\b([A-Za-z][A-Za-z\s]{1,28}) major\b/gi,
+  ]
+  for (const re of cues) {
+    for (const m of notes.matchAll(re)) {
+      const chunk = cleanMajorChunk(m[1])
+      if (!chunk || /close to home|financial aid|staying|going far|full ride/i.test(chunk)) continue
+      const knownWhole = canonicalProgram(chunk)
+      const pieces =
+        knownWhole && LABEL_FOR[knownWhole]
+          ? [chunk]
+          : chunk.split(/\s+and\s+|\s+or\s+/i).map((p) => cleanMajorChunk(p)).filter(Boolean)
+      for (const part of pieces) {
+        if (/close to home|financial aid|staying|full ride/i.test(part)) continue
+        const known = canonicalProgram(part)
+        if (known && LABEL_FOR[known]) {
+          if (matchedValues.has(known)) continue
+          matchedValues.add(known)
+          criteria.push(
+            makeCriterion(
+              'academic_interest',
+              LABEL_FOR[known],
+              known,
+              'low',
+              part,
+              'required',
+              PROGRAM_UNDERSTOOD[known] ?? LABEL_FOR[known]
+            )
+          )
+          continue
+        }
+        const slug = slugFromPhrase(part)
+        if (!slug || slug.length < 3 || NOT_A_MAJOR.has(slug) || matchedValues.has(slug)) continue
+        matchedValues.add(slug)
+        const label = humanizeSlug(slug)
+        criteria.push(
+          makeCriterion(
+            'academic_interest',
+            label,
+            slug,
+            'low',
+            part,
+            'required',
+            `${label} is the academic focus for this search.`
+          )
+        )
+      }
+    }
+  }
+}
+
 const PROGRAM_UNDERSTOOD = {
   art: 'Art is the academic focus — prioritize schools with a real studio or fine-arts program.',
+  performing_arts: 'Acting and entertainment are the academic focus — look for theatre, film, or performing-arts programs.',
   design: 'Design is the academic focus for this search.',
   marine_biology: 'Marine biology is the academic focus for this search.',
   computer_science: 'Computer science is the academic focus for this search.',
@@ -54,6 +161,7 @@ const PROGRAM_UNDERSTOOD = {
   environmental_science: 'Environmental science is the academic focus for this search.',
   agriculture: 'Agriculture is the academic focus for this search.',
   law: 'Looking for colleges with a path toward law, including pre-law advising and related majors.',
+  political_science: 'Political science is the academic focus — look for government, politics, or public-policy programs.',
 }
 
 let nextId = 1
@@ -115,6 +223,15 @@ function parseGpa(notes) {
   return dotted ? Number(dotted[1]) : null
 }
 
+export function parseListSize(notes) {
+  const m =
+    String(notes ?? '').match(/\b(\d{1,2})\s*(?:colleges|schools|universities)\b/i) ||
+    String(notes ?? '').match(/\blist of\s+(\d{1,2})\b/i)
+  const n = m ? Number(m[1]) : null
+  if (n >= 6 && n <= 24) return n
+  return null
+}
+
 function parseName(notes) {
   const named = notes.match(/\bnamed\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/)
   if (named) return named[1]
@@ -132,7 +249,7 @@ export function extractFallback(notes) {
   const unresolved = []
 
   const hedge = notes.match(/may change|might change|undecided|change direction|but not sure|\bnot sure\b/i)
-  const SUBSUMED_BY = { biology: 'marine_biology' }
+  const SUBSUMED_BY = { biology: 'marine_biology', art: 'performing_arts' }
   const matchedValues = new Set()
   for (const [re, value] of INTEREST_KEYWORDS) {
     const m = notes.match(re)
@@ -199,7 +316,10 @@ export function extractFallback(notes) {
         'Law here means an undergraduate law-related major from a published catalog. A JD is graduate school and is not the filter.'
       )
     }
+    matchedValues.add('law')
   }
+
+  addFreeformMajors(notes, criteria, matchedValues)
 
   if (sat != null) {
     const satPhrase = notes.match(/\bsat[^.]{0,24}\d{3,4}/i) || notes.match(/\b1[0-6]\d{2}\s*SAT\b/i) || String(sat)
@@ -272,7 +392,36 @@ export function extractFallback(notes) {
       )
     )
   }
-  const basketball = notes.match(/basketball|athletics|sports/i)
+  const robotics = notes.match(/robotics(?:\s+club)?/i)
+  if (robotics) {
+    criteria.push(
+      makeCriterion(
+        'other',
+        'Robotics club',
+        'robotics',
+        'low',
+        robotics[0],
+        'preferred',
+        'Look for an active robotics club or competitive robotics team.'
+      )
+    )
+  }
+  const football = notes.match(/plays football|\bfootball\b/i)
+  if (football) {
+    criteria.push(
+      makeCriterion(
+        'other',
+        'Plays football',
+        'football',
+        'low',
+        football[0],
+        'preferred',
+        'Football is part of campus fit — confirm a team or club program with the school.'
+      )
+    )
+    unresolved.push('Athletics are not in the federal snapshot — confirm football with the school.')
+  }
+  const basketball = notes.match(/\bbasketball\b/i)
   if (basketball) {
     criteria.push(
       makeCriterion(
@@ -285,7 +434,7 @@ export function extractFallback(notes) {
         'Athletics matter, especially basketball — confirm sports on campus.'
       )
     )
-    unresolved.push('Athletics are not in the federal snapshot — confirm campus sports with the school.')
+    if (!football) unresolved.push('Athletics are not in the federal snapshot — confirm campus sports with the school.')
   }
   const noEc = notes.match(/no extra[\s-]?curriculars|no extracurriculars|no activities/i)
   if (noEc) {
@@ -348,9 +497,9 @@ export function extractFallback(notes) {
     notes.match(
       /aren'?t too far from home|near home|close to home|stay in state|not too far|stay close|doesn'?t want to go far/i
     )
-  if (state || driving || nearHome || farFrom) {
+  if (driving || nearHome || farFrom) {
     const maxMiles = driving ? 180 : nearHome ? 300 : null
-    const phrase = farFrom ? farFrom[0] : driving ? driving[0] : nearHome ? nearHome[0] : state.phrase
+    const phrase = farFrom ? farFrom[0] : driving ? driving[0] : nearHome[0]
     let label = `Home state: ${state ? STATE_NAMES[state.abbr] : 'unknown'}`
     let understood = state
       ? `Home state is ${STATE_NAMES[state.abbr]}, which is the starting point for distance.`
@@ -376,7 +525,7 @@ export function extractFallback(notes) {
         understood
       )
     )
-    if ((driving || nearHome || farFrom) && !state) {
+    if (!state) {
       unresolved.push('Set home state below — distance needs a starting point.')
     }
     if (farFrom && state) {
@@ -385,7 +534,7 @@ export function extractFallback(notes) {
   }
 
   const aidMatch = notes.match(
-    /needs strong financial support|financial aid|needs aid|low income|pell|can'?t afford|scholarship|aid needed/i
+    /needs strong financial support|financial aid|needs aid|low income|pell|can'?t afford|scholarship|aid needed|\$0(?:\s*EFC)?|\bEFC\b|cannot take (?:on )?loans|can'?t take (?:on )?loans|\bno loans\b|meet(?:s)? full need|demonstrated need|expected contribution is \$0/i
   )
   if (aidMatch) {
     criteria.push(
@@ -427,18 +576,34 @@ export function extractFallback(notes) {
     )
   }
 
-  if (!matchedValues.size && !law) {
-    unresolved.push('No major in this snapshot was detected. Use “Add a criterion” and pick a program, or the list will not filter by major.')
+  if (!criteria.some((c) => c.category === 'academic_interest')) {
+    unresolved.push('No major was detected. Use “Add a criterion” and pick or name a program, or the list will not filter by major.')
   }
-  if (!state && !driving && !nearHome && !farFrom) unresolved.push('No home state detected; distance cannot be estimated.')
   if (sat == null && act == null) {
     unresolved.push('No test score detected; academic strength will use GPA only, at limited evidence.')
+  }
+
+  const listSize = parseListSize(notes)
+  if (listSize != null) {
+    const phrase = notes.match(/\b\d{1,2}\s*(?:colleges|schools|universities)\b/i) || notes.match(/\blist of\s+\d{1,2}\b/i)
+    criteria.push(
+      makeCriterion(
+        'other',
+        `List of ${listSize} schools`,
+        listSize,
+        'low',
+        phrase ? phrase[0] : String(listSize),
+        'required',
+        `Keep ${listSize} schools on the list unless the counselor cuts it.`
+      )
+    )
   }
 
   return {
     student_name: parseName(notes),
     academic: { gpa, sat, act, rigor_notes: null },
     home_state: state?.abbr ?? null,
+    list_size: listSize,
     criteria,
     affordability_signal: {
       aid_needed: Boolean(aidMatch),
@@ -457,8 +622,9 @@ function canonicalProgram(raw) {
   const words = s.replace(/_/g, ' ')
   const byLabel = PROGRAM_CHOICES.find((p) => p.label.toLowerCase() === words)
   if (byLabel) return byLabel.value
+  if (/acting|actor|actress|theatre|theater|\bdrama\b|performing|entertainment|\bfilm\b/.test(words)) return 'performing_arts'
   if (/design/.test(words)) return 'design'
-  if (/\bart/.test(words) && !/martial/.test(words)) return 'art'
+  if (/\bart\b/.test(words) && !/martial/.test(words)) return 'art'
   if (/computer|programming|coding|software/.test(words)) return 'computer_science'
   if (/marine|ocean/.test(words)) return 'marine_biology'
   if (/nurs/.test(words)) return 'nursing'
@@ -468,6 +634,7 @@ function canonicalProgram(raw) {
   if (/educat|teach/.test(words)) return 'education'
   if (/agricult/.test(words)) return 'agriculture'
   if (/\blaw\b/.test(words) || /pre_?law/.test(s)) return 'law'
+  if (/politic|public policy|international relations|government/.test(words)) return 'political_science'
   if (/\bbio/.test(words)) return 'biology'
   return null
 }
@@ -478,7 +645,7 @@ function looksFarFromHome(c) {
   return /(?<!too )far from home|away from home|out of state|leave (the )?state/i.test(blob)
 }
 
-function normalizeAiExtraction(data, notes) {
+export function normalizeAiExtraction(data, notes) {
   const fallback = extractFallback(notes)
   const home =
     typeof data.home_state === 'string' && data.home_state.length === 2
@@ -491,7 +658,13 @@ function normalizeAiExtraction(data, notes) {
     if (prog) {
       next.category = 'academic_interest'
       next.value = prog
-      next.label = LABEL_FOR[prog] ?? next.label
+      next.label = LABEL_FOR[prog] ?? humanizeSlug(prog)
+    } else if (c.category === 'academic_interest') {
+      const slug = slugFromPhrase(c.value || c.label)
+      if (slug && slug.length >= 3 && !NOT_A_MAJOR.has(slug)) {
+        next.value = slug
+        next.label = LABEL_FOR[slug] ?? (typeof c.label === 'string' && c.label.trim() ? c.label : humanizeSlug(slug))
+      }
     }
     const geoObject = c.value && typeof c.value === 'object'
     if (c.category === 'geography' || looksFarFromHome(c) || geoObject?.prefer_far || geoObject?.home_state || geoObject?.max_miles != null) {
@@ -527,7 +700,21 @@ function normalizeAiExtraction(data, notes) {
   }
 
   const fbArt = fallback.criteria.find((c) => c.value === 'art')
-  if (fbArt && !criteria.some((c) => c.value === 'art')) criteria.push({ ...fbArt, id: `fb-${fbArt.id}` })
+  if (fbArt && !criteria.some((c) => c.value === 'art' || c.value === 'performing_arts')) {
+    criteria.push({ ...fbArt, id: `fb-${fbArt.id}` })
+  }
+  const fbStage = fallback.criteria.find((c) => c.value === 'performing_arts')
+  if (fbStage && !criteria.some((c) => c.value === 'performing_arts')) {
+    criteria.push({ ...fbStage, id: `fb-${fbStage.id}` })
+  }
+  const fbPolitics = fallback.criteria.find((c) => c.value === 'political_science')
+  if (fbPolitics && !criteria.some((c) => c.value === 'political_science')) {
+    criteria.push({ ...fbPolitics, id: `fb-${fbPolitics.id}` })
+  }
+  for (const fb of fallback.criteria.filter((c) => c.category === 'academic_interest')) {
+    if (criteria.some((c) => c.category === 'academic_interest' && c.value === fb.value)) continue
+    criteria.push({ ...fb, id: `fb-${fb.id}` })
+  }
 
   const fbFar = fallback.criteria.find((c) => c.category === 'geography' && c.value?.prefer_far)
   if (fbFar) {
@@ -545,9 +732,15 @@ function normalizeAiExtraction(data, notes) {
     }
   }
 
+  const fbSize = fallback.criteria.find((c) => c.label?.startsWith('List of ') && typeof c.value === 'number')
+  if (fbSize && !criteria.some((c) => typeof c.value === 'number' && c.label?.startsWith('List of '))) {
+    criteria.push({ ...fbSize, id: `fb-${fbSize.id}` })
+  }
+
   return {
     ...data,
     home_state: home,
+    list_size: fallback.list_size ?? data.list_size ?? null,
     academic: {
       gpa: data.academic?.gpa ?? fallback.academic?.gpa,
       sat: data.academic?.sat ?? fallback.academic?.sat,

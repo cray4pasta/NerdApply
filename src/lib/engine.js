@@ -160,9 +160,10 @@ function dimensionContributions(school, ctx) {
         if (burden.miles > 350) base = 25
         else if (burden.miles > 180) base = 12
         else if (burden.miles > 60) base = 4
-      } else if (geoCriterion.value?.max_miles && burden.miles <= geoCriterion.value.max_miles) base = 25
-      else if (burden.miles < 300) base = 12
-      else if (burden.text?.includes('direct flight')) base = 6
+      } else if (geoCriterion.value?.max_miles != null && burden.miles <= geoCriterion.value.max_miles) {
+        // Only score closeness when the notes asked for it — a home state is not a distance cap.
+        base = 25
+      }
       proximityPoints = base * strengthOf(geoCriterion)
     }
   }
@@ -247,13 +248,24 @@ export function topMatchingDimensions(school, ctx, n = 3) {
     .slice(0, n)
 }
 
-// 7.7 — selection. 2-3 Likely, 3-4 Target, 2-3 Reach, 8-10 total. Never silently pad.
-function selectSchools(scored) {
+function bandTargets(want) {
+  const likely = Math.max(2, Math.round(want * 0.3))
+  const target = Math.max(3, Math.round(want * 0.4))
+  const reach = Math.max(2, want - likely - target)
+  return { Likely: likely, Target: target, Reach: reach }
+}
+
+// 7.7 — selection. Default 2-3 Likely, 3-4 Target, 2-3 Reach, 8-10 total.
+// If the notes asked for a list size, fill to that count from remaining inventory.
+function selectSchools(scored, listSize) {
   const byBand = { Likely: [], Target: [], Reach: [] }
   for (const s of scored) byBand[s.admissions.band].push(s)
   for (const band of Object.keys(byBand)) byBand[band].sort((a, b) => b.fit - a.fit)
 
-  const targetCounts = { Likely: 3, Target: 4, Reach: 3 }
+  const asked = typeof listSize === 'number' && listSize >= 6 && listSize <= 24
+  const minTotal = asked ? listSize : 8
+  const maxTotal = asked ? listSize : 10
+  const targetCounts = asked ? bandTargets(listSize) : { Likely: 3, Target: 4, Reach: 3 }
   const minCounts = { Likely: 2, Target: 3, Reach: 2 }
   const selected = { Likely: [], Target: [], Reach: [] }
 
@@ -263,25 +275,23 @@ function selectSchools(scored) {
 
   let total = () => selected.Likely.length + selected.Target.length + selected.Reach.length
 
-  // Top up toward 8-10 from whichever band has spare inventory, if a band came up short.
   const order = ['Target', 'Likely', 'Reach']
-  while (total() < 8) {
+  while (total() < minTotal) {
     let added = false
     for (const band of order) {
-      if (selected[band].length < byBand[band].length && selected[band].length < targetCounts[band] + 2) {
+      if (selected[band].length < byBand[band].length) {
         const next = byBand[band][selected[band].length]
         if (next) {
           selected[band].push(next)
           added = true
-          if (total() >= 10) break
+          if (total() >= maxTotal) break
         }
       }
     }
     if (!added) break
   }
 
-  // Trim from the top of the max range if we overshot.
-  while (total() > 10) {
+  while (total() > maxTotal) {
     if (selected.Reach.length > minCounts.Reach) selected.Reach.pop()
     else if (selected.Target.length > minCounts.Target) selected.Target.pop()
     else if (selected.Likely.length > minCounts.Likely) selected.Likely.pop()
@@ -317,7 +327,16 @@ function selectSchools(scored) {
 
 // Entry point. Takes the confirmed criteria, affordability inputs, and priority order from
 // screens 2 and 3, and returns the finished 8-10 school list with every label already computed.
-export function buildList({ schools, criteria, income_band, max_out_of_pocket, home_state, academic, priorityOrder }) {
+export function buildList({
+  schools,
+  criteria,
+  income_band,
+  max_out_of_pocket,
+  home_state,
+  academic,
+  priorityOrder,
+  listSize,
+}) {
   const knownPrograms = new Set(schools.flatMap((s) => s.programs ?? []))
   const interestPrograms = criteria
     .filter(
@@ -392,7 +411,7 @@ export function buildList({ schools, criteria, income_band, max_out_of_pocket, h
     return { ...school, admissions, affordability, travel: burden, fit, totalAnnualCost }
   })
 
-  return selectSchools(scored)
+  return selectSchools(scored, listSize)
 }
 
 export { DIMENSIONS }

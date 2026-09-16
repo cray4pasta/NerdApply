@@ -38,8 +38,33 @@
     break-inside: avoid;
   }
 
-  .page-2 {
-    break-before: page;
+  .print-sheet {
+    break-after: page;
+    box-shadow: none;
+    width: auto !important;
+    border: none;
+  }
+
+  .print-preview-toolbar {
+    display: none !important;
+  }
+
+  body:has(.print-preview-root) .history-pane,
+  body:has(.print-preview-root) .history-resize {
+    display: none !important;
+  }
+
+  .print-preview-root {
+    position: static;
+    background: var(--surface);
+    overflow: visible;
+    height: auto;
+  }
+
+  .print-preview-root > div:last-child {
+    overflow: visible;
+    display: block;
+    height: auto;
   }
 
   h1,

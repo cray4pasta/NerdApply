@@ -24,8 +24,8 @@
   --brand-hover: #4d4d85;
   --brand-tint: #efeff6;
 
-  /* app chrome — barely-there cool tint so cards separate from the page without a new hue */
-  --paper: #f7f7fa;
+  /* app chrome — page fill from the empty-state design */
+  --paper: #fafafa;
 
   /* semantic flag — the only warm value in the system, reserved for Needs Review + warnings */
   --flag: #9c5a3c;
@@ -71,28 +71,98 @@
   --width-history: 272px; /* added: past-conversations rail default */
   --width-history-min: 272px; /* added: sidebar resize floor — names must fit */
   --width-history-max: 480px; /* added: sidebar resize ceiling */
-  --width-resize: var(--space-2); /* added: drag handle between sidebar and chat */
+  --width-resize: var(--space-hit); /* drag handle hit area; the painted line is --bw-hairline */
   --height-composer-max: 240px; /* added: composer auto-grow cap */
-  --width-notes-entry: 600px; /* added: empty-state composer from design 1a */
+  --width-notes-entry: 600px; /* added: empty-state composer and criteria popup from design 1a */
   --height-notes-entry: 103px; /* added: design 1a textarea; off-grid like --text-15 */
   --height-create: 33px; /* added: Create control row; design 1a, off-grid */
+  --height-criteria-row: 64px; /* added: row-out collapse height */
+  --col-phrase: 232px; /* added: From this phrase column */
+  --col-actions: 56px; /* added: criteria row delete column */
+  --width-you: 80%; /* added: counselor note bubble in the reading thread */
+  --space-dock: 12px; /* added: gap between criteria popup and composer */
+  --icon-pencil: 13px; /* added: criteria header pencil; off-grid */
+  --icon-xs: 12px; /* added: list table column-remove; post-criteria handoff */
+  --icon-compact: 14px; /* added: add-column plus and popover close */
+  --rail: #eff0f2; /* added: empty dots, drag-over, menu hover */
+  --desk: #eeeef2; /* added: print preview desk */
+  --band-target: #2f6b46; /* added: Target band text */
+  --band-reach: #8a6412; /* added: Reach band and unverified values */
+  --cost-over: #8a4f33; /* added: over-cap cost figures */
+  --space-hit: 4px; /* added: column-X hit padding; post-criteria 4px step */
+  --space-dot: 6px; /* added: 256-dot field gap */
+  --space-prose: 20px; /* added: composer side pad, rank column, sheet lists */
+  --width-oop: 140px; /* added: max out-of-pocket field */
+  --width-ask: 300px; /* added: per-row ask popover */
+  --width-add-menu: 320px; /* added: add-column menu */
+  --width-sheet: 816px; /* added: letter preview at 96dpi */
+  --sheet-pad-x: 64px; /* added: letter sheet side pad, 0.67in at 96dpi */
+  --sheet-pad-y: 56px; /* added: letter sheet top/bottom pad */
+  --col-basis-kind: 96px; /* added: Required/Distance/Money/Mix labels */
+  --width-select-pad: 40px; /* added: custom select chevron inset */
+  --col-list-name: 180px;
+  --col-list-band: 70px;
+  --col-list-cost: 140px;
+  --col-list-distance: 100px;
+  --col-list-rate: 90px;
+  --col-list-rationale: 130px;
+  --col-list-extra: 150px;
+  --print-col-band: 72px;
+  --print-col-cost: 96px;
+  --print-col-distance: 120px;
+  --print-col-rate: 110px;
+  --print-col-rationale: 180px;
+  --print-col-extra: 120px;
+  --shadow-drag: 0 1px 8px color-mix(in srgb, var(--ink) 12%, transparent);
+  --shadow-sticky: -8px 0 12px -8px color-mix(in srgb, var(--ink) 12%, transparent);
+  --shadow-popover: 0 8px 24px color-mix(in srgb, var(--ink) 14%, transparent);
+  --shadow-sheet: 0 1px 4px color-mix(in srgb, var(--ink) 6%, transparent);
+  --motion-card-in: 12px;
+  --dot-scale-off: 0.62;
+  --duration-card-in: 280ms;
+  --duration-card-in-sm: 160ms;
+  --duration-card-in-lg: 320ms;
+  --duration-scroll: 560ms;
+  --duration-dot: 180ms;
+  --duration-drag: 160ms;
+  --duration-lookup: 1.4s;
+  --duration-build-tick: 150ms;
+  --duration-build-loop: 5s;
+  --opacity-dimmed: 0.5;
+  --z-row: 1;
+  --z-ask-row: 100;
+  --z-sticky: 150;
+  --z-ask: 200;
+  --z-menu: 220;
+  --z-preview: 400;
+  --scroll-edge: 80px;
   --duration-ph: 3.5s; /* added: rotating empty-state prompt */
   --duration-btn-in: 240ms; /* added: Create button enter */
+  --duration-row-in: 260ms; /* added: criteria row resolve */
+  --duration-row-out: 320ms; /* added: criteria row delete */
+  --duration-pulse-dim: 1.6s; /* added: live status line */
   --ease-enter: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --motion-ph-from: 10px; /* added: prompt enter; design 1a */
   --motion-ph-to: 14px; /* added: prompt exit; design 1a */
   --motion-btn-from: var(--space-1); /* added: Create button enter distance */
+  --motion-row-in: 6px; /* added: criteria row enter */
+  --motion-row-out: var(--space-4); /* added: criteria row delete slide */
   --print-margin-y: 0.6in;
   --print-margin-x: 0.75in;
   --duration-status: 1.2s; /* added: pulse on the current progress step */
 
   /* type scale — primitives. Roles below alias these; do not invent a third set of sizes. */
+  --text-11: 11px; /* added: print sheet captions */
   --text-12: 12px;
+  --text-13: 13px; /* added: print sheet body */
   --text-14: 14px;
   --text-15: 15px;
   --text-16: 16px;
   --text-18: 18px;
+  --text-20: 20px; /* added: print summary title */
   --text-22: 22px;
+  --text-24: 24px; /* added: build-progress count */
   --text-28: 28px;
   --text-40: 40px;
 
@@ -109,7 +179,7 @@
   /* letter-spacing — small uppercase labels per docs/03-DESIGN.md "Type" section */
   --tracking-label: 0.08em;
 
-  /* Lucide — 16/20/24 only. Stroke is viewBox units so it scales with size. */
+  /* Lucide — 16/20/24 plus the two post-criteria exceptions. Stroke is viewBox units so it scales with size. */
   --icon-sm: 16px;
   --icon-md: 20px;
   --icon-lg: 24px;

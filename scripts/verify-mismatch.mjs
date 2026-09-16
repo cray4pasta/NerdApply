@@ -112,4 +112,54 @@ assert.equal(
   'unknown enrollment must not count as small'
 )
 
+const nearPa = {
+  ...openDesign,
+  id: 'near-pa',
+  name: 'Near PA Design',
+  state: 'PA',
+  lat: 40.0,
+  lon: -77.0,
+}
+const noDistanceCtx = {
+  criteria: [{ id: 'c1', category: 'academic_interest', value: 'design', strength: 'required' }],
+  admissions: { band: 'Likely' },
+  affordability: { band: 'Unknown', netPrice: null },
+  priorityOrder: ['proximity', 'program', 'affordability', 'admissions_realism', 'environment', 'support'],
+  ceiling: 25000,
+}
+assert.equal(
+  topMatchingDimensions(nearPa, noDistanceCtx, 6).some((match) => match.dim === 'proximity'),
+  false,
+  'no distance mention must not score closeness'
+)
+assert.equal(
+  topMatchingDimensions(
+    nearPa,
+    {
+      ...noDistanceCtx,
+      criteria: [
+        ...noDistanceCtx.criteria,
+        { id: 'g1', category: 'geography', value: { home_state: 'PA', max_miles: null, prefer_far: false }, strength: 'preferred' },
+      ],
+    },
+    6
+  ).some((match) => match.dim === 'proximity'),
+  false,
+  'home state alone must not score closeness'
+)
+assert.equal(
+  topMatchingDimensions(
+    nearPa,
+    {
+      ...noDistanceCtx,
+      criteria: [
+        { id: 'g2', category: 'geography', value: { home_state: 'PA', max_miles: 300, prefer_far: false }, strength: 'preferred' },
+      ],
+    },
+    6
+  ).some((match) => match.dim === 'proximity'),
+  true,
+  'close-to-home cap should score nearby schools'
+)
+
 console.log('verify-mismatch ok')
